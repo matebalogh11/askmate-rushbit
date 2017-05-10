@@ -2,42 +2,42 @@
 {% extends "layout.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h2>Question:</h2>
-<h3>{{ question_id }} - {{ question[4] }}</h3>
-<form action="">
-    <p>
-        <input type="submit" value="Edit question" name="submit1" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
-    </p>
-    <p>
-        <input type="submit" value="Delete question" name="submit2" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
-    </p>
-    <p>
-        <input type="submit" value="Add answer" name="submit3" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
-    </p>
-</form>
-<a href="{{ url_for('vote', direction='up', question_id=question_id) }}">YES!</a>
-<a href="{{ url_for('vote', direction='down', question_id=question_id) }}">YES!</a>
-<button formaction="" type="submit">Edit</button>
-<button formaction="{{ url_for('delete_question') }}" type="submit">Delete</button><br>
-<button formaction="" type="submit">Upvote</button>
-<p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
-<h4> {{question[5] }} </h4>
-{% if question[6] %}
-    <img src="{{url_for('uploads', filename=question[6])}}">
-{% else %}
-    <p>!Placeholder image!</p>
-{% endif %}
+    <h1>Question: {{ question_id }}</h1>
+    <h2>Title: {{ question[4] }}</h2>
+    <form action="">
+        <p>
+            <input type="submit" value="Edit question" name="submit1" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
+        </p>
+        <p>
+            <input type="submit" value="Delete question" name="submit2" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
+        </p>
+        <p>
+            <input type="submit" value="Add answer" name="submit3" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
+        </p>
+    </form>
+    <a href="{{ url_for('vote', direction='up', question_id=question_id) }}">UP!</a>
+    <a href="{{ url_for('vote', direction='down', question_id=question_id) }}">DOWN!</a>
+    <p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
+    <h2>Descripton</h2>
+    <p>{{ question[5] }}</p>
+    {% if question[6] %}
+        <img src="{{ url_for('uploads', filename=question[6]) }}" alt="Image">
+    {% else %}
+        <p>PLACEHOLDER IMAGE</p>
+        <p>No image uploaded</p>
+    {% endif %}
+    <h2> Answers</h2>
 
-<br><h3> Answers: </h3>
-
-    {% for item in answers %}
-            <h4>{{ item[0] }} {{ item[4] }} </h4>
-            <p> Submission:{{ item[1] }} | Votes: {{ item[2] }}</p>
-            <button formaction="" type="submit" name="{{ item[0] }}">Upvote</button>
-            {% if item[5] %}
-                <img src="{{url_for('uploads', filename=item[5])}}">
-            {% else %}
-                <p>!Placeholder image!</p><br>
-            {% endif %}
-        {% endfor %}
+    {% for answer in answers %}
+        <h3>ID: {{ answer[0] }}</h3>
+        <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}">UP!</a>
+        <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}">DOWN!</a>
+        <p> Submission:{{ answer[1] }} | Votes: {{ answer[2] }}</p>
+        <p>Message: {{ answer[4] }}</p>
+        {% if answer[5] %}
+            <img src="{{ url_for('uploads', filename=answer[5]) }}">
+        {% else %}
+            <p>!Placeholder image!</p><br>
+        {% endif %}
+    {% endfor %}
 {% endblock %}

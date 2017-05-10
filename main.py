@@ -2,6 +2,7 @@
 import os
 import time
 from datetime import datetime
+from random import choice
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
@@ -19,8 +20,13 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def generate_id(table):
-    """Generate unique ID in the selected table."""
+def generate_id(table, prefix):
+    """Generate unique ID in the selected table.
+    @table list: 2D list generated from CSV.
+    @prefix string: either has the value of 'q' or 'a' to avoid identical IDs in 2 tables,
+    which could cause trouble in saving files to uploads folder.
+    @return string: unique ID in table.
+    """
     lowerletters = list("abcdefghiklmnopqrstuvwxyz")
     upperletters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     decimals = list("0123456789")
@@ -28,9 +34,8 @@ def generate_id(table):
 
     valid_ID = False
     while not valid_ID:
-        generated_id = ("id_{}{}{}".format(random.choice(lowerletters),
-                                           random.choice(upperletters),
-                                           random.choice(decimals)))
+        generated_id = ("{}_id_{}{}{}".format(prefix, choice(lowerletters),
+                                              choice(upperletters), choice(decimals)))
         if generated_id not in used_IDs:
             valid_ID = True
     return generated_id
@@ -48,7 +53,7 @@ def ask_question():
         questions = read_csv('question.csv')
         intial_views = 0
         initial_votes = 0
-        new_question = [generate_id(questions), get_unix_timestamp(),
+        new_question = [generate_id(questions, 'q'), get_unix_timestamp(),
                         intial_views, initial_votes,
                         request.form['q_title'], request.form['q_desc']]
 
@@ -74,14 +79,14 @@ def ask_question():
         questions.append(new_question)
         write_csv('question.csv', questions)
 
-        return redirect(url_for('show_question_page'))
+        return redirect(url_for('show_question_page', question_id))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
 
     return redirect(url_for('show_question_list'))
 
 
-@app.route('/question/<question_id>/edit', methods=['POST'])
+@app.route('/question/<question_id>/post-edit', methods=['POST'])
 def edit_question(question_id):
     """Edit a question in question.csv and redirects to the question page.
     Image of a question can be deleted or a new one uploaded.
@@ -244,7 +249,7 @@ def add_answer(question_id):
 
     if len(request.form.get("message", 0)) >= 10:
         answers = read_csv("answer.csv")
-        answer_id = generate_id(answers)
+        answer_id = generate_id(answers, 'a')
         time = get_unix_timestamp()
         init_votes = 0
         message = request.form["message"]
@@ -325,9 +330,53 @@ def vote(direction, question_id=None, answer_id=None):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/answer/<answer_id>/del-img")
+@app.route("/question/<question_id>/del-img")
+def delete_image(question_id=None, answer_id=None):
+    """Delete image of selected question OR answer."""
+    if question_id:
+        questions = read_csv("question.csv")
+        for i, question in enumerate(questions):
+            if question[0] == question_id:
+                current_image = questions[i][6]
+                questions[i][6] = ""
+        write_csv("question.csv", questions)
+        os.remove("/uploads/" + current_image)
+        return redirect(url_for('show_edit_question_form', question_id=question_id))
+
+    elif answer_id:
+        answers = read_csv("answer.csv")
+        for i, answer in enumerate(answers):
+            if answer[0] == answer_id:
+                question_id = answer[3]
+                current_image = answers[i][5]
+                answers[i][5] = ""
+        write_csv("answer.csv", answers)
+        os.remove("/uploads/" + current_image)
+        return redirect(url_for('show_edit_answer_form', answer_id=answer_id))
+
+
+@app.route("/answer/<answer_id>/edit")
+def show_edit_answer_form(answer_id):
+    """Show the edit answer form.
+    Still has to be put into HTMLs.
+    """
+    return "Edit answer form - TO BE IMPLEMENTED"
+
+
+@app.route("/answer/<answer_id>/edit", methods=['POST'])
+def edit_answer(answer_id):
+    """This will do the action, to edit the answer based on filled answer editing form.
+    Still has to be put into HTMLs.
+    """
+    pass
+
+
 def sort_questions():
+    """To be broken down to different ones probably."""
     pass
 
 
 if __name__ == "__main__":
+    app.secret_key = os.urandom(12)
     app.run(debug=True, port=3000)
