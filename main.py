@@ -80,9 +80,19 @@ def delete_question(question_id):
     return redirect(url_for("show_question_list"))
 
 
-@app.route("/question/<question_id>/new-answer")
-def answer_question(question_id):  # REQUIRED
-    pass
+@app.route("/question/<question_id>/new-answer", methods=["GET", "POST"])
+def answer_question():
+    if request.method == "POST":
+        comment = request.form["answer"]
+        answer = [a_id, time, 0, question_id, comment]
+        if request.form["image"]:
+            answer.append(request.form["image"])
+        all_answers = read_csv("answer.csv")
+        all_answers.append(answer)
+        write_csv("answer.csv")
+        return redirect(url_for("show_question_page"))
+    else:
+        return render_template("a_form.html")
 
 
 @app.route("/answer/<answer_id>/delete")
