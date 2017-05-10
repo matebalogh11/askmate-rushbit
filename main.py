@@ -1,71 +1,226 @@
-from flask import Flask, redirect, request, url_for, render_template
+
+import os
+import time
+from datetime import datetime
+
+from flask import Flask, flash, redirect, render_template, request, url_for
+from werkzeug.utils import secure_filename
+
 from data_manager import read_csv, write_csv
 
 app = Flask(__name__)
 
 
-# Common functions
-def sort_questions():
-    pass
+def allowed_file(filename):
+    """Takes a filename and validates by extension.
+    @filename string: filename string.
+    """
+    ALLOWED_EXTENSIONS = ['jpeg', 'jpg', 'png', 'gif']
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def importdata(filename):
-    pass
+def generate_id(table):
+    """Generate unique ID in the selected table."""
+    lowerletters = list("abcdefghiklmnopqrstuvwxyz")
+    upperletters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    decimals = list("0123456789")
+    used_IDs = [row[0] for row in table]
+
+    valid_ID = False
+    while not valid_ID:
+        generated_id = ("id_{}{}{}".format(random.choice(lowerletters),
+                                           random.choice(upperletters),
+                                           random.choice(decimals)))
+        if generated_id not in used_IDs:
+            valid_ID = True
+    return generated_id
 
 
-def exportdata(filename):
-    pass
+def get_unix_timestamp():
+    """Gets current time as Unix timestamp."""
+    return time.time()
 
 
-# Routing
+@app.route('/new-question/post', methods=['POST'])
+def ask_question():
+    """Post a new question."""
+    if len(request.form.get('q_title', 0)) >= 10 and len(request.form.get('q_desc', 0)) >= 10:
+        questions = read_csv('question.csv')
+        intial_views = 0
+        initial_votes = 0
+        new_question = [generate_id(questions), get_unix_timestamp(),
+                        intial_views, initial_votes,
+                        request.form['q_title'], request.form['q_desc']]
+
+        question_id = new_question[0]
+        image = request.files.get('q_image', None)
+        if image and image.filename:
+            # Allowing only certain extensions:
+            if allowed_file(image.filename):
+                # Making sure that filename is secure:
+                filename = question_id + "_" + secure_filename(image.filename)
+                path_with_filename = "uploads/" + filename
+                # Save file to Uploads folder:
+                image.save(path_with_filename)
+                # Append to new question to be added to CSV:
+                new_question.append(filename)
+            else:
+                new_question.append('')
+                flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+        else:
+            new_question.append('')
+
+        flash("Question posted.", "success")
+        questions.append(new_question)
+        write_csv('question.csv', questions)
+
+        return redirect(url_for('show_question_page'))
+
+    flash("Title and description must be filled and at least 10 characters long.", "error")
+
+    return redirect(url_for('show_question_list'))
+
+
+@app.route('/question/<question_id>/edit', methods=['POST'])
+def edit_question(question_id):
+    """Edit a question in question.csv and redirects to the question page.
+    Image of a question can be deleted or a new one uploaded.
+    Uploading a new image overwrites path in question.csv, deletes old file, saves new file.
+    """
+    if len(request.form.get('q_title', 0)) >= 10 and len(request.form.get('q_desc', 0)) >= 10:
+        questions = read_csv('question.csv')
+        for i, question in enumerate(questions):
+            if question[0] == question_id:
+                selected_question_index = i
+                current_id = question[0]
+                current_timestamp = question[1]
+                current_views = question[2]
+                current_votes = question[3]
+                current_image = question[6]
+                break
+        else:
+            flash("Question ID does not exist. Please use the GUI to navigate.", "error")
+            return redirect(url_for('show_question_list'))
+
+        edited_question = [current_id, current_timestamp,
+                           current_views, current_votes,
+                           request.form['q_title'], request.form['q_desc'], current_image]
+
+        image = request.files.get('q_image', None)
+        if image and image.filename:
+            # Allowing only certain extensions:
+            if allowed_file(image.filename):
+                filename = current_id + "_" + secure_filename(image.filename)
+                path_with_filename = "uploads/" + filename
+                image.save(path_with_filename)
+
+                # If there is a previous image:
+                if current_image:
+                    os.remove("/uploads/" + current_image)
+
+                edited_question[6] = filename
+
+            else:
+                flash("File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+
+        flash("Question edited.", "success")
+
+        # Overwrite question line in CSV, which was selected for editing:
+        questions[selected_question_index] = edited_question
+        write_csv('question.csv', questions)
+        return redirect(url_for('show_question_page'), question_id=question_id)
+
+    flash("Title and description must be filled and at least 10 characters long.", "error")
+
+    return redirect(url_for('show_question_list'))
+
+
+def convert_unix(unix_timestamp):
+    """Converts Unix timestamp to human readable format.
+    @unixtime int: Unix time running total of seconds.
+    @return string: human readable timestamp as example: Apr 28 - 18:49
+    """
+    return '{:%Y %b %d - %H:%M}'.format(datetime.fromtimestamp(unix_timestamp))
+
+
 @app.route("/")
-@app.route("/list")
-def show_question_list():  # REQUIRED
-    """ Displays list of questions as a table and an 'Ask a question' button. """
-
+@app.route("/list/")
+def show_question_list():
+    """Display list of questions as a table and an 'Ask a question' button."""
     questions = data_manager.read_csv("question.csv")
-
+    # Sort questions to display most recent on top:
+    questions = sorted(questions, key=lambda x: x[1], reverse=True)
+    # Convert all timestamps to human readable form:
+    for i, question in enumerate(questions):
+        questions[i][1] = convert_unix(questions[i][1])
     return render_template("list.html", questions=questions, title="Questions")
 
 
 @app.route("/new-question/")
-def show_new_question_form():  # REQUIRED
-    title = "Ask a new question"
+def show_new_question_form():
+    """View function of new question form."""
+    title = "Ask New Question"
     return render_template("q_form.html", title=title)
 
 
-@app.route("/question/<question_ID>")
-def show_question_page(question_ID):  # REQUIRED
-    q_data = read_csv("question.csv")
-    a_data = read_csv("answer.csv")
+@app.route("/question/<question_id>/new-answer")
+def show_new_answer_form(question_id):
+    """View function of new answer form."""
+    title = "Add new answer to question: {}".format(question_id)
+    return render_template("a_form.html", title=title)
 
-    answers = [item for item in a_data if question_ID in item]
+
+@app.route("/question/<question_id>")
+def show_question_page(question_id):
+    """View function of question page, with details and answers."""
+    questions = read_csv("question.csv")
+    # Redirect to list if ID is not found in table:
+    validate_id(question_id, questions)
+
+    answers = read_csv("answer.csv")
+    answers = [item for item in answers if question_id == item[3]]
     answers = sorted(answers, key=lambda x: x[2], reverse=True)
-    for question in q_data:
-        if question[0] == question_ID:
-            return render_template("question.html", question_ID=question_ID, answers=answers, question=question,
-                                   title="AskMate - Question" + question_ID)
-    return "There is no such question."
+    answers = sorted(answers, key=lambda x: x[1], reverse=True)
+    for question in questions:
+        if question[0] == question_id:
+            return render_template("question.html", question_id=question_id, answers=answers,
+                                   question=question, title=("AskMate - Question" + question_id))
+
+
+def validate_id(id_, table):
+    """Redirect to list if ID is not found in table."""
+    id_list = [line[0] for line in table]
+    if id_ not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
 
 
 @app.route("/question/<question_id>/edit")
 def show_edit_question_form(question_id):
-    title = "Edit question"
-    questions = read_csv("questions.csv")
-    question_needed = question[int(question_id) - 1]
-    return render_template("q_form.html",
-                           title=title,
-                           question_needed=question_needed,
-                           question_id=question_id)
+    """View function of edit question form"""
+    questions = read_csv("question.csv")
+    # Redirect to list if ID is not found in table:
+    validate_id(question_id, questions)
+
+    for question in questions:
+        if question[0] == question_id:
+            selected_question = question
+            break
+
+    return render_template("q_form.html", title="Edit Question",
+                           selected_question=selected_question, question_id=question_id)
 
 
 @app.route("/question/<question_id>/delete")
 def delete_question(question_id):
-    """ Deletes question based on its question_id and corresponding answers
-    upon hitting delete button on a question page and redirects to the root page. """
+    """Delete question based on its question_id and corresponding answers
+    upon hitting delete button on a question page and redirects to the root page.
+    """
+    questions = read_csv("question.csv")
+    # Redirect to list if ID is not found in table:
+    validate_id(question_id, questions)
 
-    questions = data_manager.read_csv("question.csv")
-    answers = data_manager.read_csv("answer.csv")
+    answers = read_csv("answer.csv")
 
     for question in questions:
         if question[0] == question_id:
@@ -80,68 +235,98 @@ def delete_question(question_id):
     return redirect(url_for("show_question_list"))
 
 
-@app.route("/question/<question_id>/new-answer", methods=["GET", "POST"])
-def answer_question():
-    if request.method == "POST":
-        comment = request.form["answer"]
-        answer = [a_id, time, 0, question_id, comment]
-        if request.form["image"]:
-            answer.append(request.form["image"])
-        all_answers = read_csv("answer.csv")
-        all_answers.append(answer)
-        write_csv("answer.csv")
-        return redirect(url_for("show_question_page"))
-    else:
-        return render_template("a_form.html")
+@app.route("/question/<question_id>/new-answer", methods=["POST"])
+def add_answer(question_id):
+    """Add answer and redirect to question page."""
+    questions = read_csv("question.csv")
+    # Redirect to list if ID is not found in table:
+    validate_id(question_id, questions)
+
+    if len(request.form.get("message", 0)) >= 10:
+        answers = read_csv("answer.csv")
+        answer_id = generate_id(answers)
+        time = get_unix_timestamp()
+        init_votes = 0
+        message = request.form["message"]
+        new_answer = [answer_id, time, init_votes, question_id, message]
+
+        image = request.files.get('a_image', None)
+        if image and image.filename:
+            # Allowing only certain extensions:
+            if allowed_file(image.filename):
+                # Making sure that filename is secure:
+                filename = answer_id + "_" + secure_filename(image.filename)
+                path_with_filename = "uploads/" + filename
+                # Save file to Uploads folder:
+                image.save(path_with_filename)
+                # Append to new question to be added to CSV:
+                new_answer.append(filename)
+            else:
+                new_answer.append('')
+                flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+        else:
+            new_answer.append('')
+
+        flash("Answer posted.", "success")
+        answers.append(new_answer)
+        write_csv('answer.csv', answers)
+
+        return redirect(url_for('show_question_page'), question_id=question_id)
+
+    flash("Message must be filled and at least 10 characters long.", "error")
+
+    return redirect(url_for('show_question_list'))
 
 
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
-    """Deletes an answer based on its answer_id and returns to the 
-    corresponding questions page. """
-
-    answers = data_manager.read_csv("answer.csv")
-
-    for answer in answer:
+    """Delete an answer based on its answer_id and return to the
+    corresponding questions page.
+    """
+    answers = read_csv("answer.csv")
+    for answer in answers:
         if answer[0] == answer_id:
             answers.remove(answer)
             question_id = answer[3]
 
     write_csv("answer.csv", answers)
+    return redirect(url_for('show_question_page', question_id=question_id))
 
-    return redirect(url_for('show_question_page(question_id)'))
 
-
-@app.rout("/answer=<answer_id>/vote-<direction>")
-@app.route("/question/<question-id>/vote-<direction>")
+@app.route("/answer/<answer_id>/vote-<direction>")
+@app.route("/question/<question_id>/vote-<direction>")
 def vote(question_id=None, answer_id=None, direction):
-    """ Modifies number of votes of a given question or answer and
-    returns to the corresponding question_page. """
-
+    """Modifies number of votes of a given question or answer and
+    returns to the corresponding question_page.
+    """
     if question_id:
-        questions = data_manager.read_csv("question.csv")
-        for question in questions:
+        questions = read_csv("question.csv")
+        for i, question in enumerate(questions):
             if question[0] == question_id:
                 if direction == "up":
-                    question[3] += 1
+                    questions[i][3] += 1
                 elif direction == "down":
-                    question[3] -= 1
+                    questions[i][3] -= 1
 
         write_csv("question.csv", questions)
 
     elif answer_id:
-        answers = data_manager.read_csv("answer.csv")
-        for answer in answers:
+        answers = read_csv("answer.csv")
+        for i, answer in enumerate(answers):
             if answer[0] == answer_id:
                 question_id = answer[3]
                 if direction == "up":
-                    answer[2] += 1
+                    answers[i][2] += 1
                 elif direction == "down":
-                    answer[2] -= 1
+                    answers[i][2] -= 1
 
         write_csv("answer.csv", answers)
 
-    return redirect(url_for("show_question_page(question_id"))
+    return redirect(url_for('show_question_page', question_id=question_id))
+
+
+def sort_questions():
+    pass
 
 
 if __name__ == "__main__":
