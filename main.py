@@ -147,7 +147,7 @@ def convert_unix(unix_timestamp):
 @app.route("/list/")
 def show_question_list():
     """Display list of questions as a table and an 'Ask a question' button."""
-    questions = data_manager.read_csv("question.csv")
+    questions = read_csv("question.csv")
     # Sort questions to display most recent on top:
     questions = sorted(questions, key=lambda x: x[1], reverse=True)
     # Convert all timestamps to human readable form:
@@ -295,7 +295,7 @@ def delete_answer(answer_id):
 
 @app.route("/answer/<answer_id>/vote-<direction>")
 @app.route("/question/<question_id>/vote-<direction>")
-def vote(question_id=None, answer_id=None, direction):
+def vote(direction, question_id=None, answer_id=None):
     """Modifies number of votes of a given question or answer and
     returns to the corresponding question_page.
     """
@@ -330,4 +330,4 @@ def sort_questions():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=3000)
