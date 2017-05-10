@@ -1,9 +1,24 @@
-{% extends "layout.html" %}
-{% block content %}
 
-<h2> Question: </h2>
-<h3> {{ question_ID }} {{ question[4] }} </h3>
-<button formaction="" type="submit">Edit</button><button formaction="{{ url_for('delete_question') }}" type="submit">Delete</button><br>
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h2>Question:</h2>
+<h3>{{ question_id }} - {{ question[4] }}</h3>
+<form action="">
+    <p>
+        <input type="submit" value="Edit question" name="submit1" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
+    </p>
+    <p>
+        <input type="submit" value="Delete question" name="submit2" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
+    </p>
+    <p>
+        <input type="submit" value="Add answer" name="submit3" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
+    </p>
+</form>
+<a href="{{ url_for('vote', direction='up', question_id=question_id) }}">YES!</a>
+<a href="{{ url_for('vote', direction='down', question_id=question_id) }}">YES!</a>
+<button formaction="" type="submit">Edit</button>
+<button formaction="{{ url_for('delete_question') }}" type="submit">Delete</button><br>
 <button formaction="" type="submit">Upvote</button>
 <p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
 <h4> {{question[5] }} </h4>

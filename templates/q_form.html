@@ -1,40 +1,46 @@
+
 {% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-{% if id_number %}
-<h1>Edit questions <span class="question_id_in_head">#{{ id_number }}</span></h1>
-<form action="{{ url_for('edit_question') }}" method="POST">
-    <input type="hidden" name="question_id" value="{{ question_needed[0] }}" required>
-    <p>
-        <label for="q_title">Your question is:</label><br>
-        <input type="text" name="q_title" id="q_title" value="{{ question_needed[1] }}" required>
-    </p>
-    <p>
-        <label for="q_desc">Describe your problem: </label><br>
-        <textarea name="q_desc" id="q_desc"></textarea>
-    </p>
-    <p>
-        <label for="q_image" >
-        <input type="file" name="q_image" id="q_image">
-    </p>
+    {% if question_id %}
+    <h1>Edit question <span class="question_id_in_head">#{{ id_number }}</span></h1>
+    <form action="{{ url_for('edit_question', question_id=question_id) }}" method="POST">
+        <!-- <input type="hidden" name="question_id" value="{{ selected_question[0] }}" required> -->
+        <p>
+            <label for="q_title">Your question:</label><br>
+            <input type="text" name="q_title" id="q_title" value="{{ selected_question[4] }}" minlength="10" required>
+        </p>
+        <p>
+            <label for="q_desc">Description:</label><br>
+            <textarea name="q_desc" minlength="10" id="q_desc">{{ selected_question[5] }}</textarea>
+        </p>
+        <p>
+            <label for="q_image">Image upload:</label><br>
+            <input type="file" name="q_image" id="q_image">
+        </p>
+        <p>
+            <input type="submit" value="Edit question" name="submit" id="submit">
+        </p>
+    </form>
 
-</form>
-
-{% elif %}
-<h1>New question</h1>
-<form action="{{ url_for('ask_question') }}" method="POST">
-    <p>
-        <label for="q_title">Your question is:</label><br>
-        <input type="text" name="q_title" id="q_title" required>
-    </p>
-    <p>
-        <label for="q_desc">Describe your problem: </label><br>
-        <textarea name="q_desc" id="q_desc" required></textarea>
-    </p>
-    <p>
-        <label for="q_image" >
-        <input type="file" name="q_image" id="q_image">
-    </p>
-
-</form>
-{% endif %}
+    {% else %}
+    <h1>New question</h1>
+    <form action="{{ url_for('ask_question') }}" method="POST">
+        <p>
+            <label for="q_title">Your question:</label><br>
+            <input type="text" name="q_title" id="q_title" minlength="10" required>
+        </p>
+        <p>
+            <label for="q_desc">Description:</label><br>
+            <textarea name="q_desc" id="q_desc" minlength="10" required></textarea>
+        </p>
+        <p>
+            <label for="q_image">Image upload:</label><br>
+            <input type="file" name="q_image" id="q_image">
+        </p>
+        <p>
+            <input type="submit" value="Ask question" name="submit" id="submit">
+        </p>
+    </form>
+    {% endif %}
 {% endblock %}
