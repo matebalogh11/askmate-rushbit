@@ -21,7 +21,10 @@ def exportdata(filename):
 @app.route("/")
 @app.route("/list")
 def show_question_list():  # REQUIRED
+    """ Displays list of questions as a table and an 'Ask a question' button. """
+
     questions = data_manager.read_csv("question.csv")
+
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -58,16 +61,22 @@ def show_edit_question_form(question_id):
 
 @app.route("/question/<question_id>/delete")
 def delete_question(question_id):
+    """ Deletes question based on its question_id and corresponding answers
+    upon hitting delete button on a question page and redirects to the root page. """
+
     questions = data_manager.read_csv("question.csv")
     answers = data_manager.read_csv("answer.csv")
+
     for question in questions:
         if question[0] == question_id:
             questions.remove(question)
             for answer in answers:
                 if answer[3] == question_id:
                     answers.remove(answer)
+
     write_csv("question.csv", questions)
     write_csv("answer.csv", answers)
+
     return redirect(url_for("show_question_list"))
 
 
@@ -78,18 +87,51 @@ def answer_question(question_id):  # REQUIRED
 
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
+    """Deletes an answer based on its answer_id and returns to the 
+    corresponding questions page. """
+
     answers = data_manager.read_csv("answer.csv")
+
     for answer in answer:
         if answer[0] == answer_id:
             answers.remove(answer)
             question_id = answer[3]
+
     write_csv("answer.csv", answers)
+
     return redirect(url_for('show_question_page(question_id)'))
 
 
+@app.rout("/answer=<answer_id>/vote-<direction>")
 @app.route("/question/<question-id>/vote-<direction>")
-def vote(direction):
-    pass
+def vote(question_id=None, answer_id=None, direction):
+    """ Modifies number of votes of a given question or answer and
+    returns to the corresponding question_page. """
+
+    if question_id:
+        questions = data_manager.read_csv("question.csv")
+        for question in questions:
+            if question[0] == question_id:
+                if direction == "up":
+                    question[3] += 1
+                elif direction == "down":
+                    question[3] -= 1
+
+        write_csv("question.csv", questions)
+
+    elif answer_id:
+        answers = data_manager.read_csv("answer.csv")
+        for answer in answers:
+            if answer[0] == answer_id:
+                question_id = answer[3]
+                if direction == "up":
+                    answer[2] += 1
+                elif direction == "down":
+                    answer[2] -= 1
+
+        write_csv("answer.csv", answers)
+
+    return redirect(url_for("show_question_page(question_id"))
 
 
 if __name__ == "__main__":
