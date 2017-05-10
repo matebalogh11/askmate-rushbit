@@ -24,8 +24,9 @@ def show_questions():  # REQUIRED
 
 
 @app.route("/new-question/")
-def new_question():  # REQUIRED
-    pass
+def show_new_question_form():  # REQUIRED
+    title = "Ask a new question"
+    return render_template("q_form.html", title=title)
 
 
 @app.route("/question/<question_id>")
@@ -34,8 +35,14 @@ def show_single_question(question_id):  # REQUIRED
 
 
 @app.route("/question/<question_id>/edit")
-def edit_question(question_id):
-    pass
+def show_edit_question_form(question_id):
+    title = "Edit question"
+    questions = read_csv("questions.csv")
+    question_needed = question[int(question_id) - 1]
+    return render_template("q_form.html",
+                           title=title,
+                           question_needed=question_needed,
+                           question_id=question_id)
 
 
 @app.route("/question/<question_id>/delete")
