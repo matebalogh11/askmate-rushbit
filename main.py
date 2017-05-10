@@ -49,7 +49,7 @@ def show_edit_question_form(question_id):
 @app.route("/question/<question_id>/delete")
 def delete_question(question_id):
     questions = data_manager.read_csv("question.csv")
-    answers = data_manager.read_csv()
+    answers = data_manager.read_csv("answer.csv")
     for question in questions:
         if question[0] == question_id:
             questions.remove(question)
