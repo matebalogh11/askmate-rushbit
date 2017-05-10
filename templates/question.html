@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2> Question: </h2>
+<h3> {{ question_ID }} {{ question[4] }} </h3>
+<button formaction="" type="submit">Edit</button><button formaction="{{ url_for('delete_question') }}" type="submit">Delete</button><br>
+<button formaction="" type="submit">Upvote</button>
+<p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
+<h4> {{question[5] }} </h4>
+{% if question[6] %}
+    <img src="{{url_for('uploads', filename=question[6])}}">
+{% else %}
+    <p>!Placeholder image!</p>
+{% endif %}
+
+<br><h3> Answers: </h3>
+
+    {% for item in answers %}
+            <h4>{{ item[0] }} {{ item[4] }} </h4>
+            <p> Submission:{{ item[1] }} | Votes: {{ item[2] }}</p>
+            <button formaction="" type="submit" name="{{ item[0] }}">Upvote</button>
+            {% if item[5] %}
+                <img src="{{url_for('uploads', filename=item[5])}}">
+            {% else %}
+                <p>!Placeholder image!</p><br>
+            {% endif %}
+        {% endfor %}
+{% endblock %}

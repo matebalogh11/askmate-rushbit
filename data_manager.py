@@ -18,12 +18,13 @@ def write_csv(file, data):
 
 def read_csv(file):
 
+    x = 1 if file == "question.csv" else 0
     with open(file, "r") as text:
         reader = csv.reader(text)
         requested_data = list(reader)
         for n, data in enumerate(requested_data):
             for i, items in enumerate(data):
-                if i == 1 or i == 2 or i == 3:
+                if i == x or i == x+1 or i == x+2:
                     requested_data[n][i] = int(requested_data[n][i])
                 if i == 4 or i == 5 or i == 6:
                     requested_data[n][i] = base64.b64decode(requested_data[n][i]).decode("utf-8")

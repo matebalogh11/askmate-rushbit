@@ -1,4 +1,5 @@
 from flask import Flask, redirect, request, url_for, render_template
+from data_manager import read_csv, write_csv
 
 app = Flask(__name__)
 
@@ -30,9 +31,18 @@ def show_new_question_form():  # REQUIRED
     return render_template("q_form.html", title=title)
 
 
-@app.route("/question/<question_id>")
-def show_question_page(question_id):  # REQUIRED
-    pass
+@app.route("/question/<question_ID>")
+def show_question_page(question_ID):  # REQUIRED
+    q_data = read_csv("question.csv")
+    a_data = read_csv("answer.csv")
+
+    answers = [item for item in a_data if question_ID in item]
+    answers = sorted(answers, key=lambda x: x[2], reverse=True)
+    for question in q_data:
+        if question[0] == question_ID:
+            return render_template("question.html", question_ID=question_ID, answers=answers, question=question,
+                                   title="AskMate - Question" + question_ID)
+    return "There is no such question."
 
 
 @app.route("/question/<question_id>/edit")
