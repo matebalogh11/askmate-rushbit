@@ -68,7 +68,13 @@ def answer_question(question_id):  # REQUIRED
 
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
-    pass
+    answers = data_manager.read_csv("answer.csv")
+    for answer in answer:
+        if answer[0] == answer_id:
+            answers.remove(answer)
+            question_id = answer[3]
+    write_csv("answer.csv", answers)
+    return redirect(url_for('show_question_page(question_id)'))
 
 
 @app.route("/question/<question-id>/vote-<direction>")
