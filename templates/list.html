@@ -1,0 +1,33 @@
+{% extends "layout.html"" %}
+
+{% block content %}
+
+    <table>
+        <tr>
+
+            <th>ID</th>
+            <th>Question</th>
+            <th>Posted</th>
+            <th>Views</th>
+            <th>Votes</th>
+
+        </tr>
+
+        {% for line in questions %}
+
+            <tr>
+                    <td>{{ line[0] }}</td>
+                    <td><a href="{{ url_for('show_question_page', question_id=line[0]) }}">{{ line[4] }}</a></td>
+                    <td>{{ line[1] }}</td>
+                    <td>{{ line[2] }}</td>
+                    <td>{{ line[3] }}</td>
+                
+            </tr>
+            
+        {% endfor %}
+   
+    </table>
+
+    <a href="{{ url_for('show_new_question_form') }}">Ask a question</a> 
+
+{% endblock %}
