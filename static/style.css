@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800');
+
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: -webkit-linear-gradient(left, #007FFF, #0066CC); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(left,#007FFF, #0066CC); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(left,#007FFF, #0066CC); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(left,#007FFF, #0066CC); /* Standard syntax */
+
+}
+
+.wrapper {
+    max-width: 80%;
+    margin: 0 auto 0 auto;
+    background-color: white;
+    padding: 20px 3%;
+    border-radius: 0.3em;
+    box-shadow: 0 0 25px #2C567F
+
+}
+
+
+table {
+    margin:auto;
+    min-width: 70%;
+    max-width: 100%;
+    border-collapse: collapse;
+}
+
+.header_row{
+    min-height:50px;
+    height:50px;
+}
+
+.number_cell {
+    min-width: 120px;
+    text-align: center;
+}
+
+.date_cell {
+    min-width: 200px;
+    text-align: center;
+}
+
+
+th {
+    text-align: center;
+    background-color: #4CA6FF;
+    color: white;
+    border: 1px solid #4CA6FF;
+    min-height: 30px;
+}
+
+td {
+    border: 1px solid #4CA6FF;
+    vertical-align: middle;
+    color: #3d3d3d;
+}
+
+td:hover, td>first-child:hover, tr:hover {
+    background-color: #4CA6FF;
+    color: white;
+}
+
+
+td a:hover {
+    text-decoration: none;
+    display: block;
+    background-color: #4CA6FF;
+    cursor: auto;
+}
+
+td a {
+    font-weight: 600;
+}
+
+.linked_cell {
+    padding: 5px;
+    display:block;
+}
+
+table a, table a:visited {
+    color: #1d1d1d;
+    height:100%;
+    width: 100%;
+    text-decoration:none;
+}
+
+a:hover {   
+    color: white;
+
+}
+
+
+.arrow {
+    color: #007FFF;
+    font-size: 0.8em;
+}
+
+.arrow:hover {
+    color: #0066CC;
+}
+
+
+.cta_container {
+    margin: 20px auto;
+    text-align: center;
+}
+
+.cta_home {
+    
+    display: inline-block;
+    text-align: center;
+    width: 20%;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    vertical-align: middle;
+    background-color: #4CA6FF;
+    color: white;
+    padding: 15px 15px;
+    font-size: 1.2em;
+    border-radius: 0.3em;
+}
+
+.cta_home:hover {
+    background-color: #2693ff;
+}

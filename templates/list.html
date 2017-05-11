@@ -3,8 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-
-    <h1>Question list</h1>
+<div class="wrapper">
 
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -16,49 +15,54 @@
     {% endwith %}
 
     <table>
-        <tr>
-            <th>
+        <tr class="header_row">
+            <th class="number_cell">
                 ID number
             </th>
             <th>
                 Question title
-                <a href="{{ url_for('show_question_list', title='asc') }}">asc</a>
-                <a href="{{ url_for('show_question_list', title='desc') }}">desc</a>
+                <a href="{{ url_for('show_question_list', title='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', title='desc') }}"><span class="arrow"> ▼</span></a>
             </th>
-            <th>
+            <th class="date_cell">
                 Submission time
-                <a href="{{ url_for('show_question_list', time='asc') }}">asc</a>
-                <a href="{{ url_for('show_question_list', time='desc') }}">desc</a>
+                <a href="{{ url_for('show_question_list', time='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', time='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th>
+            <th class="number_cell">
                 Views
-                <a href="{{ url_for('show_question_list', views='asc') }}">asc</a>
-                <a href="{{ url_for('show_question_list', views='desc') }}">desc</a>
+                <a href="{{ url_for('show_question_list', views='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', views='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th>
+            <th class="number_cell">
                 Votes
-                <a href="{{ url_for('show_question_list', votes='asc') }}">asc</a>
-                <a href="{{ url_for('show_question_list', votes='desc') }}">desc</a>
+                <a href="{{ url_for('show_question_list', votes='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', votes='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th>
+            <th class="number_cell">
                 Answers
-                <a href="{{ url_for('show_question_list', answers='asc') }}">asc</a>
-                <a href="{{ url_for('show_question_list', answers='desc') }}">desc</a>
+                <a href="{{ url_for('show_question_list', answers='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', answers='desc') }}"><span class="arrow">▼</span></a>
             </th>
         </tr>
         {% for line in questions %}
             <tr>
-                <td>{{ line[0] }}</td>
+                <td><span class="linked_cell number_cell"> {{ line[0] }}</span></td>
                 <td>
-                    <a href="{{ url_for('show_question_page', question_id=line[0]) }}">{{ line[4] }}</a>
+                    <a href="{{ url_for('show_question_page', question_id=line[0]) }}">
+                        <span class="linked_cell">                     
+                            {{ line[4] }}
+                        </span>
+                    </a>
                 </td>
-                <td>{{ line[1] }}</td>
-                <td>{{ line[2] }}</td>
-                <td>{{ line[3] }}</td>
-                <td>{{ line[7] }}</td>
+                <td><span class="linked_cell date_cell"> {{ line[1] }}</span></td>
+                <td><span class="linked_cell number_cell"> {{ line[2] }}</span></td>
+                <td><span class="linked_cell number_cell"> {{ line[3] }}</span></td>
+                <td><span class="linked_cell number_cell"> {{ line[7] }}</span>                                                                                                                                 </td>
             </tr>
         {% endfor %}
     </table>
-
-    <a href="{{ url_for('show_new_question_form') }}">Ask a question</a> 
+    <div class="cta_container">
+    <a href="{{ url_for('show_new_question_form') }}" class="cta_home">Ask a question</a> 
+    </div>
 {% endblock %}
