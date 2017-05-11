@@ -154,7 +154,7 @@ def show_question_list():
     """Display list of questions as a table and an 'Ask a question' button."""
     questions = read_csv("question.csv")
     # Sort questions to display most recent on top:
-    questions = sorted(questions, key=lambda x: x[1], reverse=True)
+    questions = sorted(questions, key=lambda x: x[2], reverse=True)
     # Convert all timestamps to human readable form:
     for i, question in enumerate(questions):
         questions[i][1] = convert_unix(questions[i][1])
