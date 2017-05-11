@@ -1,7 +1,20 @@
 
 {% extends "layout.html" %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
+
+    <h1>Question list</h1>
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <table>
         <tr>
             <th>
@@ -46,5 +59,6 @@
             </tr>
         {% endfor %}
     </table>
+
     <a href="{{ url_for('show_new_question_form') }}">Ask a question</a> 
 {% endblock %}
