@@ -21,27 +21,26 @@
     <a href="{{ url_for('vote', direction='up', question_id=question_id) }}">UP!</a>
     <a href="{{ url_for('vote', direction='down', question_id=question_id) }}">DOWN!</a>
     <p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
-    <h2>Descripton</h2>
+    <h2>Description</h2>
     <p>{{ question[5] }}</p>
     {% if question[6] %}
+        <h2>Uploaded image</h2>
         <img src="{{ url_for('static',filename='uploads/' + question[6]) }}" alt="Question Image">
-    {% else %}
-        <p>PLACEHOLDER IMAGE</p>
-        <p>No image uploaded</p>
     {% endif %}
-    <h2> Answers</h2>
 
-    {% for answer in answers %}
+    {% if answers %}
+    <h2> Answers</h2>
+        {% for answer in answers %}
         <h3>ID: {{ answer[0] }}</h3>
         <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}">UP!</a>
         <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}">DOWN!</a>
         <a href="{{ url_for('delete_answer', answer_id=answer[0]) }}">Delete!</a>
-        <p> Submission:{{ answer[1] }} | Votes: {{ answer[2] }}</p>
+        <p> Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</p>
         <p>Message: {{ answer[4] }}</p>
         {% if answer[5] %}
             <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
-        {% else %}
-            <p>!Placeholder image!</p><br>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
+
 {% endblock %}

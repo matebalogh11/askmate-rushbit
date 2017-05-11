@@ -7,24 +7,24 @@
     <form action="{{ url_for('edit_question', question_id=question_id) }}" method="POST" enctype='multipart/form-data'>
         <!-- <input type="hidden" name="question_id" value="{{ selected_question[0] }}" required> -->
         <p>
-            <label for="q_title">Your question:</label><br>
+            <label for="q_title">Question title</label><br>
             <input type="text" name="q_title" id="q_title" value="{{ selected_question[4] }}" minlength="10" required>
         </p>
         <p>
-            <label for="q_desc">Description:</label><br>
+            <label for="q_desc">Description</label><br>
             <textarea name="q_desc" minlength="10" id="q_desc">{{ selected_question[5] }}</textarea>
         </p>
         <p>
-            <label for="q_image">Image upload:</label><br>
+            <label for="q_image">Upload image</label><br>
             <input type="file" name="q_image" id="q_image">
         </p>
         <p>
-            <input type="submit" value="Edit question" name="submit" id="submit">
+            <input type="submit" value="Submit" name="submit" id="submit">
         </p>
         {% if selected_question[6] %}
-        <img src="{{ url_for('static', filename='uploads/' + selected_question[6]) }}" alt="Image">
-        <p>Uploaded file: {{ selected_question[6] }}</p>
-        <a href="{{ url_for('delete_image', question_id=question_id) }}">(x)</a>
+        <img src="{{ url_for('static', filename='uploads/' + selected_question[6]) }}" alt="Uploaded image">
+        <p>Currently uploaded image: {{ selected_question[6] }}</p>
+        <a href="{{ url_for('delete_image', question_id=question_id) }}">Delete image</a>
         {% endif %}
     </form>
 
@@ -44,7 +44,7 @@
             <input type="file" name="q_image" id="q_image">
         </p>
         <p>
-            <input type="submit" value="Ask question" name="submit" id="submit">
+            <input type="submit" value="Submit" name="submit" id="submit">
         </p>
     </form>
     {% endif %}

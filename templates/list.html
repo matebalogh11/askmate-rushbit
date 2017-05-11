@@ -4,12 +4,34 @@
 {% block content %}
     <table>
         <tr>
-            <th><a href="{{ url_for('sort_questions', id=asc) }}">ID</th>
-            <th>Question</th>
-            <th>Posted</th>
-            <th>Views</th>
-            <th>Votes</th>
-            <th>Answers</th>
+            <th>
+                ID number
+            </th>
+            <th>
+                Question title
+                <a href="{{ url_for('show_question_list', title='asc') }}">asc</a>
+                <a href="{{ url_for('show_question_list', title='desc') }}">desc</a>
+            </th>
+            <th>
+                Submission time
+                <a href="{{ url_for('show_question_list', time='asc') }}">asc</a>
+                <a href="{{ url_for('show_question_list', time='desc') }}">desc</a>
+            </th>
+            <th>
+                Views
+                <a href="{{ url_for('show_question_list', views='asc') }}">asc</a>
+                <a href="{{ url_for('show_question_list', views='desc') }}">desc</a>
+            </th>
+            <th>
+                Votes
+                <a href="{{ url_for('show_question_list', votes='asc') }}">asc</a>
+                <a href="{{ url_for('show_question_list', votes='desc') }}">desc</a>
+            </th>
+            <th>
+                Answers
+                <a href="{{ url_for('show_question_list', answers='asc') }}">asc</a>
+                <a href="{{ url_for('show_question_list', answers='desc') }}">desc</a>
+            </th>
         </tr>
         {% for line in questions %}
             <tr>
@@ -20,11 +42,7 @@
                 <td>{{ line[1] }}</td>
                 <td>{{ line[2] }}</td>
                 <td>{{ line[3] }}</td>
-                {% for key in number_of_answers %}
-                {% if key == line[0] %}
-                <td>{{ number_of_answers.get(key) }}</td>
-                {% endif %}
-                {% endfor %}
+                <td>{{ line[7] }}</td>
             </tr>
         {% endfor %}
     </table>
