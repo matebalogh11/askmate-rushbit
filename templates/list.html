@@ -9,6 +9,7 @@
             <th>Posted</th>
             <th>Views</th>
             <th>Votes</th>
+            <th>Answers</th>
         </tr>
         {% for line in questions %}
             <tr>
@@ -19,6 +20,11 @@
                 <td>{{ line[1] }}</td>
                 <td>{{ line[2] }}</td>
                 <td>{{ line[3] }}</td>
+                {% for key in number_of_answers %}
+                {% if key == line[0] %}
+                <td>{{ number_of_answers.get(key) }}</td>
+                {% endif %}
+                {% endfor %}
             </tr>
         {% endfor %}
     </table>

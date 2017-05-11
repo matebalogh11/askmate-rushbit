@@ -46,6 +46,19 @@ def get_unix_timestamp():
     return time.time()
 
 
+def count_answers(questions, answers):
+    number_of_answers = {}
+    for question in questions:
+        answer_counter = 0
+        number_of_answers.update({question[0]: 0})
+        for answer in answers:
+            if answer[3] == question[0]:
+                answer_counter += 1
+        number_of_answers[question[0]] = answer_counter
+    print(number_of_answers)
+    return number_of_answers
+
+
 @app.route('/new-question/post', methods=['POST'])
 def ask_question():
     """Post a new question."""
@@ -156,12 +169,14 @@ def convert_unix(unix_timestamp):
 def show_question_list():
     """Display list of questions as a table and an 'Ask a question' button."""
     questions = read_csv("question.csv")
+    answers = read_csv("answer.csv")
+    number_of_answers = count_answers(questions, answers)
     # Sort questions to display most recent on top:
     questions = sorted(questions, key=lambda x: x[2], reverse=True)
     # Convert all timestamps to human readable form:
     for i, question in enumerate(questions):
         questions[i][1] = convert_unix(questions[i][1])
-    return render_template("list.html", questions=questions, title="Questions")
+    return render_template("list.html", questions=questions, title="Questions", number_of_answers=number_of_answers)
 
 
 @app.route("/new-question/")
