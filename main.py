@@ -183,6 +183,13 @@ def show_question_page(question_id):
     validate_id(question_id, questions)
 
     answers = read_csv("answer.csv")
+
+    for i, question in enumerate(questions):
+        questions[i][1] = convert_unix(questions[i][1])
+
+    for i, asnwer in enumerate(answers):
+        answers[i][1] = convert_unix(answers[i][1])
+
     answers = [item for item in answers if question_id == item[3]]
     answers = sorted(answers, key=lambda x: x[2], reverse=True)
     answers = sorted(answers, key=lambda x: x[1], reverse=True)

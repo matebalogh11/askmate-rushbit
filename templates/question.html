@@ -35,7 +35,7 @@
         <p> Submission:{{ answer[1] }} | Votes: {{ answer[2] }}</p>
         <p>Message: {{ answer[4] }}</p>
         {% if answer[5] %}
-            <img src="{{ url_for('uploads', filename=answer[5]) }}">
+            <img src="/uploads/{{answer[5]}}">
         {% else %}
             <p>!Placeholder image!</p><br>
         {% endif %}
