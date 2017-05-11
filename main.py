@@ -79,7 +79,7 @@ def ask_question():
         questions.append(new_question)
         write_csv('question.csv', questions)
 
-        return redirect(url_for('show_question_page', question_id=question_id))
+        return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
 
@@ -133,7 +133,7 @@ def edit_question(question_id):
         # Overwrite question line in CSV, which was selected for editing:
         questions[selected_question_index] = edited_question
         write_csv('question.csv', questions)
-        return redirect(url_for('show_question_page'), question_id=question_id)
+        return redirect(url_for('show_question_page'), question_id=question_id, valid_view=False)
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
 
@@ -176,12 +176,12 @@ def show_new_answer_form(question_id):
 
 
 @app.route("/question/<question_id>")
-def show_question_page(question_id):
+def show_question_page(question_id, valid_view=True):
     """View function of question page, with details and answers."""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
     validate_id(question_id, questions)
-
+    print(valid_view)
     answers = read_csv("answer.csv")
 
     for i, asnwer in enumerate(answers):
@@ -193,8 +193,9 @@ def show_question_page(question_id):
     for i, question_ in enumerate(questions):
         if question_[0] == question_id:
             question = questions[i]
-            questions[i][2] += 1
-            write_csv("question.csv", questions)
+            if request.args.get('valid_view') != 'False':
+                questions[i][2] += 1
+                write_csv("question.csv", questions)
             questions[i][1] = convert_unix(questions[i][1])
             break
 
@@ -337,7 +338,7 @@ def vote(direction, question_id=None, answer_id=None):
 
         write_csv("answer.csv", answers)
 
-    return redirect(url_for('show_question_page', question_id=question_id))
+    return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
 
 @app.route("/answer/<answer_id>/del-img")
