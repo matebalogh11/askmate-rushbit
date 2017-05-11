@@ -79,7 +79,7 @@ def ask_question():
         questions.append(new_question)
         write_csv('question.csv', questions)
 
-        return redirect(url_for('show_question_page', question_id))
+        return redirect(url_for('show_question_page', question_id=question_id))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
 
