@@ -1,18 +1,20 @@
 import base64
 import csv
+from copy import deepcopy
 
 # This module is for import only!
 
 
 def write_csv(file, data):
 
+    copied_data = deepcopy(data)
     with open(file, "w", newline="") as text:
         writer = csv.writer(text)
-        for i, items in enumerate(data):
+        for i, items in enumerate(copied_data):
             for n, details in enumerate(items):
                 if n == 4 or n == 5 or i == 6:
-                    data[i][n] = base64.b64encode(bytes(data[i][n], "utf-8")).decode("utf-8")
-        for story in data:
+                    copied_data[i][n] = base64.b64encode(bytes(copied_data[i][n], "utf-8")).decode("utf-8")
+        for story in copied_data:
             writer.writerow(story)
 
 

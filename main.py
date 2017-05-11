@@ -190,13 +190,16 @@ def show_question_page(question_id):
     answers = [item for item in answers if question_id == item[3]]
     answers = sorted(answers, key=lambda x: x[2], reverse=True)
     answers = sorted(answers, key=lambda x: x[1], reverse=True)
-    for i, question in enumerate(questions):
-        if question[0] == question_id:
+    for i, question_ in enumerate(questions):
+        if question_[0] == question_id:
+            question = questions[i]
             questions[i][2] += 1
             write_csv("question.csv", questions)
             questions[i][1] = convert_unix(questions[i][1])
-            return render_template("question.html", question_id=question_id, answers=answers,
-                                   question=question, title=("AskMate - Question" + question_id))
+            break
+
+    return render_template("question.html", question_id=question_id, answers=answers,
+                           question=question, title=("Question" + question_id))
 
 
 def validate_id(id_, table):
