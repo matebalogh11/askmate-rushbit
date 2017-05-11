@@ -133,7 +133,7 @@ def edit_question(question_id):
         # Overwrite question line in CSV, which was selected for editing:
         questions[selected_question_index] = edited_question
         write_csv('question.csv', questions)
-        return redirect(url_for('show_question_page'), question_id=question_id, valid_view=False)
+        return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
 
