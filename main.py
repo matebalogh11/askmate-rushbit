@@ -172,7 +172,7 @@ def show_new_question_form():
 def show_new_answer_form(question_id):
     """View function of new answer form."""
     title = "Add new answer to question: {}".format(question_id)
-    return render_template("a_form.html", title=title)
+    return render_template("a_form.html", title=title, question_id=question_id)
 
 
 @app.route("/question/<question_id>")
@@ -283,7 +283,7 @@ def add_answer(question_id):
         answers.append(new_answer)
         write_csv('answer.csv', answers)
 
-        return redirect(url_for('show_question_page'), question_id=question_id)
+        return redirect(url_for('show_question_page', question_id=question_id))
 
     flash("Message must be filled and at least 10 characters long.", "error")
 

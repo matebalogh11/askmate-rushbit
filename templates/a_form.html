@@ -2,5 +2,18 @@
 {% extends "layout.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-
+    <h1>New answer</h1>
+    <form action="{{ url_for('add_answer', question_id=question_id) }}" method="POST">
+        <p>
+            <label for="message">Your answer:</label><br>
+            <input type="text" name="message" id="message" minlength="10" required>
+        </p>
+        <p>
+            <label for="a_image">Image upload:</label><br>
+            <input type="file" name="a_image" id="a_image">
+        </p>
+        <p>
+            <input type="submit" value="Answer question" name="submit" id="submit">
+        </p>
+    </form>
 {% endblock %}

@@ -36,7 +36,7 @@ def read_csv(file):
                 for i, items in enumerate(data):
                     if i == 1:
                         requested_data[n][i] = float(requested_data[n][i])
-                    if i == 0 or i == 2:
+                    if i == 2:
                         requested_data[n][i] = int(requested_data[n][i])
                     if i == 4 or i == 5 or i == 6:
                         requested_data[n][i] = base64.b64decode(requested_data[n][i]).decode("utf-8")
