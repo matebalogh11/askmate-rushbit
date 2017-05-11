@@ -1,8 +1,7 @@
 import base64
 import csv
 from copy import deepcopy
-
-# This module is for import only!
+from datetime import datetime
 
 
 def write_csv(file, data):
@@ -47,3 +46,87 @@ def read_csv(file):
                     if i == 4 or i == 5 or i == 6:
                         requested_data[n][i] = base64.b64decode(requested_data[n][i]).decode("utf-8")
     return requested_data
+
+
+def allowed_extension(filename):
+    """Takes a filename and validates by extension.
+    @filename string: filename string.
+    @return bool: True if file extension in allowed extensions, else False.
+    """
+    ALLOWED_EXTENSIONS = ['jpeg', 'jpg', 'png', 'gif']
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def generate_id(table, prefix):
+    """Generate unique ID in the selected table.
+    @table list: 2D list generated from CSV.
+    @prefix string: either has the value of 'q' or 'a' to avoid identical IDs in 2 tables,
+    which could cause trouble in saving files to uploads folder.
+    @return string: unique ID in table.
+    """
+    lowerletters = list("abcdefghiklmnopqrstuvwxyz")
+    upperletters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    decimals = list("0123456789")
+    used_IDs = [row[0] for row in table]
+
+    valid_ID = False
+    while not valid_ID:
+        generated_id = ("{}_id_{}{}{}".format(prefix, choice(lowerletters),
+                                              choice(upperletters), choice(decimals)))
+        if generated_id not in used_IDs:
+            valid_ID = True
+    return generated_id
+
+
+def get_unix_timestamp():
+    """Get current time as Unix timestamp."""
+    return time.time()
+
+
+def convert_unix(unix_timestamp):
+    """Converts Unix timestamp to human readable format.
+    @unixtime int: Unix time running total of seconds.
+    @return string: human readable timestamp as example: Apr 28 - 18:49
+    """
+    return '{:%Y %b %d - %H:%M}'.format(datetime.fromtimestamp(unix_timestamp))
+
+
+def validate_id(id_, table):
+    """Redirect to list if ID is not found in table."""
+    id_list = [line[0] for line in table]
+    if id_ not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
+
+
+def select_ordering(questions, order, criterium):
+    """Default ordering: most recent on top.
+    Based on query string, selected ordering will be dominant.
+    """
+    questions = sorted(questions, key=lambda x: x[1], reverse=True)
+
+    keys_and_indices = [('title', 4), ('time', 1), ('views', 2), ('votes', 3), ('answers', 7)]
+    for key, index in keys_and_indices:
+        if key == 'title':
+            if order == 'asc':
+                questions = sorted(questions, key=lambda x: x[index].lower(), reverse=False)
+            elif order == 'desc':
+                questions = sorted(questions, key=lambda x: x[index].lower(), reverse=True)
+        else:
+            if criterium == key:
+                if order == 'asc':
+                    questions = sorted(questions, key=lambda x: x[index], reverse=True)
+                elif order == 'desc':
+                    questions = sorted(questions, key=lambda x: x[index], reverse=False)
+    return questions
+
+
+def add_to_view_count(questions, question_id, if_valid_view):
+    for i, question_ in enumerate(questions):
+        if question_[0] == question_id:
+            question = questions[i]
+            if if_valid_view != 'False':
+                questions[i][2] += 1
+                write_csv("question.csv", questions)
+            questions[i][1] = convert_unix(questions[i][1])
+            return question

@@ -1,50 +1,14 @@
 
 import os
 import time
-from datetime import datetime
 from random import choice
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
-from data_manager import read_csv, write_csv
+from data_manager import *
 
 app = Flask(__name__)
-
-
-def allowed_file(filename):
-    """Takes a filename and validates by extension.
-    @filename string: filename string.
-    @return bool: True if file extension in allowed extensions, else False.
-    """
-    ALLOWED_EXTENSIONS = ['jpeg', 'jpg', 'png', 'gif']
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def generate_id(table, prefix):
-    """Generate unique ID in the selected table.
-    @table list: 2D list generated from CSV.
-    @prefix string: either has the value of 'q' or 'a' to avoid identical IDs in 2 tables,
-    which could cause trouble in saving files to uploads folder.
-    @return string: unique ID in table.
-    """
-    lowerletters = list("abcdefghiklmnopqrstuvwxyz")
-    upperletters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    decimals = list("0123456789")
-    used_IDs = [row[0] for row in table]
-
-    valid_ID = False
-    while not valid_ID:
-        generated_id = ("{}_id_{}{}{}".format(prefix, choice(lowerletters),
-                                              choice(upperletters), choice(decimals)))
-        if generated_id not in used_IDs:
-            valid_ID = True
-    return generated_id
-
-
-def get_unix_timestamp():
-    """Get current time as Unix timestamp."""
-    return time.time()
 
 
 @app.route('/new-question/post', methods=['POST'])
@@ -68,14 +32,9 @@ def ask_question():
         question_id = new_question[0]
         image = request.files.get('q_image', None)
         if image and image.filename:
-            # Allowing only certain extensions:
-            if allowed_file(image.filename):
-                # Making sure that filename is secure:
+            if allowed_extension(image.filename):
                 filename = question_id + "_" + secure_filename(image.filename)
-                path_with_filename = "static/uploads/" + filename
-                # Save file to Uploads folder:
-                image.save(path_with_filename)
-                # Append to new question to be added to CSV:
+                image.save("static/uploads/" + filename)
                 new_question[6] = filename
             else:
                 flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
@@ -83,11 +42,9 @@ def ask_question():
         flash("Question posted.", "success")
         questions.append(new_question)
         write_csv('question.csv', questions)
-
         return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
-
     return redirect(url_for('show_question_list'))
 
 
@@ -120,72 +77,38 @@ def edit_question(question_id):
 
         image = request.files.get('q_image', None)
         if image and image.filename:
-            # Allowing only certain extensions:
-            if allowed_file(image.filename):
+            if allowed_extension(image.filename):
                 filename = current_id + "_" + secure_filename(image.filename)
-                path_with_filename = "static/uploads/" + filename
-                image.save(path_with_filename)
-
-                # If there is a previous image:
+                image.save("static/uploads/" + filename)
+                edited_question[6] = filename
                 if current_image:
                     os.remove("static/uploads/" + current_image)
-
-                edited_question[6] = filename
 
             else:
                 flash("File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
         flash("Question edited.", "success")
-
-        # Overwrite question line in CSV, which was selected for editing:
         questions[selected_question_index] = edited_question
         write_csv('question.csv', questions)
         return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
     flash("Title and description must be filled and at least 10 characters long.", "error")
-
     return redirect(url_for('show_question_list'))
-
-
-def convert_unix(unix_timestamp):
-    """Converts Unix timestamp to human readable format.
-    @unixtime int: Unix time running total of seconds.
-    @return string: human readable timestamp as example: Apr 28 - 18:49
-    """
-    return '{:%Y %b %d - %H:%M}'.format(datetime.fromtimestamp(unix_timestamp))
 
 
 @app.route("/")
 @app.route("/list/")
 def show_question_list(criterium=None, order=None):
     """Display list of questions as a table and an 'Ask a question' button."""
-    answers = read_csv("answer.csv")
     questions = read_csv("question.csv")
-    questions = sorted(questions, key=lambda x: x[1], reverse=True)
-
     for key in request.args:
         criterium = key
         order = request.args[key]
 
-    # Sorting list based on selected criterium and ordering:
-    keys_and_indices = [('title', 4), ('time', 1), ('views', 2), ('votes', 3), ('answers', 7)]
-    for key, index in keys_and_indices:
-        if key == 'title':
-            if order == 'asc':
-                questions = sorted(questions, key=lambda x: x[index].lower(), reverse=False)
-            elif order == 'desc':
-                questions = sorted(questions, key=lambda x: x[index].lower(), reverse=True)
-        else:
-            if criterium == key:
-                if order == 'asc':
-                    questions = sorted(questions, key=lambda x: x[index], reverse=True)
-                elif order == 'desc':
-                    questions = sorted(questions, key=lambda x: x[index], reverse=False)
+    questions = select_ordering(questions, order, criterium)
 
-    # Convert all timestamps to human readable form:
-    for i, question in enumerate(questions):
+    for i in range(len(questions)):
         questions[i][1] = convert_unix(questions[i][1])
-
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -209,33 +132,22 @@ def show_question_page(question_id, valid_view=True):
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
     validate_id(question_id, questions)
-    answers = read_csv("answer.csv")
 
-    for i, asnwer in enumerate(answers):
+    answers = read_csv("answer.csv")
+    for i in range(len(answers)):
         answers[i][1] = convert_unix(answers[i][1])
 
+    # Filter answers that belong to question:
     answers = [item for item in answers if question_id == item[3]]
+    # Ordering: primary - most votes on top, secondary - most recent on top:
     answers = sorted(answers, key=lambda x: x[1], reverse=True)
     answers = sorted(answers, key=lambda x: x[2], reverse=True)
-    for i, question_ in enumerate(questions):
-        if question_[0] == question_id:
-            question = questions[i]
-            if request.args.get('valid_view') != 'False':
-                questions[i][2] += 1
-                write_csv("question.csv", questions)
-            questions[i][1] = convert_unix(questions[i][1])
-            break
+
+    if_valid_view = request.args.get('valid_view')
+    question = add_to_view_count(questions, question_id, if_valid_view)
 
     return render_template("question.html", question_id=question_id, answers=answers,
                            question=question, title=("Question" + question_id))
-
-
-def validate_id(id_, table):
-    """Redirect to list if ID is not found in table."""
-    id_list = [line[0] for line in table]
-    if id_ not in id_list:
-        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
-        return redirect(url_for('show_question_list'))
 
 
 @app.route("/question/<question_id>/edit")
@@ -291,43 +203,34 @@ def add_answer(question_id):
     if len(request.form.get("message", 0)) >= 10:
         answers = read_csv("answer.csv")
         answer_id = generate_id(answers, 'a')
-        time = get_unix_timestamp()
+        init_time = get_unix_timestamp()
         init_votes = 0
         message = request.form["message"]
-        new_answer = [answer_id, time, init_votes, question_id, message]
+        empty_image = ''
+        new_answer = [answer_id, init_time, init_votes, question_id, message, empty_image]
 
         image = request.files.get('a_image', None)
         if image and image.filename:
-            # Allowing only certain extensions:
-            if allowed_file(image.filename):
-                # Making sure that filename is secure:
+            if allowed_extension(image.filename):
                 filename = answer_id + "_" + secure_filename(image.filename)
-                path_with_filename = "static/uploads/" + filename
-                # Save file to Uploads folder:
-                image.save(path_with_filename)
-                # Append to new question to be added to CSV:
-                new_answer.append(filename)
+                image.save("static/uploads/" + filename)
+                new_answer[5] = filename
             else:
-                new_answer.append('')
                 flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
-        else:
-            new_answer.append('')
 
         # Update number of answers for selected question:
         for i, question in enumerate(questions):
             if question[0] == question_id:
                 questions[i][7] += 1
                 break
-        write_csv('question.csv', questions)
 
+        write_csv('question.csv', questions)
         flash("Answer posted.", "success")
         answers.append(new_answer)
         write_csv('answer.csv', answers)
-
         return redirect(url_for('show_question_page', question_id=question_id))
 
     flash("Message must be filled and at least 10 characters long.", "error")
-
     return redirect(url_for('show_question_list'))
 
 
