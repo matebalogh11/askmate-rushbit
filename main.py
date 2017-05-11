@@ -101,7 +101,10 @@ def edit_question(question_id):
                 current_timestamp = question[1]
                 current_views = question[2]
                 current_votes = question[3]
-                current_image = question[6]
+                if len(question) == 7:
+                    current_image = question[6]
+                else:
+                    current_image = ""
                 break
         else:
             flash("Question ID does not exist. Please use the GUI to navigate.", "error")
