@@ -22,7 +22,7 @@
             <input type="submit" value="Edit question" name="submit" id="submit">
         </p>
         {% if selected_question[6] %}
-        <img src="{{ url_for('uploads', filename=selected_question[6]) }}" alt="Image">
+        <img src="{{ url_for('static', filename='uploads/' + selected_question[6]) }}" alt="Image">
         <p>Uploaded file: {{ selected_question[6] }}</p>
         <a href="{{ url_for('delete_image', question_id=question_id) }}">(x)</a>
         {% endif %}

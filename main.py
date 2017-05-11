@@ -77,7 +77,7 @@ def ask_question():
             if allowed_file(image.filename):
                 # Making sure that filename is secure:
                 filename = question_id + "_" + secure_filename(image.filename)
-                path_with_filename = "uploads/" + filename
+                path_with_filename = "static/uploads/" + filename
                 # Save file to Uploads folder:
                 image.save(path_with_filename)
                 # Append to new question to be added to CSV:
@@ -132,12 +132,12 @@ def edit_question(question_id):
             # Allowing only certain extensions:
             if allowed_file(image.filename):
                 filename = current_id + "_" + secure_filename(image.filename)
-                path_with_filename = "uploads/" + filename
+                path_with_filename = "static/uploads/" + filename
                 image.save(path_with_filename)
 
                 # If there is a previous image:
                 if current_image:
-                    os.remove("/uploads/" + current_image)
+                    os.remove("static/uploads/" + current_image)
 
                 edited_question[6] = filename
 
@@ -289,7 +289,7 @@ def add_answer(question_id):
             if allowed_file(image.filename):
                 # Making sure that filename is secure:
                 filename = answer_id + "_" + secure_filename(image.filename)
-                path_with_filename = "uploads/" + filename
+                path_with_filename = "static/uploads/" + filename
                 # Save file to Uploads folder:
                 image.save(path_with_filename)
                 # Append to new question to be added to CSV:
@@ -319,9 +319,12 @@ def delete_answer(answer_id):
     answers = read_csv("answer.csv")
     for answer in answers:
         if answer[0] == answer_id:
-            answers.remove(answer)
             question_id = answer[3]
-
+            current_image = answer[5]
+            answers.remove(answer)
+            break
+    if current_image:
+        os.remove("static/uploads/" + current_image)
     write_csv("answer.csv", answers)
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -369,7 +372,7 @@ def delete_image(question_id=None, answer_id=None):
                 current_image = questions[i][6]
                 questions[i][6] = ""
         write_csv("question.csv", questions)
-        os.remove("/uploads/" + current_image)
+        os.remove("static/uploads/" + current_image)
         return redirect(url_for('show_edit_question_form', question_id=question_id))
 
     elif answer_id:
@@ -380,7 +383,7 @@ def delete_image(question_id=None, answer_id=None):
                 current_image = answers[i][5]
                 answers[i][5] = ""
         write_csv("answer.csv", answers)
-        os.remove("/uploads/" + current_image)
+        os.remove("static/uploads/" + current_image)
         return redirect(url_for('show_edit_answer_form', answer_id=answer_id))
 
 
