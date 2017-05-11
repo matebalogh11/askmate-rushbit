@@ -12,8 +12,12 @@ def write_csv(file, data):
         writer = csv.writer(text)
         for i, items in enumerate(copied_data):
             for n, details in enumerate(items):
-                if n == 4 or n == 5 or i == 6:
-                    copied_data[i][n] = base64.b64encode(bytes(copied_data[i][n], "utf-8")).decode("utf-8")
+                if n == 4 or n == 5 or n == 6:
+                    old_string_obj = copied_data[i][n]
+                    byte_obj = bytearray(old_string_obj, "utf-8")
+                    base64_obj = base64.b64encode(byte_obj)
+                    new_string_obj = base64_obj.decode("utf-8")
+                    copied_data[i][n] = new_string_obj
         for story in copied_data:
             writer.writerow(story)
 

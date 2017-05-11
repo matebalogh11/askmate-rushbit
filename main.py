@@ -184,7 +184,6 @@ def show_question_page(question_id, valid_view=True):
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
     validate_id(question_id, questions)
-    print(valid_view)
     answers = read_csv("answer.csv")
 
     for i, asnwer in enumerate(answers):
@@ -393,4 +392,4 @@ def sort_questions():
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=2000)

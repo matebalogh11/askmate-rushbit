@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h1>New answer</h1>
-    <form action="{{ url_for('add_answer', question_id=question_id) }}" method="POST">
+    <form action="{{ url_for('add_answer', question_id=question_id) }}" method="POST" enctype='multipart/form-data'>
         <p>
             <label for="message">Your answer:</label><br>
             <input type="text" name="message" id="message" minlength="10" required>

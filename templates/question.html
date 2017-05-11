@@ -24,7 +24,7 @@
     <h2>Descripton</h2>
     <p>{{ question[5] }}</p>
     {% if question[6] %}
-        <img src="{{ url_for('uploads', filename=question[6]) }}" alt="Image">
+        <img src="uploads/lol.png" alt="Question Image">
     {% else %}
         <p>PLACEHOLDER IMAGE</p>
         <p>No image uploaded</p>
@@ -38,7 +38,7 @@
         <p> Submission:{{ answer[1] }} | Votes: {{ answer[2] }}</p>
         <p>Message: {{ answer[4] }}</p>
         {% if answer[5] %}
-            <img src="/uploads/{{answer[5]}}">
+            <img src="uploads/{{ answer[5] }}" alt="Answer Image">
         {% else %}
             <p>!Placeholder image!</p><br>
         {% endif %}
