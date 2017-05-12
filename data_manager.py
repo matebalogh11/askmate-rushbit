@@ -93,14 +93,6 @@ def convert_unix(unix_timestamp):
     return '{:%Y %b %d - %H:%M}'.format(datetime.fromtimestamp(unix_timestamp))
 
 
-def validate_id(id_, table):
-    """Redirect to list if ID is not found in table."""
-    id_list = [line[0] for line in table]
-    if id_ not in id_list:
-        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
-        return redirect(url_for('show_question_list'))
-
-
 def select_ordering(questions, order, criterium):
     """Default ordering: most recent on top.
     Based on query string, selected ordering will be dominant.

@@ -129,7 +129,10 @@ def show_question_page(question_id, valid_view=True):
     """View function of question page, with details and answers."""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    validate_id(question_id, questions)
+    id_list = [line[0] for line in questions]
+    if question_id not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
 
     answers = read_csv("answer.csv")
     for i in range(len(answers)):
