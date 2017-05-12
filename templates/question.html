@@ -5,7 +5,6 @@
 {% block content %}
 <div class="wrapper">
     
-
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -36,8 +35,6 @@
         <a href="{{ url_for('vote', direction='down', question_id=question_id) }}" class="votedown">VOTE DOWN</a>
     </div>
 
-        
-
     {% if question[6] %}
         <h3>Attachment</h3>
         <img src="{{ url_for('static',filename='uploads/' + question[6]) }}" alt="Question Image">
@@ -45,6 +42,7 @@
 
     {% if answers %}
     <hr>
+    <h3>Answers</h3>
         {% for answer in answers %}
         <p class="comment">{{ answer[4] }}</p>
         <div class="voter-mini">
@@ -53,12 +51,6 @@
         </div>
         <h5><a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</h5>
         
-        
-        
-
-    
-        
-
         {% if answer[5] %}
             <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
         {% endif %}
