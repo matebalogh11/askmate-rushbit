@@ -1,7 +1,5 @@
 
 import os
-import time
-from random import choice
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
