@@ -3,8 +3,8 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-
-    <h1>Question: {{ question_id }}</h1>
+<div class="wrapper">
+    
 
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -15,49 +15,49 @@
         {% endif %}
     {% endwith %}
 
-    <h2>Title: {{ question[4] }}</h2>
+    <h1>{{ question[4] }}</h1>
+    <h5>Question: {{ question_id }} | Views: {{ question[2] }} | Submission: {{ question[1] }}</h5>
+        <form action="">
+            <p class="actionbuttons">
+                <input type="submit" value="Edit question" name="submit1" class= "cta" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
 
-    <form action="">
-        <p>
-            <input type="submit" value="Edit question" name="submit1" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
-        </p>
-        <p>
-            <input type="submit" value="Delete question" name="submit2" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
-        </p>
-        <p>
-            <input type="submit" value="Add answer" name="submit3" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
-        </p>
-        <p>
-            <input type="submit" value="Back to Questions" name="submit4" id="submit4" formaction="{{ url_for('show_question_list') }}">
-        </p>
-    </form>
+                <input type="submit" value="Delete question" name="submit2" class= "delete_button" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
 
-    <a href="{{ url_for('vote', direction='up', question_id=question_id) }}">UP!</a>
-    <a href="{{ url_for('vote', direction='down', question_id=question_id) }}">DOWN!</a>
+                <input type="submit" value="Add answer" name="submit3" class= "cta" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
 
-    <p> Views: {{ question[2] }} | Votes: {{ question[3] }} | Submission: {{ question[1] }}</p>
+                <input type="submit" value="Back to Questions" name="submit4" class= "cta" id="submit4" formaction="{{ url_for('show_question_list') }}">
+            </p>
+        </form>
+    <p class="description">{{ question[5] }}</p>
 
-    <h2>Description</h2>
-    <p>{{ question[5] }}</p>
+    <div class="voter">
+        <a href="{{ url_for('vote', direction='up', question_id=question_id) }}" class="voteup">VOTE UP</a>
+        <span class="votecounter"> {{ question[3] }} </span>
+        <a href="{{ url_for('vote', direction='down', question_id=question_id) }}" class="votedown">VOTE DOWN</a>
+    </div>
+
+        
 
     {% if question[6] %}
-        <h2>Uploaded image</h2>
+        <h3>Attachment</h3>
         <img src="{{ url_for('static',filename='uploads/' + question[6]) }}" alt="Question Image">
     {% endif %}
 
     {% if answers %}
-    <h2>Answers</h2>
+    <hr>
         {% for answer in answers %}
+        <p class="comment">{{ answer[4] }}</p>
+        <div class="voter-mini">
+            <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}" class="voteup-mini">▲</a>
+            <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}" class="votedown-mini">▼</a>
+        </div>
+        <h5><a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</h5>
+        
+        
+        
 
-        <h3>Answer ID: {{ answer[0] }}</h3>
-
-        <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}">UP!</a>
-        <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}">DOWN!</a>
-
-        <a href="{{ url_for('delete_answer', answer_id=answer[0]) }}">Delete</a>
-
-        <p>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</p>
-        <p>Message: {{ answer[4] }}</p>
+    
+        
 
         {% if answer[5] %}
             <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
@@ -65,5 +65,5 @@
 
         {% endfor %}
     {% endif %}
-
+</div>
 {% endblock %}
