@@ -9,9 +9,15 @@
     <body>
         <div class="askmate_logo">
             <a href="{{ url_for('show_question_list') }}">
-                <img src="{{ url_for('logos'), filename='askmate_logo.png'}}">
+                <img src="/static/logos/askmate_logo.png">
             </a>
         </div>
         {% block content %}{% endblock %}
+    <div class="rushbit_logo_container">
+        <p class="credits"> All rights reserved.</p>
+        <a href="{{ url_for('show_question_list') }}" >
+            <img src="/static/logos/rushbit.png" class="rushbit_logo">
+        </a>
+    </div>
     </body>
 </html>
