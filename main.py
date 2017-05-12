@@ -37,14 +37,14 @@ def ask_question():
                 image.save("static/uploads/" + filename)
                 new_question[6] = filename
             else:
-                flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+                flash("✘ File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
-        flash("Question posted.", "success")
+        flash("✓ Question posted.", "success")
         questions.append(new_question)
         write_csv('question.csv', questions)
         return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
-    flash("Title and description must be filled and at least 10 characters long.", "error")
+    flash("✘ Title and description must be filled and at least 10 characters long.", "error")
     return redirect(url_for('show_question_list'))
 
 
@@ -67,7 +67,7 @@ def edit_question(question_id):
                 current_answer_count = question[7]
                 break
         else:
-            flash("Question ID does not exist. Please use the GUI to navigate.", "error")
+            flash("✘ Question ID does not exist. Please use the GUI to navigate.", "error")
             return redirect(url_for('show_question_list'))
 
         edited_question = [current_id, current_timestamp,
@@ -85,14 +85,14 @@ def edit_question(question_id):
                     os.remove("static/uploads/" + current_image)
 
             else:
-                flash("File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+                flash("✘ File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
-        flash("Question edited.", "success")
+        flash("✓ Question edited.", "success")
         questions[selected_question_index] = edited_question
         write_csv('question.csv', questions)
         return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
 
-    flash("Title and description must be filled and at least 10 characters long.", "error")
+    flash("✘ Title and description must be filled and at least 10 characters long.", "error")
     return redirect(url_for('show_question_list'))
 
 
@@ -216,7 +216,7 @@ def add_answer(question_id):
                 image.save("static/uploads/" + filename)
                 new_answer[5] = filename
             else:
-                flash("File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+                flash("✘ File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
         # Update number of answers for selected question:
         for i, question in enumerate(questions):
@@ -225,12 +225,12 @@ def add_answer(question_id):
                 break
 
         write_csv('question.csv', questions)
-        flash("Answer posted.", "success")
+        flash("✓ Answer posted.", "success")
         answers.append(new_answer)
         write_csv('answer.csv', answers)
         return redirect(url_for('show_question_page', question_id=question_id))
 
-    flash("Message must be filled and at least 10 characters long.", "error")
+    flash("✘ Message must be filled and at least 10 characters long.", "error")
     return redirect(url_for('show_question_list'))
 
 
