@@ -129,7 +129,7 @@ def show_question_page(question_id, valid_view=True):
     """View function of question page, with details and answers."""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    id_list = [line[0] for line in questions]
+    id_list = [line[0] for q in questions]
     if question_id not in id_list:
         flash("That ID does not exist. Use GUI to navigate the web page.", "error")
         return redirect(url_for('show_question_list'))
@@ -156,7 +156,10 @@ def show_edit_question_form(question_id):
     """View function of edit question form"""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    validate_id(question_id, questions)
+    id_list = [line[0] for q in questions]
+    if question_id not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
 
     for question in questions:
         if question[0] == question_id:
@@ -174,7 +177,10 @@ def delete_question(question_id):
     """
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    validate_id(question_id, questions)
+    id_list = [line[0] for q in questions]
+    if question_id not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
 
     answers = read_csv("answer.csv")
 
@@ -199,7 +205,10 @@ def add_answer(question_id):
     """Add answer and redirect to question page."""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    validate_id(question_id, questions)
+    id_list = [line[0] for q in questions]
+    if question_id not in id_list:
+        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
+        return redirect(url_for('show_question_list'))
 
     if len(request.form.get("message", 0)) >= 10:
         answers = read_csv("answer.csv")
