@@ -1,7 +1,7 @@
 
 import os
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for, abort
 from werkzeug.utils import secure_filename
 
 from data_manager import *
@@ -40,7 +40,7 @@ def ask_question():
         flash("✓ Question posted.", "success")
         questions.append(new_question)
         write_csv('question.csv', questions)
-        return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
+        return redirect(url_for('show_question_page', question_id=question_id))
 
     flash("✘ Title and description must be filled and at least 10 characters long.", "error")
     return redirect(url_for('show_question_list'))
@@ -88,7 +88,7 @@ def edit_question(question_id):
         flash("✓ Question edited.", "success")
         questions[selected_question_index] = edited_question
         write_csv('question.csv', questions)
-        return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
+        return redirect(url_for('show_question_page', question_id=question_id))
 
     flash("✘ Title and description must be filled and at least 10 characters long.", "error")
     return redirect(url_for('show_question_list'))
@@ -125,27 +125,21 @@ def show_new_answer_form(question_id):
 
 
 @app.route("/question/<question_id>")
-def show_question_page(question_id, valid_view=True):
+def show_question_page(question_id):
     """View function of question page, with details and answers."""
     questions = read_csv("question.csv")
-    # Redirect to list if ID is not found in table:
-    id_list = [line[0] for q in questions]
-    if question_id not in id_list:
-        flash("That ID does not exist. Use GUI to navigate the web page.", "error")
-        return redirect(url_for('show_question_list'))
 
-    answers = read_csv("answer.csv")
-    for i in range(len(answers)):
-        answers[i][1] = convert_unix(answers[i][1])
+    view = request.args.get('view')
+    if view == "counted":
+        increase_view_count(questions, question_id)
 
-    # Filter answers that belong to question:
-    answers = [item for item in answers if question_id == item[3]]
-    # Ordering: primary - most votes on top, secondary - most recent on top:
-    answers = sorted(answers, key=lambda x: x[1], reverse=True)
-    answers = sorted(answers, key=lambda x: x[2], reverse=True)
+    question = select_question(questions, question_id)
+    if not question:
+        return abort(404)
 
-    if_valid_view = request.args.get('valid_view')
-    question = add_to_view_count(questions, question_id, if_valid_view)
+    question[1] = convert_unix(question[1])
+
+    answers = get_ordered_answers(question_id)
 
     return render_template("question.html", question_id=question_id, answers=answers,
                            question=question, title=("Question" + question_id))
@@ -156,7 +150,7 @@ def show_edit_question_form(question_id):
     """View function of edit question form"""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    id_list = [line[0] for q in questions]
+    id_list = [question[0] for question in questions]
     if question_id not in id_list:
         flash("That ID does not exist. Use GUI to navigate the web page.", "error")
         return redirect(url_for('show_question_list'))
@@ -177,7 +171,7 @@ def delete_question(question_id):
     """
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    id_list = [line[0] for q in questions]
+    id_list = [question[0] for question in questions]
     if question_id not in id_list:
         flash("That ID does not exist. Use GUI to navigate the web page.", "error")
         return redirect(url_for('show_question_list'))
@@ -205,7 +199,7 @@ def add_answer(question_id):
     """Add answer and redirect to question page."""
     questions = read_csv("question.csv")
     # Redirect to list if ID is not found in table:
-    id_list = [line[0] for q in questions]
+    id_list = [question[0] for question in questions]
     if question_id not in id_list:
         flash("That ID does not exist. Use GUI to navigate the web page.", "error")
         return redirect(url_for('show_question_list'))
@@ -300,7 +294,7 @@ def vote(direction, question_id=None, answer_id=None):
 
         write_csv("answer.csv", answers)
 
-    return redirect(url_for('show_question_page', question_id=question_id, valid_view=False))
+    return redirect(url_for('show_question_page', question_id=question_id))
 
 
 @app.route("/answer/<answer_id>/del-img")
@@ -327,6 +321,11 @@ def delete_image(question_id=None, answer_id=None):
         write_csv("answer.csv", answers)
         os.remove("static/uploads/" + current_image)
         return redirect(url_for('show_edit_answer_form', answer_id=answer_id))
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
 
 
 if __name__ == "__main__":

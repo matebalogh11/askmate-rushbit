@@ -49,7 +49,7 @@
             <tr>
                 <td><span class="linked_cell number_cell"> {{ line[0] }}</span></td>
                 <td>
-                    <a href="{{ url_for('show_question_page', question_id=line[0]) }}">
+                    <a href="{{ url_for('show_question_page', question_id=line[0], view='counted') }}">
                         <span class="linked_cell">                     
                             {{ line[4] }}
                         </span>

@@ -1,3 +1,4 @@
+
 import base64
 import csv
 from copy import deepcopy
@@ -115,12 +116,39 @@ def select_ordering(questions, order, criterium):
     return questions
 
 
-def add_to_view_count(questions, question_id, if_valid_view):
-    for i, question_ in enumerate(questions):
-        if question_[0] == question_id:
-            question = questions[i]
-            if if_valid_view != 'False':
-                questions[i][2] += 1
-                write_csv("question.csv", questions)
-            questions[i][1] = convert_unix(questions[i][1])
-            return question
+def select_question(questions, question_id):
+    """Return selected question."""
+    selected_question = None
+    for i in range(len(questions)):
+        if questions[i][0] == question_id:
+            selected_question = questions[i]
+    return selected_question
+
+
+def increase_view_count(questions, question_id):
+    """Increase view count of question if view is
+    marked as counted. Counted only if navigated from
+    list view or requested question_id URL manually from
+    browser address bar.
+    Updates view count in CSV as well.
+    """
+    for i in range(len(questions)):
+        if questions[i][0] == question_id:
+            questions[i][2] += 1
+            write_csv("question.csv", questions)
+
+
+def get_ordered_answers(question_id):
+    """Return answers corresponding to question_id.
+    @question_id string: selected question id.
+    @return list: 2D list, where each sublist is an answer.
+    """
+    answers = read_csv("answer.csv")
+    answers = [answer for answer in answers if question_id == answer[3]]
+    for i in range(len(answers)):
+        answers[i][1] = convert_unix(answers[i][1])
+
+    # Ordering: primary - most votes on top, secondary - most recent on top:
+    answers = sorted(answers, key=lambda x: x[1], reverse=True)
+    answers = sorted(answers, key=lambda x: x[2], reverse=True)
+    return answers
