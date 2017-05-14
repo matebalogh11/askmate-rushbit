@@ -176,20 +176,27 @@ def delete_question(question_id):
         flash("That ID does not exist. Use GUI to navigate the web page.", "error")
         return redirect(url_for('show_question_list'))
 
-    answers = read_csv("answer.csv")
-
+    filtered_questions = []
     for question in questions:
-        if question[0] == question_id:
-            questions.remove(question)
-            for answer in answers:
-                if answer[3] == question_id:
-                    filename = answer[5]
-                    if filename:
-                        os.remove('static/uploads/' + filename)
-                    answers.remove(answer)
+        if question[0] != question_id:
+            filtered_questions.append(question)
+        else:
+            question_image = question[6]
+            if question_image:
+                os.remove('static/uploads/' + question_image)
 
-    write_csv("question.csv", questions)
-    write_csv("answer.csv", answers)
+    answers = read_csv("answer.csv")
+    filtered_answers = []
+    for answer in answers:
+        if answer[3] != question_id:
+            filtered_answers.append(answer)
+        else:
+            answer_image = answer[5]
+            if answer_image:
+                os.remove('static/uploads/' + answer_image)
+
+    write_csv("question.csv", filtered_questions)
+    write_csv("answer.csv", filtered_answers)
 
     return redirect(url_for("show_question_list"))
 
