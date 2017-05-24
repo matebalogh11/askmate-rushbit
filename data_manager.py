@@ -2,6 +2,8 @@
 import base64
 import csv
 from copy import deepcopy
+import config
+import psycopg2
 
 
 def write_csv(file, data):
@@ -46,3 +48,35 @@ def read_csv(file):
                     if i == 4 or i == 5 or i == 6:
                         requested_data[n][i] = base64.b64decode(requested_data[n][i]).decode("utf-8")
     return requested_data
+
+
+def connect_db(func):
+    def wrapper():
+        """Return connection object if established. Set autocommit to True."""
+        DNS = "dbname='{}' host='{}' user='{}' password='{}'".format(config.DB, config.HOST, config.USER, config.PW)
+        try:
+            conn = psycopg2.connect(DNS)
+            conn.autocommit = True
+        except Exception as e:
+            print("Cannot connect. Invalid credentials.")
+            print(e, end='')
+        else:
+            print("Connected to database '{}' on '{}' as user '{}'.".format(config.DB, config.HOST, config.USER))
+            result = func(conn)
+            return result
+        finally:
+            if conn:
+                conn.close()
+    return wrapper
+
+
+@connect_db
+def get_questions(conn):
+    """Return mentors full table."""
+    SQL = """SELECT * FROM tag;"""
+    with conn.cursor() as cursor:
+        cursor.execute(SQL)
+        result = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+    result.insert(0, column_names)
+    return result

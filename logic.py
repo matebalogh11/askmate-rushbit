@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 
 from data_manager import *
 
+# b = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.now())
 
 def allowed_extension(filename):
     """Takes a filename and validates by extension.
