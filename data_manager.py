@@ -51,7 +51,7 @@ def read_csv(file):
 
 
 def connect_db(func):
-    def wrapper():
+    def wrapper(query_args):
         """Return connection object if established. Set autocommit to True."""
         DNS = "dbname='{}' host='{}' user='{}' password='{}'".format(config.DB, config.HOST, config.USER, config.PW)
         try:
@@ -62,7 +62,7 @@ def connect_db(func):
             print(e, end='')
         else:
             print("Connected to database '{}' on '{}' as user '{}'.".format(config.DB, config.HOST, config.USER))
-            result = func(conn)
+            result = func(conn, query_args)
             return result
         finally:
             if conn:
@@ -71,12 +71,21 @@ def connect_db(func):
 
 
 @connect_db
-def get_questions(conn):
-    """Return mentors full table."""
-    SQL = """SELECT * FROM tag;"""
+def get_questions(conn, query_args):
+    """Return questions list for list.html"""
+    columns = query_args.get("columns")
+    SQL = """SELECT {},{},{},{},{},{} FROM {} ORDER BY {} {};""".format(columns[0],
+                                                                        columns[1],
+                                                                        columns[2],
+                                                                        columns[3],
+                                                                        columns[4],
+                                                                        columns[5],
+                                                                        query_args.get("table"),
+                                                                        query_args.get("criterium"),
+                                                                        query_args.get("order"))
     with conn.cursor() as cursor:
         cursor.execute(SQL)
         result = cursor.fetchall()
-        column_names = [desc[0] for desc in cursor.description]
-    result.insert(0, column_names)
+    #     column_names = [desc[0] for desc in cursor.description]
+    # result.insert(0, column_names)
     return result

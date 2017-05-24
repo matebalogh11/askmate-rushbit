@@ -69,19 +69,18 @@ def edit_question(question_id):
 
 @app.route("/")
 @app.route("/list/")
-def show_question_list(criterium=None, order=None):
+def show_question_list(criterium="submission_time", order="DESC"):
     """View function of question list, shown as a table, plus button to add new question.
     If URL requested with query string (through ordering buttons),
     then selects the ordering accoringly before rendering list.html.
     """
-    questions = read_csv("question.csv")
     for key in request.args:
         criterium = key
         order = request.args[key]
 
-    questions = select_ordering(questions, order, criterium)
-    for i in range(len(questions)):
-        questions[i][1] = convert_unix(questions[i][1])
+    query_args = {"columns": ("id", "title", "submission_time", "view_number", "vote_number", "answer_count"),
+                  "table": "question", "criterium": criterium, "order": order}
+    questions = get_questions(query_args)
 
     return render_template("list.html", questions=questions, title="Questions")
 
@@ -227,4 +226,4 @@ def page_not_found(error):
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=2000)
+    app.run(debug=True, port=2001)

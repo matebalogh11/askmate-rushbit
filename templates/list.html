@@ -26,23 +26,23 @@
             </th>
             <th class="date_cell">
                 Submission time
-                <a href="{{ url_for('show_question_list', time='asc') }}"><span class="arrow">▲</span></a>
-                <a href="{{ url_for('show_question_list', time='desc') }}"><span class="arrow">▼</span></a>
+                <a href="{{ url_for('show_question_list', submission_time='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', submission_time='desc') }}"><span class="arrow">▼</span></a>
             </th>
             <th class="number_cell">
                 Views
-                <a href="{{ url_for('show_question_list', views='asc') }}"><span class="arrow">▲</span></a>
-                <a href="{{ url_for('show_question_list', views='desc') }}"><span class="arrow">▼</span></a>
+                <a href="{{ url_for('show_question_list', view_number='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', view_number='desc') }}"><span class="arrow">▼</span></a>
             </th>
             <th class="number_cell">
                 Votes
-                <a href="{{ url_for('show_question_list', votes='asc') }}"><span class="arrow">▲</span></a>
-                <a href="{{ url_for('show_question_list', votes='desc') }}"><span class="arrow">▼</span></a>
+                <a href="{{ url_for('show_question_list', vote_number='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', vote_number='desc') }}"><span class="arrow">▼</span></a>
             </th>
             <th class="number_cell">
                 Answers
-                <a href="{{ url_for('show_question_list', answers='asc') }}"><span class="arrow">▲</span></a>
-                <a href="{{ url_for('show_question_list', answers='desc') }}"><span class="arrow">▼</span></a>
+                <a href="{{ url_for('show_question_list', answer_count='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_question_list', answer_count='desc') }}"><span class="arrow">▼</span></a>
             </th>
         </tr>
         {% for line in questions %}
@@ -51,14 +51,14 @@
                 <td>
                     <a href="{{ url_for('show_question_page', question_id=line[0], view='counted') }}">
                         <span class="linked_cell">                     
-                            {{ line[4] }}
+                            {{ line[1] }}
                         </span>
                     </a>
                 </td>
-                <td><span class="linked_cell date_cell"> {{ line[1] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ line[2] }}</span></td>
+                <td><span class="linked_cell date_cell"> {{ line[2] }}</span></td>
                 <td><span class="linked_cell number_cell"> {{ line[3] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ line[7] }}</span>                                                                                                                                 </td>
+                <td><span class="linked_cell number_cell"> {{ line[4] }}</span></td>
+                <td><span class="linked_cell number_cell"> {{ line[5] }}</span>                                                                                                                                 </td>
             </tr>
         {% endfor %}
     </table>
