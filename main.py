@@ -67,7 +67,7 @@ def edit_question(question_id):
 
 @app.route("/")
 @app.route("/list/")
-def show_question_list(criterium="submission_time", order="DESC"):
+def show_question_list(criterium='submission_time', order='desc'):
     """View function of question list, shown as a table, plus button to add new question.
     If URL requested with query string (through ordering buttons),
     then selects the ordering accoringly before rendering list.html.
@@ -76,10 +76,7 @@ def show_question_list(criterium="submission_time", order="DESC"):
         criterium = key
         order = request.args[key]
 
-    query_args = {"columns": ("id", "title", "submission_time", "view_number", "vote_number", "answer_count"),
-                  "table": "question", "criterium": criterium, "order": order}
-    questions = get_questions(query_args)
-    print(questions)
+    questions = get_questions(criterium, order)
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -143,31 +140,26 @@ def delete_question(question_id):
 @app.route("/question/<question_id>/new-answer", methods=["POST"])
 def add_answer(question_id):
     """Add answer and redirect to its question page."""
-    questions = read_csv("question.csv")
-
-    selected_question = select_question(questions, question_id)
-    if not selected_question:
+    try:
+        selected_question = get_question_details(question_id)
+    except Exception:
         return abort(404)
 
     if not valid_answer_message(request.form):
         flash("✘ Message must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    update_answer_counter(questions, question_id, operation="ADD")
-    write_csv('question.csv', questions)
+    update_answer_counter(question_id, operation="ADD")
 
-    answers = read_csv("answer.csv")
-    new_answer = create_new_answer_no_image(answers, request.form["message"], question_id)
+    new_answer = create_new_answer_no_image(request.form["message"], question_id)
+    answer_id, image = insert_answer(new_answer)
+    image_status = update_answer_image(answer_id, request.files)
 
-    image_status = update_answer_image(new_answer, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "not_allowed_ext":
         flash("✘ File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
     flash("✓ Answer posted.", "success")
-
-    answers.append(new_answer)
-    write_csv('answer.csv', answers)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 

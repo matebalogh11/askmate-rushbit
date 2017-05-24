@@ -237,21 +237,21 @@ def filter_answers(question_id):
     return filtered_answers
 
 
-def create_new_answer_no_image(answers, message, question_id):
+def create_new_answer_no_image(message, question_id):
     """Return new answer, based on HTTP request form, initialized without image.
     @answers list: 2d list.
     @message str: message from request.form.
     @return list: id(str), unix_timestamp(int), votes(int), question_id(str), message(str), image_path(str).
     """
-    answer_id = generate_id(answers, 'a')
-    init_time = get_unix_timestamp()
+
+    init_time = create_timestamp()
     init_votes = 0
-    init_image = ''
-    new_answer = [answer_id, init_time, init_votes, question_id, message, init_image]
+    init_image = None
+    new_answer = [init_time, init_votes, question_id, message, init_image]
     return new_answer
 
 
-def update_answer_image(answer, files):
+def update_answer_image(answer_id, files):
     """Update path to answer image and upload file to filesystem (/static/uploads).
     Validated server-side if file has been really sent with HTTP request
     and if extension is valid.
@@ -259,27 +259,24 @@ def update_answer_image(answer, files):
     @files dict: a_image key is the only expected key.
     @return str: status to know what message should be flashed to user.
     """
-    answer_id = answer[0]
+
     image = files.get('a_image', None)
     image_status = None
     if image and image.filename:
         if allowed_extension(image.filename):
-            filename = answer_id + "_" + secure_filename(image.filename)
+            filename = str(answer_id) + "_" + secure_filename(image.filename)
             image.save("static/uploads/" + filename)
-            answer[5] = filename
+            rename_answer_image(filename, answer_id)
             image_status = "uploaded"
         else:
             image_status = "not_allowed_ext"
     return image_status
 
 
-def update_answer_counter(questions, question_id, operation=None):
-    """Update number of answers for selected question."""
-    number = 1 if operation == "ADD" else (-1)
-    for i in range(len(questions)):
-        if questions[i][0] == question_id:
-            questions[i][7] += number
-            break
+# def update_answer_counter(question_id, operation=None):
+#     """Update number of answers for selected question."""
+#     number = 1 if operation == "ADD" else (-1)
+#     """UPDATE question SET answer_count += 1"""
 
 
 def remove_answer(answers, answer_id):

@@ -72,22 +72,22 @@ def connect_db(func):
 
 
 @connect_db
-def get_questions(conn, query_args):
+def get_questions(conn, criterium, order):
     """Return questions list for list.html"""
-    columns = query_args.get("columns")
-    SQL = """SELECT {},{},{},{},{},{} FROM {} ORDER BY {} {};""".format(columns[0],
-                                                                        columns[1],
-                                                                        columns[2],
-                                                                        columns[3],
-                                                                        columns[4],
-                                                                        columns[5],
-                                                                        query_args.get("table"),
-                                                                        query_args.get("criterium"),
-                                                                        query_args.get("order"))
+
+    check_criterium = ("title", "submission_time", "view_number", "vote_number", "answer_count")
+    check_order = ("asc", "desc")
+
+    if criterium not in check_criterium or order not in check_order:
+        criterium = "submission_time"
+        order = "desc"
+
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+             FROM question ORDER BY {} {};""".format(criterium, order)
+
     with conn.cursor() as cursor:
         cursor.execute(SQL)
         result = cursor.fetchall()
-        print(result)
     return result
 
 
@@ -142,5 +142,42 @@ def rename_question_image(conn, filename, question_id):
     """"""
     SQL = """UPDATE question SET image = %s WHERE id = %s;"""
     data = (filename, question_id)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def update_answer_counter(conn, question_id, operation):
+    """"""
+    number = 1 if operation == "ADD" else 0
+    if number:
+        SQL = """UPDATE question SET answer_count = answer_count + 1"""
+    else:
+        SQL = """UPDATE question SET answer_count = answer_count - 1"""
+
+    with conn.cursor() as cursor:
+        cursor.execute(SQL)
+
+
+@connect_db
+def insert_answer(conn, new_answer):
+    """Insert answer."""
+    SQL = """INSERT INTO answer (submission_time, vote_number,
+                                   question_id, message, image)
+             VALUES (%s, %s, %s, %s, %s)
+             RETURNING id, image;"""
+    data = (new_answer[0], new_answer[1], new_answer[2], new_answer[3],
+            new_answer[4])
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def rename_answer_image(conn, filename, answer_id):
+    """"""
+    SQL = """UPDATE answer SET image = %s WHERE id = %s;"""
+    data = (filename, answer_id)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
