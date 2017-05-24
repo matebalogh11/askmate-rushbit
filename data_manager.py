@@ -51,7 +51,7 @@ def read_csv(file):
 
 
 def connect_db(func):
-    def wrapper(query_args):
+    def wrapper(*args, **kwargs):
         """Return connection object if established. Set autocommit to True."""
         DNS = "dbname='{}' host='{}' user='{}' password='{}'".format(config.DB, config.HOST, config.USER, config.PW)
         conn = None
@@ -63,7 +63,7 @@ def connect_db(func):
             print(e, end='')
         else:
             print("Connected to database '{}' on '{}' as user '{}'.".format(config.DB, config.HOST, config.USER))
-            result = func(conn, query_args)
+            result = func(conn, *args, **kwargs)
             return result
         finally:
             if conn:
@@ -118,5 +118,29 @@ def get_all_for_question(conn, question_id):
 def update_view_count(conn, question_id):
     SQL = """ UPDATE question SET view_number = view_number + 1 WHERE id = %s """
     data = (question_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def insert_question(conn, new_question):
+    """Insert question."""
+    SQL = """INSERT INTO question (submission_time, view_number, vote_number,
+                                   title, message, image, answer_count)
+             VALUES (%s, %s, %s, %s, %s, %s, %s)
+             RETURNING id, image;"""
+    data = (new_question[0], new_question[1], new_question[2], new_question[3],
+            new_question[4], new_question[5], new_question[6])
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def rename_question_image(conn, filename, question_id):
+    """"""
+    SQL = """UPDATE question SET image = %s WHERE id = %s;"""
+    data = (filename, question_id)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)

@@ -20,19 +20,17 @@ def ask_question():
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    questions = read_csv('question.csv')
-    new_question = create_new_question_no_image(questions, request.form)
+    new_question = create_new_question_no_image(request.form)
+    question_id, previous_image = insert_question(new_question)
 
-    image_status = update_question_image(new_question, request.files)
+    image_status = update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "not_allowed_ext":
         flash("✘ File was not uploaded. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
     flash("✓ Question posted.", "success")
-    questions.append(new_question)
-    write_csv('question.csv', questions)
-    return redirect(url_for('show_question_page', question_id=new_question[0]))
+    return redirect(url_for('show_question_page', question_id=question_id))
 
 
 @app.route('/question/<question_id>/post-edit', methods=['POST'])

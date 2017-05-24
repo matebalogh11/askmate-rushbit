@@ -8,7 +8,11 @@ from werkzeug.utils import secure_filename
 
 from data_manager import *
 
-# b = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.now())
+
+def create_timestamp():
+    """Create timestamp."""
+    timestamp = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.now())
+    return timestamp
 
 
 def allowed_extension(filename):
@@ -103,7 +107,7 @@ def get_ordered_answers(question_id):
     return answers
 
 
-def create_new_question_no_image(questions, q_form):
+def create_new_question_no_image(q_form):
     """Create new question from successfully filled question form
     with unique ID in questions, actual unix timestamp and additional initial values.
     @questions list: 2d list.
@@ -113,16 +117,14 @@ def create_new_question_no_image(questions, q_form):
     """
     intial_views = 0
     initial_votes = 0
-    empty_image = ''
+    empty_image = None
     initial_answer_count = 0
-    new_question = [generate_id(questions, 'q'), get_unix_timestamp(),
-                    intial_views, initial_votes,
-                    q_form['q_title'], q_form['q_desc'],
+    new_question = [create_timestamp(), intial_views, initial_votes, q_form['q_title'], q_form['q_desc'],
                     empty_image, initial_answer_count]
     return new_question
 
 
-def update_question_image(question, files):
+def update_question_image(question_id, previous_image, files):
     """Update path to question image and manage filesystem.
     If image belonged to question already and new image is uploaded,
     then delete previous image and upload new image.
@@ -137,16 +139,13 @@ def update_question_image(question, files):
     @files dict: q_image key is the only expected key.
     @return str: status to know what message should be flashed to user.
     """
-    previous_image = question[6]
-    question_id = question[0]
-
     image = files.get('q_image', None)
     image_status = None
     if image and image.filename:
         if allowed_extension(image.filename):
-            filename = question_id + "_" + secure_filename(image.filename)
+            filename = "q_id_" + str(question_id) + "_" + secure_filename(image.filename)
             image.save("static/uploads/" + filename)
-            question[6] = filename
+            rename_question_image(filename, question_id)
             image_status = "uploaded"
             if previous_image:
                 image_status = "updated"
