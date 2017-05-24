@@ -97,7 +97,7 @@ def get_question_details(conn, question_id):
     data = (question_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
-        result = cursor.fetchall()[0]
+        result = cursor.fetchone()
     return result
 
 
@@ -108,7 +108,7 @@ def get_all_for_question(conn, question_id):
     data = (question_id, )
     with conn.cursor() as cursor:
         cursor.execute(SQL_q, data)
-        result_q = cursor.fetchall()[0]
+        result_q = cursor.fetchone()
         cursor.execute(SQL_a, data)
         result_a = cursor.fetchall()
     return result_q, result_a
@@ -233,4 +233,24 @@ def get_answer_details(conn, answer_id):
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
         result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def update_question(conn, q_form, question_id):
+    """Insert question."""
+    SQL = """UPDATE question SET title = %s, message = %s WHERE id = %s;"""
+    data = (q_form['q_title'], q_form['q_desc'], question_id)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def get_image_for_update_question(conn, question_id):
+    """Get image name for question with question_id."""
+    SQL = """SELECT image FROM question WHERE id = %s;"""
+    data = (question_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()[0]
     return result

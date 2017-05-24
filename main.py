@@ -42,16 +42,18 @@ def edit_question(question_id):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    questions = read_csv('question.csv')
-    temp = create_edited_question_no_image(questions, request.form, question_id)
-    edited_question = temp[0]
-    selected_question_index = temp[1]
+    try:
+        selected_question = get_question_details(question_id)
+        if not selected_question:
+            raise IndexError
+    except (psycopg2.DatabaseError, IndexError):
+        return abort(404)
 
-    if not edited_question:
-        flash("✘ Question ID does not exist. Please use the GUI to navigate.", "error")
-        return redirect(url_for('show_question_list'))
+    update_question(request.form, question_id)
 
-    image_status = update_question_image(edited_question, request.files)
+    previous_image = get_image_for_update_question(question_id)
+
+    image_status = update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "updated":
@@ -60,8 +62,7 @@ def edit_question(question_id):
         flash("✘ File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
     flash("✓ Question successfully edited.", "success")
-    questions[selected_question_index] = edited_question
-    write_csv('question.csv', questions)
+
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
@@ -99,7 +100,9 @@ def show_edit_question_form(question_id):
     """View function of edit question form"""
     try:
         selected_question = get_question_details(question_id)
-    except Exception:
+        if not selected_question:
+            raise IndexError
+    except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
     return render_template("q_form.html", title="Edit Question",
@@ -127,12 +130,14 @@ def delete_question(question_id):
     furthermore delete corresponding answers and their images.
     """
     try:
-        question_details = get_question_details(question_id)
-    except:
+        selected_question = get_question_details(question_id)
+        if not selected_question:
+            raise IndexError
+    except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
     remove_answer_images_by_q_id(question_id)
-    image = question_details[2]
+    image = selected_question[2]
     filter_questions(question_id, image)
 
     return redirect(url_for("show_question_list"))
@@ -143,7 +148,9 @@ def add_answer(question_id):
     """Add answer and redirect to its question page."""
     try:
         selected_question = get_question_details(question_id)
-    except Exception:
+        if not selected_question:
+            raise IndexError
+    except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
     if not valid_answer_message(request.form):
@@ -169,7 +176,9 @@ def add_answer(question_id):
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
     try:
-        selected_answer_id = get_answer_details(answer_id)[0]
+        selected_answer_id = get_answer_details(answer_id)
+        if not selected_answer_id:
+            raise IndexError
     except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
