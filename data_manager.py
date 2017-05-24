@@ -181,3 +181,24 @@ def rename_answer_image(conn, filename, answer_id):
     data = (filename, answer_id)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
+
+
+@connect_db
+def delete_question(conn, question_id):
+    """"""
+    SQL = """DELETE FROM question WHERE id = %s"""
+    data = (question_id, )
+
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def fetch_answer_images(conn, question_id):
+    SQL = """SELECT image from answer WHERE question_id = %s;"""
+    data = (question_id, )
+
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchall()[0]
+    return result

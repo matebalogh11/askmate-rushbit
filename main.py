@@ -126,14 +126,15 @@ def delete_question(question_id):
     """Delete question (and its image) based on its question_id
     furthermore delete corresponding answers and their images.
     """
-    filtered_questions, id_never_found = filter_questions(question_id)
-    if id_never_found:
+    try:
+        question_details = get_question_details(question_id)
+    except:
         return abort(404)
 
-    filtered_answers = filter_answers(question_id)
+    filter_answers(question_id)
+    image = question_details[2]
+    filter_questions(question_id, image)
 
-    write_csv("question.csv", filtered_questions)
-    write_csv("answer.csv", filtered_answers)
     return redirect(url_for("show_question_list"))
 
 

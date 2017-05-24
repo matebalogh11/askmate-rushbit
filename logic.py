@@ -194,47 +194,31 @@ def create_edited_question_no_image(questions, q_form, question_id):
     return (edited_question, selected_question_index)
 
 
-def filter_questions(question_id):
+def filter_questions(question_id, question_image):
     """Return filtered questions, removing question with question_id,
     also return a status indicator whether any question was found with question_id.
     @return tuple: 2d list, bool.
     """
-    questions = read_csv("question.csv")
-    id_never_found = True
-    filtered_questions = []
-    for question in questions:
-        if question[0] != question_id:
-            filtered_questions.append(question)
-        else:
-            id_never_found = False
-            question_image = question[6]
-            if question_image:
-                try:
-                    os.remove('static/uploads/' + question_image)
-                except FileNotFoundError:
-                    pass
+    delete_question(question_id)
 
-    return (filtered_questions, id_never_found)
+    if question_image:
+        try:
+            os.remove('static/uploads/' + question_image)
+        except FileNotFoundError:
+            pass
 
 
 def filter_answers(question_id):
     """Return filtered answers, removing answers with question_id.
     @return list: 2d list of filtered answers.
     """
-    answers = read_csv("answer.csv")
-    filtered_answers = []
-    for answer in answers:
-        if answer[3] != question_id:
-            filtered_answers.append(answer)
-        else:
-            answer_image = answer[5]
-            if answer_image:
-                try:
-                    os.remove('static/uploads/' + answer_image)
-                except FileNotFoundError:
-                    pass
+    images = fetch_answer_images(question_id)
 
-    return filtered_answers
+    for image in images:
+        try:
+            os.remove('static/uploads/' + image)
+        except FileNotFoundError:
+            pass
 
 
 def create_new_answer_no_image(message, question_id):
@@ -271,12 +255,6 @@ def update_answer_image(answer_id, files):
         else:
             image_status = "not_allowed_ext"
     return image_status
-
-
-# def update_answer_counter(question_id, operation=None):
-#     """Update number of answers for selected question."""
-#     number = 1 if operation == "ADD" else (-1)
-#     """UPDATE question SET answer_count += 1"""
 
 
 def remove_answer(answers, answer_id):
