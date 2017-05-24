@@ -86,6 +86,14 @@ def get_questions(conn, query_args):
     with conn.cursor() as cursor:
         cursor.execute(SQL)
         result = cursor.fetchall()
-    #     column_names = [desc[0] for desc in cursor.description]
-    # result.insert(0, column_names)
+    return result
+
+
+@connect_db
+def get_question_details(conn, question_id):
+    SQL = """ SELECT title, message, image FROM question WHERE id = %s """
+    data = (question_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchall()[0]
     return result

@@ -102,10 +102,9 @@ def show_new_answer_form(question_id):
 @app.route("/question/<question_id>/edit")
 def show_edit_question_form(question_id):
     """View function of edit question form"""
-    questions = read_csv("question.csv")
-
-    selected_question = select_question(questions, question_id)
-    if not selected_question:
+    try:
+        selected_question = get_question_details(question_id)
+    except Exception:
         return abort(404)
 
     return render_template("q_form.html", title="Edit Question",
