@@ -81,7 +81,7 @@ def show_question_list(criterium="submission_time", order="DESC"):
     query_args = {"columns": ("id", "title", "submission_time", "view_number", "vote_number", "answer_count"),
                   "table": "question", "criterium": criterium, "order": order}
     questions = get_questions(query_args)
-
+    print(questions)
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -114,21 +114,16 @@ def show_edit_question_form(question_id):
 @app.route("/question/<question_id>")
 def show_question_page(question_id):
     """View function of question page, with details and answers."""
-    questions = read_csv("question.csv")
-
     if request.args.get('view') == "counted":
-        increase_view_count(questions, question_id)
+        update_view_count(question_id)
 
-    question = select_question(questions, question_id)
-    if not question:
+    try:
+        selected_question, answers = get_all_for_question(question_id)
+    except Exception:
         return abort(404)
 
-    question[1] = convert_unix(question[1])
-
-    answers = get_ordered_answers(question_id)
-
     return render_template("question.html", question_id=question_id, answers=answers,
-                           question=question, title=("Question " + question_id))
+                           question=selected_question, title=("Question " + question_id))
 
 
 @app.route("/question/<question_id>/delete")

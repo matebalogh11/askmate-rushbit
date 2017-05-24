@@ -54,6 +54,7 @@ def connect_db(func):
     def wrapper(query_args):
         """Return connection object if established. Set autocommit to True."""
         DNS = "dbname='{}' host='{}' user='{}' password='{}'".format(config.DB, config.HOST, config.USER, config.PW)
+        conn = None
         try:
             conn = psycopg2.connect(DNS)
             conn.autocommit = True
@@ -86,6 +87,7 @@ def get_questions(conn, query_args):
     with conn.cursor() as cursor:
         cursor.execute(SQL)
         result = cursor.fetchall()
+        print(result)
     return result
 
 
@@ -97,3 +99,24 @@ def get_question_details(conn, question_id):
         cursor.execute(SQL, data)
         result = cursor.fetchall()[0]
     return result
+
+
+@connect_db
+def get_all_for_question(conn, question_id):
+    SQL_q = """ SELECT * FROM question WHERE id = %s """
+    SQL_a = """ SELECT * FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC"""
+    data = (question_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL_q, data)
+        result_q = cursor.fetchall()[0]
+        cursor.execute(SQL_a, data)
+        result_a = cursor.fetchall()
+    return result_q, result_a
+
+
+@connect_db
+def update_view_count(conn, question_id):
+    SQL = """ UPDATE question SET view_number = view_number + 1 WHERE id = %s """
+    data = (question_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)

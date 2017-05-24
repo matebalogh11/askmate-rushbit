@@ -10,6 +10,7 @@ from data_manager import *
 
 # b = '{:%Y-%m-%d %H:%M:%S}'.format(datetime.now())
 
+
 def allowed_extension(filename):
     """Takes a filename and validates by extension.
     @filename string: filename string.
@@ -84,19 +85,6 @@ def select_question(questions, question_id):
             selected_question = questions[i]
             break
     return selected_question
-
-
-def increase_view_count(questions, question_id):
-    """Increase view count of question if view is
-    marked as counted. Counted only if navigated from
-    list view or requested question_id URL manually from
-    browser address bar.
-    Updates view count in CSV as well.
-    """
-    for i in range(len(questions)):
-        if questions[i][0] == question_id:
-            questions[i][2] += 1
-            write_csv("question.csv", questions)
 
 
 def get_ordered_answers(question_id):
