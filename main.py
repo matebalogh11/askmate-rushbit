@@ -131,7 +131,7 @@ def delete_question(question_id):
     except:
         return abort(404)
 
-    filter_answers(question_id)
+    remove_answer_images_by_q_id(question_id)
     image = question_details[2]
     filter_questions(question_id, image)
 
@@ -168,17 +168,14 @@ def add_answer(question_id):
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
-    answers = read_csv("answer.csv")
-    filtered_answers, id_never_found, question_id = remove_answer(answers, answer_id)
-
-    if id_never_found:
+    try:
+        selected_answer_id = get_answer_details(answer_id)[0]
+    except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
-    questions = read_csv('question.csv')
-    update_answer_counter(questions, question_id, operation="SUB")
+    question_id = remove_answer(answer_id)
+    update_answer_counter(question_id, operation="SUB")
 
-    write_csv("question.csv", questions)
-    write_csv("answer.csv", filtered_answers)
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
@@ -211,4 +208,4 @@ def page_not_found(error):
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=2001)
+    app.run(debug=True, port=2002)

@@ -208,7 +208,7 @@ def filter_questions(question_id, question_image):
             pass
 
 
-def filter_answers(question_id):
+def remove_answer_images_by_q_id(question_id):
     """Return filtered answers, removing answers with question_id.
     @return list: 2d list of filtered answers.
     """
@@ -217,7 +217,7 @@ def filter_answers(question_id):
     for image in images:
         try:
             os.remove('static/uploads/' + image)
-        except FileNotFoundError:
+        except (FileNotFoundError, TypeError):
             pass
 
 
@@ -257,28 +257,22 @@ def update_answer_image(answer_id, files):
     return image_status
 
 
-def remove_answer(answers, answer_id):
+def remove_answer(answer_id):
     """Return filtered answers, removing answer with answer_id,
     also return status message whether id was ever found or not,
     and return question_id for later use.
     Deletes answer image from filesystem if found.
     @return tuple: 2d list, bool, str.
     """
-    id_never_found = True
-    filtered_answers = []
-    for answer in answers:
-        if answer[0] != answer_id:
-            filtered_answers.append(answer)
-        else:
-            id_never_found = False
-            question_id = answer[3]
-            current_image = answer[5]
-    if current_image:
-        try:
-            os.remove("static/uploads/" + current_image)
-        except FileNotFoundError:
-            pass
-    return (filtered_answers, id_never_found, question_id)
+    image_to_delete, question_id = get_answer_image(answer_id)
+
+    try:
+        os.remove("static/uploads/" + image_to_delete)
+    except FileNotFoundError:
+        pass
+
+    delete_answer_by_id(answer_id)
+    return question_id
 
 
 def do_vote(direction, question_id=None, answer_id=None):

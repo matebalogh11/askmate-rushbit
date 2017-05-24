@@ -151,12 +151,14 @@ def update_answer_counter(conn, question_id, operation):
     """"""
     number = 1 if operation == "ADD" else 0
     if number:
-        SQL = """UPDATE question SET answer_count = answer_count + 1"""
+        SQL = """UPDATE question SET answer_count = answer_count + 1 WHERE id = %s"""
     else:
-        SQL = """UPDATE question SET answer_count = answer_count - 1"""
+        SQL = """UPDATE question SET answer_count = answer_count - 1 WHERE id = %s"""
+
+    data = (question_id,)
 
     with conn.cursor() as cursor:
-        cursor.execute(SQL)
+        cursor.execute(SQL, data)
 
 
 @connect_db
@@ -196,9 +198,39 @@ def delete_question(conn, question_id):
 @connect_db
 def fetch_answer_images(conn, question_id):
     SQL = """SELECT image from answer WHERE question_id = %s;"""
-    data = (question_id, )
+    data = (question_id,)
 
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
-        result = cursor.fetchall()[0]
+        result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def delete_answer_by_id(conn, answer_id):
+    """Deletes answer by answer ID."""
+    SQL = """DELETE FROM answer WHERE id = %s"""
+    data = (answer_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def get_answer_image(conn, answer_id):
+    """Deletes image of an answer."""
+    SQL = """SELECT image, question_id FROM answer WHERE id = %s"""
+    data = (answer_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def get_answer_details(conn, answer_id):
+    SQL = """ SELECT id FROM answer WHERE id = %s """
+    data = (answer_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()
     return result
