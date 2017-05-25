@@ -275,9 +275,10 @@ def do_delete_image(question_id):
 
 
 def new_comment(comment_data, question_id=None, answer_id=None):
+    """"""
     init_time = create_timestamp()
     init_edit = 0
-    comment = (question_id, answer_id, comment_data, init_time, init_edit)
+    comment = [question_id, answer_id, comment_data, init_time, init_edit]
     return comment
 
 

@@ -115,12 +115,12 @@ def show_question_page(question_id):
     if request.args.get('view') == "counted":
         update_view_count(question_id)
 
-    # try:
-    selected_question, answers = get_all_for_question(question_id)
-    answer_ids = tuple(collect_answer_ids(answers))
-    q_comments, a_comments = retrieve_comments(question_id, answer_ids)
-    # except Exception:
-    #     return abort(404)
+    try:
+        selected_question, answers = get_all_for_question(question_id)
+        answer_ids = tuple(collect_answer_ids(answers))
+        q_comments, a_comments = retrieve_comments(question_id, answer_ids)
+    except (IndexError, FileNotFoundError):
+        return abort(404)
 
     return render_template("question.html", question_id=question_id, answers=answers,
                            question=selected_question, title=("Question " + question_id),
@@ -213,10 +213,10 @@ def delete_image(question_id):
     return redirect(url_for('show_edit_question_form', question_id=question_id))
 
 
-@app.route("/question/<question_id>/question_comment", methods=["POST"])
-@app.route("/answer/<question_id>/answer_comment/<answer_id>", methods=["POST"])
-def add_comment(question_id, answer_id=None):
+@app.route("/comment/<question_id>", methods=["POST"])
+def add_comment(question_id):
     """This is ok for questions and answers as well"""
+    answer_id = request.args.get("answer_id")
     new_com = new_comment(question_id, answer_id, request.form.get("get_comment"))
     insert_comment(new_com)
     return redirect(url_for("show_question_page", question_id=question_id))
