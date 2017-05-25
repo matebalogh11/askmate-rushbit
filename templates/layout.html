@@ -22,8 +22,8 @@
                 <div class="searchbar">
                     <form action="{{ url_for('show_search_results') }}">
                         <div>
-                            <input type="text" name="q" id="search" class="inputfield" placeholder="Search" cha>
-                            <input type="submit" name="submit" id="search-submit" value="Go!" class="searchbutton">
+                            <input type="text" name="q" id="search" class="inputfield" placeholder="Search">
+                            <input type="image" src="{{ url_for('static', filename='magnifier.svg')}}" name="submit" id="search-submit" class="searchbutton">
                         </div>
                     </form>
                 </div>
