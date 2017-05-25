@@ -404,5 +404,8 @@ textarea {
 .credits {
     color: white;
     margin: 5px 0;
-    
+}
+
+#q_comment {
+    display: none;
 }
