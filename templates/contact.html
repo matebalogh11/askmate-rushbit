@@ -1,0 +1,26 @@
+
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>Contact</h1>
+    <p>You can contact us through any of the contact info listed below.</p>
+    <ul>
+        <li>Phone: 0036 666-6666</li>
+        <li>Email: office@codecool.com</li>
+        <li>Address: Nagymezo str 44, Budapest, Hungary</li>
+    </ul>
+</div>
+
+{% endblock %}

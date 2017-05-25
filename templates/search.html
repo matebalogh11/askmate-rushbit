@@ -1,0 +1,35 @@
+
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+
+    <h1>Search Results</h1>
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% for question in questions %}
+    <h2><a href="{{ url_for('show_question_page', question_id=question[0], view='counted') }}">{{ question[1]|safe }}</a></h2>
+    <p>[{{ question[2] }}] - ID: {{ question[0] }} - Views: {{ question[3] }} - Votes: {{ question[4] }} - Answers: {{ question[5] }}</p>
+
+        {% if question[6] %}
+            {% for answer in question[6] %}
+            <h4>Answer - ID: {{ answer[0] }}</h4>
+            <p>Message: {{ answer[4]|safe }}</p>
+            <p>[{{ answer[1] }}] - Votes: {{ answer[2] }}</p>
+            {% endfor %}
+        {% endif %}
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -46,7 +46,7 @@ def get_questions(conn, criterium, order):
 
 @connect_db
 def get_question_details(conn, question_id):
-    SQL = """ SELECT title, message, image FROM question WHERE id = %s """
+    SQL = """SELECT title, message, image FROM question WHERE id = %s;"""
     data = (question_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
@@ -56,8 +56,8 @@ def get_question_details(conn, question_id):
 
 @connect_db
 def get_all_for_question(conn, question_id):
-    SQL_q = """ SELECT * FROM question WHERE id = %s """
-    SQL_a = """ SELECT * FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC"""
+    SQL_q = """ SELECT * FROM question WHERE id = %s;"""
+    SQL_a = """ SELECT * FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC;"""
     data = (question_id, )
     with conn.cursor() as cursor:
         cursor.execute(SQL_q, data)
@@ -69,7 +69,7 @@ def get_all_for_question(conn, question_id):
 
 @connect_db
 def update_view_count(conn, question_id):
-    SQL = """ UPDATE question SET view_number = view_number + 1 WHERE id = %s """
+    SQL = """UPDATE question SET view_number = view_number + 1 WHERE id = %s;"""
     data = (question_id, )
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
@@ -104,9 +104,9 @@ def update_answer_counter(conn, question_id, operation):
     """"""
     number = 1 if operation == "ADD" else 0
     if number:
-        SQL = """UPDATE question SET answer_count = answer_count + 1 WHERE id = %s"""
+        SQL = """UPDATE question SET answer_count = answer_count + 1 WHERE id = %s;"""
     else:
-        SQL = """UPDATE question SET answer_count = answer_count - 1 WHERE id = %s"""
+        SQL = """UPDATE question SET answer_count = answer_count - 1 WHERE id = %s;"""
 
     data = (question_id,)
 
@@ -141,7 +141,7 @@ def rename_answer_image(conn, filename, answer_id):
 @connect_db
 def delete_question(conn, question_id):
     """"""
-    SQL = """DELETE FROM question WHERE id = %s"""
+    SQL = """DELETE FROM question WHERE id = %s;"""
     data = (question_id, )
 
     with conn.cursor() as cursor:
@@ -162,7 +162,7 @@ def fetch_answer_images(conn, question_id):
 @connect_db
 def delete_answer_by_id(conn, answer_id):
     """Deletes answer by answer ID."""
-    SQL = """DELETE FROM answer WHERE id = %s"""
+    SQL = """DELETE FROM answer WHERE id = %s;"""
     data = (answer_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
@@ -171,7 +171,7 @@ def delete_answer_by_id(conn, answer_id):
 @connect_db
 def get_answer_image(conn, answer_id):
     """Deletes image of an answer."""
-    SQL = """SELECT image, question_id FROM answer WHERE id = %s"""
+    SQL = """SELECT image, question_id FROM answer WHERE id = %s;"""
     data = (answer_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
@@ -181,7 +181,7 @@ def get_answer_image(conn, answer_id):
 
 @connect_db
 def get_answer_details(conn, answer_id):
-    SQL = """ SELECT id FROM answer WHERE id = %s """
+    SQL = """SELECT id FROM answer WHERE id = %s;"""
     data = (answer_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
@@ -240,12 +240,58 @@ def change_vote_count(conn, direction, question_id=None, answer_id=None):
 @connect_db
 def get_question_image(conn, question_id):
     """Deletes image of a question."""
-    SQL1 = """SELECT image FROM question WHERE id = %s"""
-    SQL2 = """UPDATE question SET image = NULL WHERE id = %s"""
+    SQL1 = """SELECT image FROM question WHERE id = %s;"""
+    SQL2 = """UPDATE question SET image = NULL WHERE id = %s;"""
     data = (question_id,)
 
     with conn.cursor() as cursor:
         cursor.execute(SQL1, data)
         result = cursor.fetchone()[0]
         cursor.execute(SQL2, data)
+    return result
+
+
+@connect_db
+def get_5_questions(conn):
+    """Return 5 most recent questions."""
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+             FROM question ORDER BY submission_time DESC LIMIT 5;"""
+    with conn.cursor() as cursor:
+        cursor.execute(SQL)
+        result = cursor.fetchall()
+    return result
+
+
+@connect_db
+def get_search_results(conn, phrase):
+    """Return search results based on search phrase as tuple: questions 2d list, answers 2d list.
+    In question table [0] index as primary key is connected to [3] index as foreign key in answer table.
+    """
+    SQL1 = """SELECT id, title, submission_time, view_number, vote_number, answer_count FROM question
+             WHERE title ILIKE %s ORDER BY vote_number;"""
+    SQL2 = """SELECT id, submission_time, vote_number, question_id, message FROM answer
+            WHERE message ILIKE %s ORDER BY vote_number DESC;"""
+    data = ('%' + phrase + '%',)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL1, data)
+        result_questions = cursor.fetchall()
+        cursor.execute(SQL2, data)
+        result_answers = cursor.fetchall()
+    return result_questions, result_answers
+
+
+@connect_db
+def get_additional_questions(conn, missing_question_ids):
+    """Return those questions that are still missing to serve as parent question
+    for answers found by phrase, even though these questions do not have the phrase in their title/description.
+    """
+    if not missing_question_ids:
+        missing_question_ids = (None,)
+
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count FROM question
+             WHERE id IN %s;"""
+    data = (missing_question_ids,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchall()
     return result

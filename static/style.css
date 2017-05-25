@@ -406,3 +406,7 @@ textarea {
     margin: 5px 0;
     
 }
+
+.highlight {
+    background-color: yellow;
+}
