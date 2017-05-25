@@ -91,22 +91,6 @@ def select_question(questions, question_id):
     return selected_question
 
 
-def get_ordered_answers(question_id):
-    """Return answers corresponding to question_id.
-    @question_id string: selected question id.
-    @return list: 2D list, where each sublist is an answer.
-    """
-    answers = read_csv("answer.csv")
-    answers = [answer for answer in answers if question_id == answer[3]]
-    for i in range(len(answers)):
-        answers[i][1] = convert_unix(answers[i][1])
-
-    # Ordering: primary - most votes on top, secondary - most recent on top:
-    answers = sorted(answers, key=lambda x: x[1], reverse=True)
-    answers = sorted(answers, key=lambda x: x[2], reverse=True)
-    return answers
-
-
 def create_new_question_no_image(q_form):
     """Create new question from successfully filled question form
     with unique ID in questions, actual unix timestamp and additional initial values.
@@ -268,7 +252,7 @@ def remove_answer(answer_id):
 
     try:
         os.remove("static/uploads/" + image_to_delete)
-    except FileNotFoundError:
+    except (FileNotFoundError, TypeError):
         pass
 
     delete_answer_by_id(answer_id)
