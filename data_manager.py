@@ -251,25 +251,26 @@ def get_question_image(conn, question_id):
     return result
 
 
-@conncet_db
+@connect_db
 def insert_comment(conn, new_comment):
     SQL = """INSERT INTO comment (question_id, answer_id,
-                                    message, submission_time, edited_number)
+                                    message, submission_time, edited_count)
             VALUES (%s, %s, %s, %s, %s)"""
-    data = (new_comment[0], new_comment[1], new_comment[2], new_comment[3], new_comment[4])
-    while conn.cursor() as cursor:
+    data = (new_comment[2], new_comment[0], new_comment[1], new_comment[3], new_comment[4])
+    with conn.cursor() as cursor:
         cursor.execute(SQL, data)
 
 
 @connect_db
-def retrieve_comments(conn, question_id, anwer_ids=None):
+def retrieve_comments(conn, question_id, answer_ids=None):
     SQL_q = """ SELECT * FROM comment WHERE question_id = question_id ORDER BY submission_time """
-    SQL_a = """ SELECT * FROM comment WHERE answer_id IN answer_ids ORDER BY submission_time """
-    while conn.cursor() as cursor:
+    SQL_a = """ SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time """
+    data = (answer_ids,)
+    with conn.cursor() as cursor:
         cursor.execute(SQL_q)
         result_q = cursor.fetchall()
-        if answer_id:
-            cursor.execute(SQL_a)
+        if answer_ids:
+            cursor.execute(SQL_a, data)
             result_a = cursor.fetchall()
         else:
             result_a = None
