@@ -15,11 +15,6 @@
     {% endwith %}
 
     <h1>Index Page</h1>
-    <img src="{{ url_for('static', filename='project.png') }}" alt="Project image">
-    <p>Here goes some basic description how AskMate was created and more information can be found by clicking on the button below.</p>
-    <div class="cta_container">
-    <a href="https://www.youtube.com/" class="cta_home">About the project</a> 
-    </div>
     <h2>Most recent questions</h2>
     <div class="cta_container">
     <a href="{{ url_for('show_question_list') }}" class="cta_home">All questions</a> 
@@ -75,6 +70,13 @@
             </tr>
         {% endfor %}
     </table>
+
+    <h2>About the project</h2>
+    <img src="{{ url_for('static', filename='project.png') }}" alt="Project image">
+    <p>Here goes some basic description how AskMate was created and more information can be found by clicking on the button below.</p>
+    <div class="cta_container">
+    <a href="https://www.youtube.com/" class="cta_home">About the project</a> 
+    </div>
 </div>
 
 {% endblock %}

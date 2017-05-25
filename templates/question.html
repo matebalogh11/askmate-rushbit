@@ -21,15 +21,21 @@
         <form action="">
             <p class="actionbuttons">
                 <input type="submit" value="Edit question" name="submit1" class= "cta" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
-
                 <input type="submit" value="Delete question" name="submit2" class= "delete_button" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
-
                 <input type="submit" value="Add answer" name="submit3" class= "cta" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
-
-                <input type="submit" value="Back to Questions" name="submit4" class= "cta" id="submit4" formaction="{{ url_for('show_question_list') }}">
+                <input type="submit" value="Add tag" name="submit4" class= "cta" id="submit4" formaction="{{ url_for('show_add_tag', question_id=question_id) }}">
+                <input type="submit" value="Back to Questions" name="submit5" class= "cta" id="submit5" formaction="{{ url_for('show_question_list') }}">
             </p>
         </form>
     <p class="description">{{ question[5] }}</p>
+
+    {% if added_ids_tags %}
+    <div class="tags">
+        {% for tag_id, tag_name in added_ids_tags %}
+            <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">✘</a></span>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="voter">
         <a href="{{ url_for('vote', direction='up', question_id=question_id) }}" class="voteup">VOTE UP</a>

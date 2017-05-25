@@ -186,9 +186,11 @@ def show_question_page(question_id):
     except (IndexError, FileNotFoundError):
         return abort(404)
 
+    added_ids_tags = get_added_tags(question_id)
+
     return render_template("question.html", question_id=question_id, answers=answers,
                            question=selected_question, title=("Question " + question_id),
-                           q_comments=q_comments, a_comments=a_comments)
+                           q_comments=q_comments, a_comments=a_comments, added_ids_tags=added_ids_tags)
 
 
 @app.route("/question/<question_id>/delete")
@@ -300,6 +302,64 @@ def remove_comment(question_id, comment_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/question/<question_id>/new-tag", methods=["GET", "POST"])
+def show_add_tag(question_id):
+    """View function of question tag addition page."""
+    if request.method == "POST":
+        all_existing_tags = get_all_existing_tags()
+
+        new_tags = []
+        for key in ("new_tag1", "new_tag2", "new_tag3"):
+            if len(request.form.get(key, '')) <= 20 and len(request.form.get(key, '')) >= 2:
+                if " " in request.form.get(key):
+                    flash("The tag cannot contain spaces!", "error")
+                    return redirect(url_for('show_question_page', question_id=question_id))
+                new_key = request.form[key]
+                if new_key not in all_existing_tags:
+                    new_tags.append(new_key)
+
+        if new_tags:
+            new_tag_ids = insert_new_tags(new_tags)
+
+        selected_tags = []
+        if request.form.get("select_tag1"):
+            selected_tags.append(request.form["select_tag1"])
+        if request.form.get("select_tag2") and request.form.get("select_tag2") not in selected_tags:
+            selected_tags.append(request.form["select_tag2"])
+        if request.form.get("select_tag3") and request.form.get("select_tag3") not in selected_tags:
+            selected_tags.append(request.form["select_tag3"])
+
+        if selected_tags:
+            selected_tag_ids = get_selected_tag_ids(tuple(selected_tags))
+
+        tag_ids = []
+        if new_tags:
+            tag_ids.extend(list(new_tag_ids))
+        if selected_tags:
+            tag_ids.extend(list(selected_tag_ids))
+
+        if tag_ids:
+            insert_tag_relations(question_id, tag_ids)
+
+        return redirect(url_for('show_question_page', question_id=question_id))
+
+    else:
+        ids_tags = get_added_tags(question_id)
+        added_tags = [item[1] for item in ids_tags]
+        existing_tags = get_existing_tags(tuple(added_tags))
+
+        return render_template("tag.html", added_tags=added_tags, existing_tags=existing_tags,
+                               question_id=question_id, title="Add Tag")
+
+
+@app.route("/question/<question_id>/tag/<tag_id>/delete")
+def delete_tag(question_id, tag_id):
+    """Delete tag."""
+    do_delete_tag(question_id, tag_id)
+
+    return redirect(url_for('show_question_page', question_id=question_id))
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
@@ -307,4 +367,4 @@ def page_not_found(error):
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=2002)
+    app.run(debug=True, port=2003)

@@ -301,7 +301,7 @@ def get_additional_questions(conn, missing_question_ids):
 def insert_comment(conn, new_comment):
     SQL = """INSERT INTO comment (question_id, answer_id,
                                     message, submission_time, edited_count)
-            VALUES (%s, %s, %s, %s, %s)"""
+            VALUES (%s, %s, %s, %s, %s);"""
     if new_comment[0]:
         new_comment[2] = None
     data = (new_comment[2], new_comment[0], new_comment[1], new_comment[3], new_comment[4])
@@ -311,8 +311,8 @@ def insert_comment(conn, new_comment):
 
 @connect_db
 def retrieve_comments(conn, question_id, answer_ids=None):
-    SQL_q = """ SELECT * FROM comment WHERE question_id = %s ORDER BY submission_time """
-    SQL_a = """ SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time """
+    SQL_q = """SELECT * FROM comment WHERE question_id = %s ORDER BY submission_time;"""
+    SQL_a = """SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time;"""
     data = (question_id,)
     with conn.cursor() as cursor:
         cursor.execute(SQL_q, data)
@@ -337,7 +337,93 @@ def edit_comment(conn, new_comment, comment_id, submission_time):
 
 @connect_db
 def delete_comment(conn, comment_id):
-    SQL = """DELETE FROM comment WHERE id = %s"""
+    SQL = """DELETE FROM comment WHERE id = %s;"""
     data = (comment_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def get_added_tags(conn, question_id):
+    """Return added tags."""
+    SQL = """SELECT tag.id, tag.name FROM question_tag AS qt
+             JOIN tag ON
+                qt.tag_id = tag.id
+             WHERE qt.question_id = %s;"""
+    data = (question_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchall()
+    return result
+
+
+@connect_db
+def get_existing_tags(conn, added_tags):
+    """Return existing tags."""
+    if not added_tags:
+        SQL = """SELECT name FROM tag;"""
+    else:
+        SQL = """SELECT name FROM tag
+                WHERE name NOT IN %s;"""
+    data = (added_tags,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchall()
+    result = [name[0] for name in result]
+    return result
+
+
+@connect_db
+def get_all_existing_tags(conn):
+    """Return all existing tags."""
+    SQL = """SELECT name FROM tag;"""
+    with conn.cursor() as cursor:
+        cursor.execute(SQL)
+        result = cursor.fetchall()
+    result = [name[0] for name in result]
+    return result
+
+
+@connect_db
+def insert_new_tags(conn, new_tags):
+    """Insert new tags into tag table."""
+    inserted_tags = []
+    for new_tag in new_tags:
+        SQL = """INSERT INTO tag (name) VALUES (%s) RETURNING id;"""
+        data = (new_tag,)
+        with conn.cursor() as cursor:
+            cursor.execute(SQL, data)
+            result = cursor.fetchone()[0]
+            inserted_tags.append(result)
+
+    return inserted_tags
+
+
+@connect_db
+def get_selected_tag_ids(conn, selected_tags):
+    """Return selected tag ids."""
+    SQL = """SELECT id FROM tag WHERE name in %s;"""
+    data = (selected_tags,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+        result = cursor.fetchone()
+    return result
+
+
+@connect_db
+def insert_tag_relations(conn, question_id, tag_ids):
+    """Insert tag relations."""
+    for tag_id in tag_ids:
+        SQL = """INSERT INTO question_tag (question_id, tag_id) VALUES (%s, %s);"""
+        data = (question_id, tag_id)
+        with conn.cursor() as cursor:
+            cursor.execute(SQL, data)
+
+
+@connect_db
+def do_delete_tag(conn, question_id, tag_id):
+    """Delete tag."""
+    SQL = """DELETE FROM question_tag WHERE question_id = %s AND tag_id = %s;"""
+    data = (question_id, tag_id)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
