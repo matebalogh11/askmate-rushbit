@@ -285,3 +285,10 @@ def edit_comment(conn, new_comment, comment_id, submission_time):
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
 
+
+@connect_db
+def delete_comment(conn, comment_id):
+    SQL = """DELETE FROM comment WHERE id = %s"""
+    data = (comment_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
