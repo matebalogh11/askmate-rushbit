@@ -223,6 +223,14 @@ def add_comment(question_id, answer_id=None):
     return redirect(url_for("show_question_page", question_id=question_id))
 
 
+@app.route("/comment/edit/<question_id>/<comment_id>", methods=["POST"])
+def fetch_comment_for_edit(question_id, answer_id=None):
+    new_comment = request.form.get("edit_com")
+    submission_time = create_timestamp()
+    edit_comment(new_comment, comment_id, submission_time)
+    return render_template(url_for("show_question_page", question_id=question_id))
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
