@@ -8,24 +8,26 @@
         <link rel="shortcut icon" type="image/png" sizes="16x16" href="{{url_for('static', filename='favicon.png')}}">
     </head>
     <body>
-        <div class="askmate_logo">
-            <a href="{{ url_for('show_index') }}">
-                <img src="/static/logos/askmate_logo.png">
-            </a>
-        </div>
         <div class="navbar">
-            <ul>
-                <li><a href="{{ url_for('show_index') }}">Home</a></li>
-                <li><a href="{{ url_for('show_question_list') }}">Questions</a></li>
-                <li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
-                <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
-            </ul>
-            <form action="{{ url_for('show_search_results') }}">
-                <p>
-                    <h3><label for="search">Search</label><br></h3>
-                    <input type="text" name="q" id="search" class="inputfield" placeholder="Search">
-                    <input type="submit" name="submit" id="search-submit" value"Go!" class="cta_home">
-                </p>
+            <div class="navbar_wrapper">
+                <a href="{{ url_for('show_index') }}">
+                    <img src="{{ url_for('static', filename='logos/askmate_logo2.png') }}">
+                </a> 
+                <ul>
+                    <li><a href="{{ url_for('show_index') }}">Home</a></li>
+                    <li><a href="{{ url_for('show_question_list') }}">Questions</a></li>
+                    <li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
+                    <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
+                </ul>
+                <div class="searchbar">
+                    <form action="{{ url_for('show_search_results') }}">
+                        <div>
+                            <input type="text" name="q" id="search" class="inputfield" placeholder="Search" cha>
+                            <input type="submit" name="submit" id="search-submit" value="Go!" class="searchbutton">
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         {% block content %}{% endblock %}
     <div class="rushbit_logo_container">
