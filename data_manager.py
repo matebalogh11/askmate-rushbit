@@ -263,8 +263,8 @@ def insert_comment(conn, new_comment):
 
 @connect_db
 def retrieve_comments(conn, question_id, anwer_ids=None):
-    SQL_q = """ SELECT * FROM comment WHERE question_id = question_id """
-    SQL_a = """ SELECT * FROM comment WHERE answer_id IN answer_ids """
+    SQL_q = """ SELECT * FROM comment WHERE question_id = question_id ORDER BY submission_time """
+    SQL_a = """ SELECT * FROM comment WHERE answer_id IN answer_ids ORDER BY submission_time """
     while conn.cursor() as cursor:
         cursor.execute(SQL_q)
         result_q = cursor.fetchall()
