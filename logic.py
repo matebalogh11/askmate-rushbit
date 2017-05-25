@@ -280,36 +280,23 @@ def do_vote(direction, question_id=None, answer_id=None):
     @return str: return ONLY if called with answer_id, otherwise would be needless.
     """
     if question_id:
-        questions = read_csv("question.csv")
-        for i, question in enumerate(questions):
-            if question[0] == question_id:
-                if direction == "up":
-                    questions[i][3] += 1
-                elif direction == "down":
-                    questions[i][3] -= 1
-        write_csv("question.csv", questions)
+        if direction == "up":
+            change_vote_count("up", question_id=question_id)
+        elif direction == "down":
+            change_vote_count("down", question_id=question_id)
 
-    elif answer_id:
-        answers = read_csv("answer.csv")
-        for i, answer in enumerate(answers):
-            if answer[0] == answer_id:
-                question_id = answer[3]
-                if direction == "up":
-                    answers[i][2] += 1
-                elif direction == "down":
-                    answers[i][2] -= 1
-        write_csv("answer.csv", answers)
+    if answer_id:
+        if direction == "up":
+            question_id = change_vote_count("up", answer_id=answer_id)
+        elif direction == "down":
+            question_id = change_vote_count("down", answer_id=answer_id)
         return question_id
 
 
 def do_delete_image(question_id):
     """Delete image belonging to a question with question_id."""
-    questions = read_csv("question.csv")
-    for i, question in enumerate(questions):
-        if question[0] == question_id:
-            current_image = questions[i][6]
-            questions[i][6] = ""
-    write_csv("question.csv", questions)
+    current_image = get_question_image(question_id)
+
     try:
         os.remove("static/uploads/" + current_image)
     except FileNotFoundError:

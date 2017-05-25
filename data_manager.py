@@ -254,3 +254,45 @@ def get_image_for_update_question(conn, question_id):
         cursor.execute(SQL, data)
         result = cursor.fetchone()[0]
     return result
+
+
+@connect_db
+def change_vote_count(conn, direction, question_id=None, answer_id=None):
+    """Change vote count in direction. 'up' as add one, 'down' as reduce by one."""
+    if question_id:
+        table = "question"
+        the_id = question_id
+    elif answer_id:
+        table = "answer"
+        the_id = answer_id
+        SQL2 = """SELECT question_id FROM answer WHERE id = %s;"""
+        data2 = (answer_id,)
+
+    if direction == "up":
+        SQL1 = """UPDATE {} SET vote_number = vote_number + 1 WHERE id = %s;""".format(table)
+    elif direction == "down":
+        SQL1 = """UPDATE {} SET vote_number = vote_number - 1 WHERE id = %s;""".format(table)
+    data1 = (the_id,)
+
+    with conn.cursor() as cursor:
+        cursor.execute(SQL1, data1)
+        if answer_id:
+            cursor.execute(SQL2, data2)
+            result = cursor.fetchone()[0]
+
+    if answer_id:
+        return result
+
+
+@connect_db
+def get_question_image(conn, question_id):
+    """Deletes image of a question."""
+    SQL1 = """SELECT image FROM question WHERE id = %s"""
+    SQL2 = """UPDATE question SET image = NULL WHERE id = %s"""
+    data = (question_id,)
+
+    with conn.cursor() as cursor:
+        cursor.execute(SQL1, data)
+        result = cursor.fetchone()[0]
+        cursor.execute(SQL2, data)
+    return result
