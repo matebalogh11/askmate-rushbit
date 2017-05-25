@@ -74,7 +74,20 @@
         {% if answer[5] %}
             <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
         {% endif %}
+            {% for comment in a_comments %}
+                {% if comment[2] == answer[0] %}
+                <p class="comment"> {{ comment[3] }} </p>
+                <h5> Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
 
+                <button onclick="hideMe_answer()" class="cta">Edit comment</button>
+                <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
+                <div id="a_comment">
+                    <textarea class="textarea" name="get_comment"></textarea><br>
+                    <input type="submit" value="Submit comment" class="cta">
+            </div>
+        </form>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
     {% endif %}
 </div>

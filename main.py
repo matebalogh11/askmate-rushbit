@@ -121,7 +121,6 @@ def show_question_page(question_id):
     q_comments, a_comments = retrieve_comments(question_id, answer_ids)
     # except Exception:
     #     return abort(404)
-    
 
     return render_template("question.html", question_id=question_id, answers=answers,
                            question=selected_question, title=("Question " + question_id),
@@ -224,11 +223,11 @@ def add_comment(question_id, answer_id=None):
 
 
 @app.route("/comment/edit/<question_id>/<comment_id>", methods=["POST"])
-def fetch_comment_for_edit(question_id, answer_id=None):
-    new_comment = request.form.get("edit_com")
+def fetch_comment_for_edit(question_id, comment_id):
+    new_comment = request.form.get("get_comment")
     submission_time = create_timestamp()
     edit_comment(new_comment, comment_id, submission_time)
-    return render_template(url_for("show_question_page", question_id=question_id))
+    return redirect(url_for("show_question_page", question_id=question_id))
 
 
 @app.errorhandler(404)

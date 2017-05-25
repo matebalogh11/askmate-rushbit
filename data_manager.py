@@ -279,7 +279,7 @@ def retrieve_comments(conn, question_id, answer_ids=None):
 
 @connect_db
 def edit_comment(conn, new_comment, comment_id, submission_time):
-    SQL = """UPDATE comment SET (message = %s, edited_number = edited_number + 1, submission_time = %s)
+    SQL = """UPDATE comment SET message = %s, edited_count = edited_count + 1, submission_time = %s
              WHERE id = %s;"""
     data = (new_comment, submission_time, comment_id)
     with conn.cursor() as cursor:
