@@ -45,19 +45,6 @@ def generate_id(table, prefix):
     return generated_id
 
 
-def get_unix_timestamp():
-    """Get current time as Unix timestamp."""
-    return time.time()
-
-
-def convert_unix(unix_timestamp):
-    """Converts Unix timestamp to human readable format.
-    @unixtime int: Unix time running total of seconds.
-    @return string: human readable timestamp as example: Apr 28 - 18:49
-    """
-    return '{:%Y %b %d - %H:%M}'.format(datetime.fromtimestamp(unix_timestamp))
-
-
 def select_ordering(questions, order, criterium):
     """Default ordering: most recent on top.
     Based on query string, selected ordering will be dominant.
@@ -285,3 +272,18 @@ def do_delete_image(question_id):
         os.remove("static/uploads/" + current_image)
     except FileNotFoundError:
         pass
+
+
+def new_comment(comment_data, question_id=None, answer_id=None):
+    """"""
+    init_time = create_timestamp()
+    init_edit = 0
+    comment = [question_id, answer_id, comment_data, init_time, init_edit]
+    return comment
+
+
+def collect_answer_ids(answers):
+    answer_ids = []
+    for answer in answers:
+        answer_ids.append(answer[0])
+    return answer_ids

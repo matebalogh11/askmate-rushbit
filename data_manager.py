@@ -295,3 +295,49 @@ def get_additional_questions(conn, missing_question_ids):
         cursor.execute(SQL, data)
         result = cursor.fetchall()
     return result
+
+
+@connect_db
+def insert_comment(conn, new_comment):
+    SQL = """INSERT INTO comment (question_id, answer_id,
+                                    message, submission_time, edited_count)
+            VALUES (%s, %s, %s, %s, %s)"""
+    if new_comment[0]:
+        new_comment[2] = None
+    data = (new_comment[2], new_comment[0], new_comment[1], new_comment[3], new_comment[4])
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def retrieve_comments(conn, question_id, answer_ids=None):
+    SQL_q = """ SELECT * FROM comment WHERE question_id = %s ORDER BY submission_time """
+    SQL_a = """ SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time """
+    data = (question_id,)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL_q, data)
+        result_q = cursor.fetchall()
+        if answer_ids:
+            data = (answer_ids,)
+            cursor.execute(SQL_a, data)
+            result_a = cursor.fetchall()
+        else:
+            result_a = None
+    return result_q, result_a
+
+
+@connect_db
+def edit_comment(conn, new_comment, comment_id, submission_time):
+    SQL = """UPDATE comment SET message = %s, edited_count = edited_count + 1, submission_time = %s
+             WHERE id = %s;"""
+    data = (new_comment, submission_time, comment_id)
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)
+
+
+@connect_db
+def delete_comment(conn, comment_id):
+    SQL = """DELETE FROM comment WHERE id = %s"""
+    data = (comment_id, )
+    with conn.cursor() as cursor:
+        cursor.execute(SQL, data)

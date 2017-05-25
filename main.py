@@ -181,11 +181,14 @@ def show_question_page(question_id):
 
     try:
         selected_question, answers = get_all_for_question(question_id)
-    except Exception:
+        answer_ids = tuple(collect_answer_ids(answers))
+        q_comments, a_comments = retrieve_comments(question_id, answer_ids)
+    except (IndexError, FileNotFoundError):
         return abort(404)
 
     return render_template("question.html", question_id=question_id, answers=answers,
-                           question=selected_question, title=("Question " + question_id))
+                           question=selected_question, title=("Question " + question_id),
+                           q_comments=q_comments, a_comments=a_comments)
 
 
 @app.route("/question/<question_id>/delete")
@@ -272,6 +275,29 @@ def delete_image(question_id):
     do_delete_image(question_id)
 
     return redirect(url_for('show_edit_question_form', question_id=question_id))
+
+
+@app.route("/comment/<question_id>", methods=["POST"])
+def add_comment(question_id):
+    """This is ok for questions and answers as well"""
+    answer_id = request.args.get("answer_id")
+    new_com = new_comment(question_id, answer_id, request.form.get("get_comment"))
+    insert_comment(new_com)
+    return redirect(url_for("show_question_page", question_id=question_id))
+
+
+@app.route("/comment/edit/<question_id>/<comment_id>", methods=["POST"])
+def fetch_comment_for_edit(question_id, comment_id):
+    new_comment = request.form.get("get_comment")
+    submission_time = create_timestamp()
+    edit_comment(new_comment, comment_id, submission_time)
+    return redirect(url_for("show_question_page", question_id=question_id))
+
+
+@app.route("/comment/<question_id>/<comment_id>/delete")
+def remove_comment(question_id, comment_id):
+    delete_comment(comment_id)
+    return redirect(url_for('show_question_page', question_id=question_id))
 
 
 @app.errorhandler(404)

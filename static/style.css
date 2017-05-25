@@ -404,9 +404,20 @@ textarea {
 .credits {
     color: white;
     margin: 5px 0;
-    
 }
 
 .highlight {
     background-color: yellow;
+}
+
+#q_comment {
+    display: none;
+}
+
+.conditional_form_part {
+    display: none;
+}
+
+.conditional_form_part_activator:checked + .conditional_form_part {
+    display: block;
 }
