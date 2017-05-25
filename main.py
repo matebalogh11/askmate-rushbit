@@ -231,7 +231,7 @@ def fetch_comment_for_edit(question_id, comment_id):
 
 
 @app.route("/comment/<question_id>/<comment_id>/delete")
-def remove_comment():
+def remove_comment(question_id, comment_id):
     delete_comment(comment_id)
     return redirect(url_for('show_question_page', question_id=question_id))
 
