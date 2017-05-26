@@ -337,11 +337,12 @@ a:hover {
 
 .description {
     background-color: rgba(76, 164, 252, 0.15);
-    padding: 15px;
+    padding: 15px 0 15px 15px;
     color: #3d3d3d;
     border-left: 3px solid rgb(76, 164, 252);
     display: inline-block;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .answers {
@@ -594,8 +595,16 @@ textarea {
     float: none;
 }
 
+q_table {
+    width: 100%;
+}
+
 .q_table td {
     padding: 5px;
+}
+
+.q_table {
+    width: 100%;
 }
 
 
@@ -665,4 +674,12 @@ q_table img {
 
 .midimg {
     margin: 14px 0;
+}
+
+.vote_cell {
+    width: 5%;
+}
+
+.desc_cell {
+    width: 95%;
 }
