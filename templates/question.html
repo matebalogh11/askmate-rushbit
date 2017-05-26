@@ -27,59 +27,73 @@
                 <input type="submit" value="Back to Questions" name="submit5" class= "cta" id="submit5" formaction="{{ url_for('show_question_list') }}">
             </p>
         </form>
-    <p class="description">{{ question[5] }}</p>
-
-    {% if added_ids_tags %}
-    <div class="tags">
-        {% for tag_id, tag_name in added_ids_tags %}
-            <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">✘</a></span>
-        {% endfor %}
+    <table class="q_table">
+        <tr>
+            <td>
+                <div class="voter">
+                    <a href="{{ url_for('vote', direction='up', question_id=question_id) }}" class="voteup"><img src="{{ url_for('static', filename='upvote.svg') }}"></a>
+                    <div><span class="votecounter"> {{ question[3] }} </span></div>
+                    <a href="{{ url_for('vote', direction='down', question_id=question_id) }}" class="votedown"><img src="{{ url_for('static', filename='downvote.svg') }}"></a>
+                </div>
+            </td>
+            <td>
+                <p class="description">{{ question[5] }}</p>
+                {% if added_ids_tags %}
+                <div class="tags">
+                {% for tag_id, tag_name in added_ids_tags %}
+                <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
+                {% endfor %}
     </div>
     {% endif %}
-
-    <div class="voter">
-        <a href="{{ url_for('vote', direction='up', question_id=question_id) }}" class="voteup">VOTE UP</a>
-        <span class="votecounter"> {{ question[3] }} </span>
-        <a href="{{ url_for('vote', direction='down', question_id=question_id) }}" class="votedown">VOTE DOWN</a>
-    </div>
+            </td>
+        </tr>
+    </table>
+    
 
     {% if question[6] %}
         <h3>Attachment</h3>
-        <img src="{{ url_for('static',filename='uploads/' + question[6]) }}" alt="Question Image">
+        <a href="{{ url_for('static',filename='uploads/' + question[6]) }}" target="_blank">
+            <img src="{{ url_for('static',filename='uploads/' + question[6]) }}" alt="Question Image" class="attachment">
+        </a>
     {% endif %}
 
-    <div class = "q_comments">
-         <button onclick="hideMe()" class="cta">Add comment</button>
-         <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
-            <div id="q_comment">
-                <textarea class="textarea" name="get_comment"></textarea><br>
-                <input type="submit" value="Submit comment" class="cta">
-            </div>
-        </form>
-        {% if q_comments %}
         <h3>Comments</h3>
-            {% for comment in q_comments %}     
-                <p class="comment">{{ comment[3] }}</p>
-                <h5>Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
-                <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a></h5>
-                <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
-                    <label>Edit comment</label>
-                    <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                    <div class="conditional_form_part" id="cd">
-                        <textarea class="textarea" name="get_comment"></textarea><br>
-                        <input type="submit" value="Submit comment" class="cta">
-                    </div>
-                </form>
+        <div class = "q_comments">
+            <button onclick="hideMe()" class="cta marg">Add comment</button>
+            <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
+                <div id="q_comment">
+                    <textarea class="textarea" name="get_comment"></textarea><br>
+                    <input type="submit" value="Submit comment" class="cta marg">
+                </div>
+            </form>
+        </div>
+        {% if q_comments %}        
+            {% for comment in q_comments %}
+                <div>     
+                    <p class="commentzone">{{ comment[3] }}</p>
+                    <h5>Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
+                    <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a></h5>
+                    <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
+                        <label>Edit comment</label>
+                        <input class="conditional_form_part_activator" type="checkbox" value="edit">
+                        <div class="conditional_form_part" id="cd">
+                            <textarea class="textarea" name="get_comment"></textarea><br>
+                            <input type="submit" value="Submit comment" class="cta">
+                        </div>
+                    </form>
+                </div>
             {% endfor %}
+        {% else %}
+        <p>There are no comments yet! Be the first to comment!</p>
         {% endif %}
         
-    </div>
+    
 
     {% if answers %}
     <hr>
     <h3>Answers</h3>
         {% for answer in answers %}
-        <p class="comment">{{ answer[4] }}</p>
+        <p class="answers">{{ answer[4] }}</p>
         <div class="voter-mini">
             <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}" class="voteup-mini">▲</a>
             <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}" class="votedown-mini">▼</a>
@@ -91,24 +105,25 @@
         {% endif %}
             <button onclick="hideMe_answer()" class="cta">Add comment</button>
             <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
-            <div class="a_comment" style="display: none;">
+            <div class="a_answer" style="display: none;">
                 <textarea class="textarea" name="get_comment"></textarea><br>
                 <input type="submit" value="Submit comment" class="cta">
             </div>
         </form>
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
-                <p class="comment"> {{ comment[3] }} </p>
-                <h5> Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
-                <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a></h5>
-                <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
-                    <label>Edit comment</label>
-                    <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                    <div class="conditional_form_part" id="cd">
-                        <textarea class="textarea" name="get_comment"></textarea><br>
-                        <input type="submit" value="Submit comment" class="cta">
-                    </div>
-                </form>
+                <div class="commentident">
+                    <p class="commentzone"> {{ comment[3] }} </p>
+                    <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a> Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
+                    <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
+                        <label>Edit comment</label>
+                        <input class="conditional_form_part_activator" type="checkbox" value="edit">
+                        <div class="conditional_form_part" id="cd">
+                            <textarea class="textarea" name="get_comment"></textarea><br>
+                            <input type="submit" value="Submit comment" class="cta">
+                        </div>
+                    </form>
+                </div>
                 {% endif %}
             {% endfor %}
         {% endfor %}

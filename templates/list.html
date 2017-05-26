@@ -14,10 +14,10 @@
         {% endif %}
     {% endwith %}
 
-    <table>
+    <table class="maintable">
         <tr class="header_row">
             <th class="number_cell">
-                ID number
+                ID
             </th>
             <th>
                 Question title
@@ -63,7 +63,7 @@
         {% endfor %}
     </table>
     <div class="cta_container">
-    <a href="{{ url_for('show_new_question_form') }}" class="cta_home">Ask a question</a> 
+        <a href="{{ url_for('show_new_question_form') }}" class="cta_home asknew secondarybutton" class="asknew"><img src="{{ url_for('static', filename='plus.svg') }}"><span>Ask a question</span></a> 
     </div>
 </div>
 
