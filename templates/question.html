@@ -29,14 +29,14 @@
         </form>
     <table class="q_table">
         <tr>
-            <td>
+            <td class="vote_cell">
                 <div class="voter">
                     <a href="{{ url_for('vote', direction='up', question_id=question_id) }}" class="voteup"><img src="{{ url_for('static', filename='upvote.svg') }}"></a>
                     <div><span class="votecounter"> {{ question[3] }} </span></div>
                     <a href="{{ url_for('vote', direction='down', question_id=question_id) }}" class="votedown"><img src="{{ url_for('static', filename='downvote.svg') }}"></a>
                 </div>
             </td>
-            <td>
+            <td class="desc_cell">
                 <p class="description">{{ question[5] }}</p>
                 {% if added_ids_tags %}
                 <div class="tags">
