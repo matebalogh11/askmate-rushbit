@@ -103,13 +103,14 @@
         {% if answer[5] %}
             <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
         {% endif %}
-            <button onclick="hideMe_answer()" class="cta">Add comment</button>
-            <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
-            <div class="a_answer" style="display: none;">
-                <textarea class="textarea" name="get_comment"></textarea><br>
-                <input type="submit" value="Submit comment" class="cta">
-            </div>
-        </form>
+            <form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>
+                <label>Add comment</label>
+                <input class="conditional_form_part_activator" type="checkbox" value="edit">
+                <div class="conditional_form_part" id="cd">
+                    <textarea class="textarea" name="get_comment"></textarea><br>
+                    <input type="submit" value="Submit comment" class="cta">
+                </div>
+            </form>
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
                 <div class="commentident">
