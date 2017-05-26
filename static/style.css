@@ -3,10 +3,7 @@
 
 body {
     font-family: 'Open Sans', sans-serif;
-    background: -webkit-linear-gradient(left, #007FFF, #0066CC); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(left,#007FFF, #0066CC); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(left,#007FFF, #0066CC); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(left,#007FFF, #0066CC); /* Standard syntax */
+    background-color: #92B2BD;
     margin: 0px;
 }
 
@@ -57,7 +54,7 @@ h5 {
     background-color: white;
     padding: 20px 3%;
     border-radius: 0.3em;
-    box-shadow: 0 0 25px #2C567F;
+    box-shadow: 0 0 15px rgba(29, 29, 29, 0.3);
     min-height: 90%;
 }
 
@@ -458,7 +455,7 @@ textarea {
     position: fixed;
     top: 0;
     width: 100%;
-    box-shadow: 0px 0px 3px #5f5f5f; 
+    box-shadow: 0px 0px 15px rgba(29, 29, 29, 0.3); 
 }
 
 .navbar_wrapper{
@@ -501,7 +498,7 @@ textarea {
 }
 
 .navbar li a:hover {
-    background-color: #FF3220;
+    background-color: #E87668;
     color: white;   
 }
 
