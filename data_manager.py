@@ -406,7 +406,8 @@ def get_selected_tag_ids(conn, selected_tags):
     data = (selected_tags,)
     with conn.cursor() as cursor:
         cursor.execute(SQL, data)
-        result = cursor.fetchone()
+        result = cursor.fetchall()
+        result = [item[0] for item in result]
     return result
 
 
