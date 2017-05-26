@@ -1,6 +1,5 @@
 
 import os
-import re
 
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
@@ -42,7 +41,6 @@ def edit_question(question_id):
     if not valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
-
     try:
         selected_question = get_question_details(question_id)
         if not selected_question:
@@ -71,64 +69,32 @@ def edit_question(question_id):
 def show_index():
     """View function of index page."""
     questions = get_5_questions()
+
     return render_template("index.html", questions=questions, title="Index")
 
 
 @app.route("/contact/")
 def show_contact():
     """View function of contact page."""
+
     return render_template("contact.html", title="Contact")
 
 
 @app.route("/search/")
 def show_search_results():
     """View function of the results page."""
-    search_results = None
-
     if request.args.get("q"):
         phrase = request.args["q"]
-        insensitive_phrase = re.compile(re.escape(phrase), re.IGNORECASE)
 
-        questions, answers = get_search_results(phrase)
+        questions = get_questions_with_answers(phrase)
+        if not questions:
+            flash("No search results for phrase '{}'.".format(phrase), "error")
 
-        for i in range(len(questions)):
-            questions[i] = list(questions[i])
-            questions[i].append([])
+        return render_template("search.html", questions=questions, phrase=phrase, title="Search Results")
 
-        missing_question_ids = []
-        question_ids = [question[0] for question in questions]
-        for i, answer in enumerate(answers):
-            answers[i] = list(answers[i])
-            answers[i][4] = answers[i][4].replace('<', '')
-            answers[i][4] = answers[i][4].replace('>', '')
-            answers[i][4] = insensitive_phrase.sub('<span class="highlight">{}</span>'.format(phrase), answers[i][4])
-            if answer[3] not in question_ids:
-                missing_question_ids.append(answer[3])
+    flash("Empty search field. No results retrieved.", "error")
 
-        additional_questions = get_additional_questions(tuple(missing_question_ids))
-        for i in range(len(additional_questions)):
-            additional_questions[i] = list(additional_questions[i])
-            additional_questions[i].append([])
-
-        for i, question in enumerate(additional_questions):
-            for j, answer in enumerate(answers):
-                if question[0] == answer[3]:
-                    additional_questions[i][6].append(answer)
-
-        for i, question in enumerate(questions):
-            questions[i][1] = questions[i][1].replace('<', '')
-            questions[i][1] = questions[i][1].replace('>', '')
-            questions[i][1] = insensitive_phrase.sub('<span class="highlight">{}</span>'.format(phrase), questions[i][1])
-            for j, answer in enumerate(answers):
-                if question[0] == answer[3]:
-                    questions[i][6].append(answer)
-
-        questions.extend(additional_questions)
-        flash("Showing search results for phrase '{}'.".format(phrase), "success")
-        return render_template("search.html", questions=questions, title="Search Results")
-    else:
-        flash("Empty search field. No results retrieved.", "error")
-        return redirect(url_for('show_index'))
+    return redirect(url_for('show_index'))
 
 
 @app.route("/list/")
@@ -142,6 +108,7 @@ def show_question_list(criterium='submission_time', order='desc'):
         order = request.args[key]
 
     questions = get_questions(criterium, order)
+
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -149,6 +116,7 @@ def show_question_list(criterium='submission_time', order='desc'):
 def show_new_question_form():
     """View function of new question form."""
     title = "Ask New Question"
+
     return render_template("q_form.html", title=title)
 
 
@@ -156,6 +124,7 @@ def show_new_question_form():
 def show_new_answer_form(question_id):
     """View function of new answer form."""
     title = "Add new answer to question: {}".format(question_id)
+
     return render_template("a_form.html", title=title, question_id=question_id)
 
 
@@ -178,7 +147,6 @@ def show_question_page(question_id):
     """View function of question page, with details and answers."""
     if request.args.get('view') == "counted":
         update_view_count(question_id)
-
     try:
         selected_question, answers = get_all_for_question(question_id)
         answer_ids = tuple(collect_answer_ids(answers))
@@ -281,15 +249,17 @@ def delete_image(question_id):
 
 @app.route("/comment/<question_id>", methods=["POST"])
 def add_comment(question_id):
-    """This is ok for questions and answers as well"""
+    """Add comment. Works for question and answer as well."""
     answer_id = request.args.get("answer_id")
     new_com = new_comment(question_id, answer_id, request.form.get("get_comment"))
     insert_comment(new_com)
+
     return redirect(url_for("show_question_page", question_id=question_id))
 
 
 @app.route("/comment/edit/<question_id>/<comment_id>", methods=["POST"])
 def fetch_comment_for_edit(question_id, comment_id):
+    """Fetch comment for edit."""
     new_comment = request.form.get("get_comment")
     submission_time = create_timestamp()
     edit_comment(new_comment, comment_id, submission_time)
@@ -298,6 +268,7 @@ def fetch_comment_for_edit(question_id, comment_id):
 
 @app.route("/comment/<question_id>/<comment_id>/delete")
 def remove_comment(question_id, comment_id):
+    """Remove comment from question."""
     delete_comment(comment_id)
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -306,40 +277,12 @@ def remove_comment(question_id, comment_id):
 def show_add_tag(question_id):
     """View function of question tag addition page."""
     if request.method == "POST":
-        all_existing_tags = get_all_existing_tags()
 
-        new_tags = []
-        for key in ("new_tag1", "new_tag2", "new_tag3"):
-            if len(request.form.get(key, '')) <= 20 and len(request.form.get(key, '')) >= 2:
-                if " " in request.form.get(key):
-                    flash("The tag cannot contain spaces!", "error")
-                    return redirect(url_for('show_question_page', question_id=question_id))
-                new_key = request.form[key]
-                if new_key not in all_existing_tags:
-                    new_tags.append(new_key)
+        status_message = do_inserts(request.form, question_id)
 
-        if new_tags:
-            new_tag_ids = insert_new_tags(new_tags)
-
-        selected_tags = []
-        if request.form.get("select_tag1"):
-            selected_tags.append(request.form["select_tag1"])
-        if request.form.get("select_tag2") and request.form.get("select_tag2") not in selected_tags:
-            selected_tags.append(request.form["select_tag2"])
-        if request.form.get("select_tag3") and request.form.get("select_tag3") not in selected_tags:
-            selected_tags.append(request.form["select_tag3"])
-
-        if selected_tags:
-            selected_tag_ids = get_selected_tag_ids(tuple(selected_tags))
-
-        tag_ids = []
-        if new_tags:
-            tag_ids.extend(list(new_tag_ids))
-        if selected_tags:
-            tag_ids.extend(list(selected_tag_ids))
-
-        if tag_ids:
-            insert_tag_relations(question_id, tag_ids)
+        if status_message == "contains_space":
+            flash("The tag cannot contain spaces!", "error")
+            return redirect(url_for('show_question_page', question_id=question_id))
 
         return redirect(url_for('show_question_page', question_id=question_id))
 

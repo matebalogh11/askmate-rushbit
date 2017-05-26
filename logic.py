@@ -1,5 +1,6 @@
 
 import os
+import re
 import time
 from datetime import datetime
 from random import choice
@@ -198,7 +199,6 @@ def create_new_answer_no_image(message, question_id):
     @message str: message from request.form.
     @return list: id(str), unix_timestamp(int), votes(int), question_id(str), message(str), image_path(str).
     """
-
     init_time = create_timestamp()
     init_votes = 0
     init_image = None
@@ -214,7 +214,6 @@ def update_answer_image(answer_id, files):
     @files dict: a_image key is the only expected key.
     @return str: status to know what message should be flashed to user.
     """
-
     image = files.get('a_image', None)
     image_status = None
     if image and image.filename:
@@ -267,7 +266,6 @@ def do_vote(direction, question_id=None, answer_id=None):
 def do_delete_image(question_id):
     """Delete image belonging to a question with question_id."""
     current_image = get_question_image(question_id)
-
     try:
         os.remove("static/uploads/" + current_image)
     except FileNotFoundError:
@@ -275,7 +273,7 @@ def do_delete_image(question_id):
 
 
 def new_comment(comment_data, question_id=None, answer_id=None):
-    """"""
+    """Return a new comment as list."""
     init_time = create_timestamp()
     init_edit = 0
     comment = [question_id, answer_id, comment_data, init_time, init_edit]
@@ -283,7 +281,95 @@ def new_comment(comment_data, question_id=None, answer_id=None):
 
 
 def collect_answer_ids(answers):
+    """Return answer ids."""
     answer_ids = []
     for answer in answers:
         answer_ids.append(answer[0])
     return answer_ids
+
+
+def get_questions_with_answers(phrase):
+    """Get questions with answers."""
+    insensitive_phrase = re.compile(re.escape(phrase), re.IGNORECASE)
+    questions, answers = get_search_results(phrase)
+
+    for i in range(len(questions)):
+        questions[i] = list(questions[i])
+        questions[i].append([])
+
+    missing_question_ids = []
+    question_ids = [question[0] for question in questions]
+    for i, answer in enumerate(answers):
+        answers[i] = list(answers[i])
+        answers[i][4] = answers[i][4].replace('<', '')
+        answers[i][4] = answers[i][4].replace('>', '')
+        answers[i][4] = insensitive_phrase.sub('<span class="highlight">{}</span>'.format(phrase), answers[i][4])
+        if answer[3] not in question_ids:
+            missing_question_ids.append(answer[3])
+
+    additional_questions = get_additional_questions(tuple(missing_question_ids))
+    for i in range(len(additional_questions)):
+        additional_questions[i] = list(additional_questions[i])
+        additional_questions[i].append([])
+
+    for i, question in enumerate(additional_questions):
+        for j, answer in enumerate(answers):
+            if question[0] == answer[3]:
+                additional_questions[i][6].append(answer)
+
+    for i, question in enumerate(questions):
+        questions[i][1] = questions[i][1].replace('<', '')
+        questions[i][1] = questions[i][1].replace('>', '')
+        questions[i][1] = insensitive_phrase.sub('<span class="highlight">{}</span>'.format(phrase), questions[i][1])
+        for j, answer in enumerate(answers):
+            if question[0] == answer[3]:
+                questions[i][6].append(answer)
+
+    questions.extend(additional_questions)
+
+    return questions
+
+
+def do_inserts(r_form, question_id):
+    """Do inserts into both question_tag and tag tables,
+    based on new tags added and existing tags.
+    """
+    all_existing_tags = get_all_existing_tags()
+
+    new_tags = []
+    for key in ("new_tag1", "new_tag2", "new_tag3"):
+        if len(r_form.get(key, '')) <= 20 and len(r_form.get(key, '')) >= 2:
+            if " " in r_form.get(key):
+                status_message = "contains_space"
+                return status_message
+            new_key = r_form[key]
+            if new_key not in all_existing_tags:
+                new_tags.append(new_key)
+
+    if new_tags:
+        new_tag_ids = insert_new_tags(new_tags)
+
+    selected_tags = []
+    if r_form.get("select_tag1"):
+        selected_tags.append(r_form["select_tag1"])
+        print(selected_tags)
+    if r_form.get("select_tag2") and r_form.get("select_tag2") not in selected_tags:
+        selected_tags.append(r_form["select_tag2"])
+        print(selected_tags)
+    if r_form.get("select_tag3") and r_form.get("select_tag3") not in selected_tags:
+        selected_tags.append(r_form["select_tag3"])
+        print(selected_tags)
+
+    if selected_tags:
+        selected_tag_ids = get_selected_tag_ids(tuple(selected_tags))
+        print(selected_tag_ids)
+
+    tag_ids = []
+    if new_tags:
+        tag_ids.extend(list(new_tag_ids))
+    if selected_tags:
+        tag_ids.extend(list(selected_tag_ids))
+        print(tag_ids)
+
+    if tag_ids:
+        insert_tag_relations(question_id, tag_ids)
