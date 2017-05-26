@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="wrapper">
+<div class="wrapper searchresult">
 
     <h1>Search Results</h1>
     <p><strong>You searched for</strong>: '{{ phrase }}'</p>
@@ -19,16 +19,16 @@
 
     {% for question in questions %}
     <h2><a href="{{ url_for('show_question_page', question_id=question[0], view='counted') }}">{{ question[1]|safe }}</a></h2>
-    <p>[{{ question[2] }}] - ID: {{ question[0] }} - Views: {{ question[3] }} - Votes: {{ question[4] }} - Answers: {{ question[5] }}</p>
+    <h5>{{ question[2] }} - ID: {{ question[0] }} - Views: {{ question[3] }} - Votes: {{ question[4] }} - Answers: {{ question[5] }}</h5>
 
         {% if question[6] %}
             {% for answer in question[6] %}
-            <h4>Answer - ID: {{ answer[0] }}</h4>
-            <p>Message: {{ answer[4]|safe }}</p>
-            <p>[{{ answer[1] }}] - Votes: {{ answer[2] }}</p>
+            <p class="commentzone">ANSWER: {{ answer[4]|safe }}</p>
+            <h5>{{ answer[1] }} - Votes: {{ answer[2] }}</h5>
+            
             {% endfor %}
         {% endif %}
-
+        <hr>
     {% endfor %}
 
 </div>

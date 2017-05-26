@@ -432,8 +432,11 @@ textarea {
 }
 
 .highlight {
-    background-color: yellow;
+    color: #3d3d3d;
+    background-color: #E8BC85;
+    border-radius: 5px;
 }
+
 
 #q_comment {
     display: none;
@@ -583,6 +586,10 @@ textarea {
     margin-left: 5px;
 }
 
+.tags {
+    margin-bottom: 10px;
+}
+
 .secondarybutton {
     float: none;
 }
@@ -603,4 +610,59 @@ q_table img {
 
 .marg {
     margin-bottom: 15px;
+}
+
+.searchresult a {
+    color: #4CA6FF;
+}
+
+.searchresult a:hover {
+    color: #0066cc
+}
+
+.searchresult h2, .searchresult p {
+    margin: 0;
+    margin-top: 20px;
+}
+
+.add_tags {
+    margin: 15px 0px;
+}
+
+.select_tags {
+    margin: 15px 0px;
+}
+
+.select_tags * {
+    width: 200px;
+}
+
+.add_tags * {
+    width: 196px;
+}
+
+.fixed_button {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    text-decoration: none;
+    background-color: #4fa851;
+    color: white;
+    padding: 5px;
+    font-size: 1.2em;
+    border-radius: 50%;
+    border:none;
+    vertical-align: middle;
+    box-shadow: 0 0 15px rgba(29, 29, 29, 0.3);
+}
+
+.fixed_button:hover {
+    background-color: rgba(13, 99, 18, 1); 
+}
+
+.midimg {
+    margin: 14px 0;
 }

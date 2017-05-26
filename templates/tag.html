@@ -9,38 +9,41 @@
 
     {% if added_tags %}
     <h3>Added tags:</h3>
-    <ul>
-    {% for tag in added_tags %}
-        <li>{{ tag }}</li>
-    {% endfor %}
-    </ul>
+        <div class="tags">
+        {% for tag in added_tags %}
+            <span>{{ tag }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
+        {% endfor %}
+        </div>
     {% endif %}
 
     
     <form action="{{ url_for('show_add_tag', question_id=question_id) }}" method="POST">
-        <select name="select_tag1" id="select_tag1">
-            <option disabled selected value> -- select an option -- </option>
-            {% for tag in existing_tags %}
-            <option>{{ tag }}</option>
-            {% endfor %}
-        </select>
-        <select name="select_tag2" id="select_tag2">
-            <option disabled selected value> -- select an option -- </option>
-            {% for tag in existing_tags %}
-            <option>{{ tag }}</option>
-            {% endfor %}
-        </select>
-        <select name="select_tag3" id="select_tag3">
-            <option disabled selected value> -- select an option -- </option>
-            {% for tag in existing_tags %}
-            <option>{{ tag }}</option>
-            {% endfor %}
-        </select>
-
-        <input name="new_tag1" id="new_tag1" placeholder="Enter new tag" maxlength="20" minlength="2">
-        <input name="new_tag2" id="new_tag2" placeholder="Enter new tag" maxlength="20" minlength="2">
-        <input name="new_tag3" id="new_tag3" placeholder="Enter new tag" maxlength="20" minlength="2">
-        <input type="submit" value="Submit" class="cta">
+        <div class="select_tags">
+            <select name="select_tag1" id="select_tag1">
+                <option disabled selected value> -- select an option -- </option>
+                {% for tag in existing_tags %}
+                <option>{{ tag }}</option>
+                {% endfor %}
+            </select>
+            <select name="select_tag2" id="select_tag2">
+                <option disabled selected value> -- select an option -- </option>
+                {% for tag in existing_tags %}
+                <option>{{ tag }}</option>
+                {% endfor %}
+            </select>
+            <select name="select_tag3" id="select_tag3">
+                <option disabled selected value> -- select an option -- </option>
+                {% for tag in existing_tags %}
+                <option>{{ tag }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="add_tags">
+            <input name="new_tag1" id="new_tag1" placeholder="Enter new tag" maxlength="20" minlength="2">
+            <input name="new_tag2" id="new_tag2" placeholder="Enter new tag" maxlength="20" minlength="2">
+            <input name="new_tag3" id="new_tag3" placeholder="Enter new tag" maxlength="20" minlength="2">
+        </div>
+            <input type="submit" value="Submit" class="cta">
     </form>
 
 </div>
