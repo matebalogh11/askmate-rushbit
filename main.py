@@ -1,10 +1,10 @@
 
-import os
+from os import urandom
 
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
-from werkzeug.utils import secure_filename
 
+import questions
 from data_manager import *
 from logic import *
 
@@ -20,10 +20,10 @@ def ask_question():
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    new_question = create_new_question_no_image(request.form)
-    question_id, previous_image = insert_question(new_question)
+    new_question = questions.create_new_question_no_image(request.form)
+    question_id, previous_image = questions.insert_question(new_question)
 
-    image_status = update_question_image(question_id, previous_image, request.files)
+    image_status = questions.update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "not_allowed_ext":
@@ -309,5 +309,5 @@ def page_not_found(error):
 
 
 if __name__ == "__main__":
-    app.secret_key = os.urandom(12)
+    app.secret_key = urandom(12)
     app.run(debug=True, port=2003)
