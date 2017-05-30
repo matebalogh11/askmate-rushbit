@@ -186,11 +186,12 @@ def remove_answer_images_by_q_id(question_id):
     """
     images = fetch_answer_images(question_id)
 
-    for image in images:
-        try:
-            os.remove('static/uploads/' + image)
-        except (FileNotFoundError, TypeError):
-            pass
+    if images:
+        for image in images:
+            try:
+                os.remove('static/uploads/' + image)
+            except (FileNotFoundError, TypeError):
+                pass
 
 
 def create_new_answer_no_image(message, question_id):
