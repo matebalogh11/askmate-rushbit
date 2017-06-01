@@ -31,6 +31,8 @@ def run_statements(SQL_data_fetch_trios):
                     result.append(cursor.fetchall())
                 elif fetch == "one":
                     result.append(cursor.fetchone())
+                elif fetch == "col":
+                    result.append([row[0] for row in cursor])
         if result:
             return result
     finally:
