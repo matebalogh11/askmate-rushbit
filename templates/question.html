@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<!--script src="{{ url_for('static', filename='script.js')}}">-->
+
 <script src="{{url_for('static', filename='script.js')}}"></script>
 <div class="wrapper">
     
@@ -41,10 +41,10 @@
                 {% if added_ids_tags %}
                 <div class="tags">
                 {% for tag_id, tag_name in added_ids_tags %}
-                <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
+                    <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
                 {% endfor %}
-    </div>
-    {% endif %}
+                </div>
+                {% endif %}
             </td>
         </tr>
     </table>
@@ -57,37 +57,38 @@
         </a>
     {% endif %}
 
-        <h3>Comments</h3>
-        <div class = "q_comments">
-            <button onclick="hideMe()" class="cta marg">Add comment</button>
-            <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
-                <div id="q_comment">
-                    <textarea class="textarea" name="get_comment"></textarea><br>
-                    <input type="submit" value="Submit comment" class="cta marg">
-                </div>
-            </form>
-        </div>
-        {% if q_comments %}        
-            {% for comment in q_comments %}
-                <div>     
-                    <p class="commentzone">{{ comment[3] }}</p>
-                    <h5>Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
-                    <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a></h5>
-                    <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
-                        <label>Edit comment</label>
-                        <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                        <div class="conditional_form_part" id="cd">
-                            <textarea class="textarea" name="get_comment"></textarea><br>
-                            <input type="submit" value="Submit comment" class="cta">
-                        </div>
-                    </form>
-                </div>
-            {% endfor %}
-        {% else %}
-        <p>There are no comments yet! Be the first to comment!</p>
-        {% endif %}
-        
-    
+    <h3>Comments</h3>
+
+    {% if q_comments %}        
+        {% for comment in q_comments %}
+            <div>     
+                <p class="commentzone">{{ comment[3] }}</p>
+                <h5>Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
+                <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a></h5>
+                <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
+                    <label>Edit comment</label>
+                    <input class="conditional_form_part_activator" type="checkbox" value="edit">
+                    <div class="conditional_form_part" id="cd">
+                        <textarea class="textarea" name="get_comment"></textarea><br>
+                        <input type="submit" value="Submit comment" class="cta">
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+    <p>There are no comments yet! Be the first to comment!</p>
+    {% endif %}
+
+    <div class = "q_comments">
+        <button onclick="hideMe()" class="cta marg">Add comment</button>
+        <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
+            <div id="q_comment">
+                <textarea class="textarea" name="get_comment"></textarea><br>
+                <input type="submit" value="Submit comment" class="cta marg">
+            </div>
+        </form>
+    </div>
+
 
     {% if answers %}
     <hr>
@@ -131,4 +132,5 @@
     {% endif %}
     
 </div>
+
 {% endblock %}
