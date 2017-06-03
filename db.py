@@ -10,8 +10,6 @@ def run_statements(SQL_data_fetch_trios):
     @return list: if fetch == 'all' then appends a list of tuple(s),
     elif fetch == 'one' then appends a tuple.
     """
-    print(SQL_data_fetch_trios)
-    print(len(SQL_data_fetch_trios))
     conn = None
     try:
         conn = psycopg2.connect(config.DNS)
