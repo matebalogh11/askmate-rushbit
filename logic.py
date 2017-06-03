@@ -219,7 +219,7 @@ def update_answer_image(answer_id, files):
     image_status = None
     if image and image.filename:
         if allowed_extension(image.filename):
-            filename = str(answer_id) + "_" + secure_filename(image.filename)
+            filename = 'a_id' + str(answer_id) + "_" + secure_filename(image.filename)
             image.save("static/uploads/" + filename)
             rename_answer_image(filename, answer_id)
             image_status = "uploaded"
