@@ -80,4 +80,4 @@ def rename_question_image(filename, question_id):
     data = (filename, question_id)
     fetch = None
 
-    db.run_statements((SQL, data, fetch))
+    db.run_statements(((SQL, data, fetch),))
