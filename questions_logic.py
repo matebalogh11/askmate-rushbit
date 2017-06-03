@@ -1,5 +1,7 @@
 
 import os
+
+from psycopg2 import DatabaseError
 from werkzeug.utils import secure_filename
 
 import db
@@ -114,3 +116,63 @@ def get_questions(criterium, order):
     fetch = "all"
     questions = db.run_statements(((SQL, data, fetch),))[0]
     return questions
+
+
+def update_view_count(question_id):
+    """Update view count by plus one."""
+    SQL = """UPDATE question SET view_number = view_number + 1 WHERE id = %s;"""
+    data = (question_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+
+def valid_question_id(question_id):
+    """Return True if question_id found in question table."""
+    SQL = """SELECT id FROM question WHERE id = %s;"""
+    data = (question_id,)
+    fetch = "one"
+    try:
+        found_id = db.run_statements(((SQL, data, fetch),))[0][0]
+    except (DatabaseError, TypeError):
+        return False
+    return True
+
+
+def get_all_for_question(question_id):
+    """Return tuple: 1. question record with question_id, 2. answers 2d list for question."""
+    SQL1 = """SELECT * FROM question WHERE id = %s;"""
+    SQL2 = """SELECT * FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC;"""
+    data = (question_id,)
+    fetch1 = "one"
+    fetch2 = "all"
+    results = db.run_statements(((SQL1, data, fetch1), (SQL2, data, fetch2)))
+    return results
+
+
+def retrieve_comments(question_id, answers):
+    """Return comments for question and each answer."""
+    SQL1 = """SELECT * FROM comment WHERE question_id = %s ORDER BY submission_time;"""
+    data1 = (question_id,)
+    fetch = "all"
+
+    if answers[0]:
+        SQL2 = """SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time;"""
+        answer_ids = tuple(answer[0] for answer in answers)
+        data2 = (answer_ids,)
+        results = db.run_statements(((SQL1, data1, fetch), (SQL2, data2, fetch)))
+    else:
+        results = db.run_statements(((SQL1, data1, fetch),)), None
+
+    return results
+
+
+def get_added_tags(question_id):
+    """Return added tags for question with question_id."""
+    SQL = """SELECT tag.id, tag.name FROM question_tag AS qt
+             JOIN tag ON
+                qt.tag_id = tag.id
+             WHERE qt.question_id = %s;"""
+    data = (question_id,)
+    fetch = "all"
+    added_tags = db.run_statements(((SQL, data, fetch),))[0]
+    return added_tags

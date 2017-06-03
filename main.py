@@ -43,15 +43,12 @@ def edit_question(question_id):
     if not helper.valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
-    try:
-        selected_question = questions_logic.get_question_details(question_id)
-        if not selected_question:
-            raise IndexError
-    except (psycopg2.DatabaseError, IndexError):
+
+    if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
+    selected_question = questions_logic.get_question_details(question_id)
     questions_logic.update_question(request.form, question_id)
-
     previous_image = questions_logic.get_image_for_update_question(question_id)
 
     image_status = questions_logic.update_question_image(question_id, previous_image, request.files)
@@ -63,7 +60,6 @@ def edit_question(question_id):
         flash("✘ File was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
 
     flash("✓ Question successfully edited.", "success")
-
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
@@ -71,14 +67,12 @@ def edit_question(question_id):
 def show_index():
     """View function of index page."""
     questions = questions_logic.get_5_questions()
-
     return render_template("index.html", questions=questions, title="Index")
 
 
 @app.route("/contact/")
 def show_contact():
     """View function of contact page."""
-
     return render_template("contact.html", title="Contact")
 
 
@@ -99,16 +93,14 @@ def show_search_results():
 
 @app.route("/list/")
 def show_question_list(criterium='submission_time', order='desc'):
-    """View function of question list, shown as a table, plus button to add new question.
-    If URL requested with query string (through ordering buttons),
-    then selects the ordering accoringly before rendering list.html.
+    """View function of question list. Normally shows most recent on top,
+    if requested from table headers (query string), orders accordingly.
     """
     for key in request.args:
         criterium = key
         order = request.args[key]
 
     questions = questions_logic.get_questions(criterium, order)
-
     return render_template("list.html", questions=questions, title="Questions")
 
 
@@ -116,7 +108,6 @@ def show_question_list(criterium='submission_time', order='desc'):
 def show_new_question_form():
     """View function of new question form."""
     title = "Ask New Question"
-
     return render_template("q_form.html", title=title)
 
 
@@ -124,19 +115,16 @@ def show_new_question_form():
 def show_new_answer_form(question_id):
     """View function of new answer form."""
     title = "Add new answer to question: {}".format(question_id)
-
     return render_template("a_form.html", title=title, question_id=question_id)
 
 
 @app.route("/question/<question_id>/edit")
 def show_edit_question_form(question_id):
     """View function of edit question form"""
-    try:
-        selected_question = questions_logic.get_question_details(question_id)
-        if not selected_question:
-            raise IndexError
-    except (psycopg2.DatabaseError, IndexError):
+    if not questions_logic.valid_question_id(question_id):
         return abort(404)
+
+    selected_question = questions_logic.get_question_details(question_id)
 
     return render_template("q_form.html", title="Edit Question",
                            selected_question=selected_question, question_id=question_id)
@@ -145,20 +133,21 @@ def show_edit_question_form(question_id):
 @app.route("/question/<question_id>")
 def show_question_page(question_id):
     """View function of question page, with details and answers."""
-    if request.args.get('view') == "counted":
-        update_view_count(question_id)
-    try:
-        selected_question, answers = get_all_for_question(question_id)
-        answer_ids = tuple(collect_answer_ids(answers))
-        q_comments, a_comments = retrieve_comments(question_id, answer_ids)
-    except (IndexError, FileNotFoundError):
+    if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
-    added_ids_tags = get_added_tags(question_id)
+    if request.args.get('view') == "counted":
+        questions_logic.update_view_count(question_id)
 
-    return render_template("question.html", question_id=question_id, answers=answers,
-                           question=selected_question, title=("Question " + question_id),
-                           q_comments=q_comments, a_comments=a_comments, added_ids_tags=added_ids_tags)
+    question, answers = questions_logic.get_all_for_question(question_id)
+
+    q_comments, a_comments = questions_logic.retrieve_comments(question_id, answers)
+
+    added_tags = questions_logic.get_added_tags(question_id)
+    title = "Question {}".format(question_id)
+
+    return render_template("question.html", question=question, answers=answers, title=title,
+                           q_comments=q_comments, a_comments=a_comments, added_tags=added_tags)
 
 
 @app.route("/question/<question_id>/delete")

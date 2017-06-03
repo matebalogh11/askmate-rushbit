@@ -4,7 +4,10 @@
 
 {% block content %}
 
+{% set question_id = question[0] %}
+
 <script src="{{url_for('static', filename='script.js')}}"></script>
+
 <div class="wrapper">
     
     <!-- Error messages in a loop with classes: error, success -->
@@ -40,11 +43,11 @@
             </td>
             <td class="desc_cell">
                 <p class="description">{{ question[5] }}</p>
-                {% if added_ids_tags %}
+                {% if added_tags %}
                 <div class="tags">
-                {% for tag_id, tag_name in added_ids_tags %}
+                    {% for tag_id, tag_name in added_tags %}
                     <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
-                {% endfor %}
+                    {% endfor %}
                 </div>
                 {% endif %}
             </td>
@@ -103,6 +106,7 @@
             {% if answer[5] %}
                 <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
             {% endif %}
+
             <form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>
                 <label>Add comment</label>
                 <input class="conditional_form_part_activator" type="checkbox" value="edit">
@@ -115,8 +119,13 @@
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
                 <div class="commentident">
+
                     <p class="commentzone"> {{ comment[3] }} </p>
-                    <h5><a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a> Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}</h5>
+
+                    <h5>
+                        <a href="{{ url_for('remove_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a> Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }}
+                    </h5>
+
                     <form action="{{ url_for('fetch_comment_for_edit', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
                         <label>Edit comment</label>
                         <input class="conditional_form_part_activator" type="checkbox" value="edit">
@@ -125,12 +134,14 @@
                             <input type="submit" value="Submit comment" class="cta">
                         </div>
                     </form>
+
                 </div>
                 {% endif %}
             {% endfor %}
+
         {% endfor %}
+
     {% endif %}
     
 </div>
-
 {% endblock %}
