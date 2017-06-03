@@ -107,7 +107,7 @@ def show_question_list(criterium='submission_time', order='desc'):
         criterium = key
         order = request.args[key]
 
-    questions = get_questions(criterium, order)
+    questions = questions_logic.get_questions(criterium, order)
 
     return render_template("list.html", questions=questions, title="Questions")
 

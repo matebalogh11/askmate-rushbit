@@ -97,3 +97,20 @@ def get_5_questions():
     fetch = "all"
     questions = db.run_statements(((SQL, data, fetch),))[0]
     return questions
+
+
+def get_questions(criterium, order):
+    """Return questions list ordered by a criterium and in certain order."""
+    check_criterium = ("title", "submission_time", "view_number", "vote_number", "answer_count")
+    check_order = ("asc", "desc")
+
+    if criterium not in check_criterium or order not in check_order:
+        criterium = "submission_time"
+        order = "desc"
+
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+             FROM question ORDER BY {} {};""".format(criterium, order)
+    data = None
+    fetch = "all"
+    questions = db.run_statements(((SQL, data, fetch),))[0]
+    return questions
