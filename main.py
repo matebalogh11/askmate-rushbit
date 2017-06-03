@@ -4,11 +4,12 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+import answers_logic
+import helper
 import questions_logic
 import search_logic
 from data_manager import *
 from logic import *
-import helper
 
 app = Flask(__name__)
 
@@ -167,22 +168,18 @@ def delete_question(question_id):
 @app.route("/question/<question_id>/new-answer", methods=["POST"])
 def add_answer(question_id):
     """Add answer and redirect to its question page."""
-    try:
-        selected_question = get_question_details(question_id)
-        if not selected_question:
-            raise IndexError
-    except (psycopg2.DatabaseError, IndexError):
+    if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
-    if not valid_answer_message(request.form):
+    if not answers_logic.valid_answer_message(request.form):
         flash("✘ Message must be filled and at least 10 characters long.", "error")
-        return redirect(url_for('show_question_list'))
+        return redirect(url_for('show_new_answer_form', question_id=question_id))
 
-    update_answer_counter(question_id, operation="ADD")
+    answers_logic.update_answer_counter(question_id, operation="ADD")
 
-    new_answer = create_new_answer_no_image(request.form["message"], question_id)
-    answer_id, image = insert_answer(new_answer)
-    image_status = update_answer_image(answer_id, request.files)
+    new_answer = answers_logic.create_new_answer_no_image(request.form["message"], question_id)
+    answer_id, image = answers_logic.insert_answer(new_answer)
+    image_status = answers_logic.update_answer_image(answer_id, request.files)
 
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
