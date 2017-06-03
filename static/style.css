@@ -26,18 +26,19 @@ h1, h2, h3 {
 
 h1 {
     color: #5d5d5d;
-    font-size: 1.4em;
+    font-size: 1.7em;
 }
 
 h2 {
     color: #5d5d5d;
-    font-size: 1.2em;
+    font-size: 1.4em;
 }
 
 h3 {
-    margin-top: 30px;
+    font-size: 1.4em;
+    margin-top: 20px;
     margin-bottom: 5px;
-    color: #2d2d2d;
+    color: #5d5d5d;
 }
 
 h5 {
@@ -46,6 +47,7 @@ h5 {
     color: #5d5d5d;
     font-weight: 100;
     font-style: italic;
+    font-size: 0.9em;
 }
 
 .wrapper {
@@ -175,7 +177,8 @@ a:hover {
 }
 
 .actionbuttons {
-    margin-top: 3px;
+    margin-top: 0px;
+    margin-bottom: 5px;
 }
 
 .cta {
@@ -215,7 +218,7 @@ a:hover {
 }
 
 .delete_mini {
-    margin-right: 15px;
+    margin-right: 5px;
     border: none;
     display: inline-block;
     text-align: center;
@@ -228,7 +231,8 @@ a:hover {
     color: white;
     padding: 2px 10px;
     border-radius: 0.3em;
-    font-size: 0.7em;
+    font-size: 0.85em;
+    font-style: italic;
 }
 
 .delete_button:hover {
@@ -263,16 +267,16 @@ a:hover {
     text-transform: uppercase;
     text-decoration: none;
     vertical-align: middle;
-    background-color: #FF2420;
+    background-color: #DC4B47;
     color: white;
     font-size: 0.7em;
-    padding: 2px;
+    padding: 2px 2px 5px 2px;
     border-radius: 0.3em;
     width:20px;
 }
 
 .votedown:hover, .votedown-mini:hover {
-    background-color: rgba(212, 30, 26, 0.7);
+    background-color: rgba(212, 30, 26, 0.8);
 }
 
 .voteup {
@@ -302,16 +306,16 @@ a:hover {
     text-transform: uppercase;
     text-decoration: none;
     vertical-align: middle;
-    background-color: #107D17;
+    background-color: #6EB173;
     color: white;
     font-size: 0.7em;
-    padding: 2px;
+    padding: 2px 2px 5px 2px;
     border-radius: 0.3em;
     width:20px;
 }
 
 .voteup:hover, .voteup-mini:hover {
-    background-color: rgba(13, 99, 18, 0.7);
+    background-color: rgba(13, 99, 18, 0.8);
 }
 
 
@@ -336,23 +340,24 @@ a:hover {
 }
 
 .description {
-    background-color: rgba(76, 164, 252, 0.15);
+    background-color: rgba(76, 164, 252, 0.25);
     padding: 15px 0 15px 15px;
     color: #3d3d3d;
-    border-left: 3px solid rgb(76, 164, 252);
+    border-left: 5px solid rgb(76, 164, 252);
     display: inline-block;
     margin-bottom: 15px;
     width: 100%;
+    border-radius: 5px;
 }
 
 .answers {
     clear:right;
-    margin:25px 0px 0px;
-    background-color: rgba(76, 164, 252, 0.15);
+    margin: 10px 0px 5px;
+    background-color: rgba(76, 164, 252, 0.25);
     padding: 15px;
     color: #3d3d3d;
-    border-left: 3px solid rgb(76, 164, 252);
-    border-radius: 3px
+    border-left: 5px solid rgb(76, 164, 252);
+    border-radius: 5px;
 }
 
 .commentident {
@@ -360,14 +365,14 @@ a:hover {
 }
 
 .commentzone {
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     clear:right;
-    background-color: rgba(16, 125, 23, 0.1);
+    background-color: rgba(16, 125, 23, 0.15);
     padding: 15px;
     color: #3d3d3d;
-    border-left: 3px solid rgba(16, 125, 23, 0.5);
-    border-radius: 3px
+    border-left: 5px solid rgba(16, 125, 23, 0.5);
+    border-radius: 5px;
 }
 
 textarea {
@@ -439,7 +444,19 @@ textarea {
 }
 
 
-#q_comment {
+#q_comment_submit {
+    display: none;
+}
+
+.q_comment_edit {
+    display: none;
+}
+
+.a_comment_submit {
+    display: none;
+}
+
+.a_comment_edit {
     display: none;
 }
 
@@ -607,7 +624,6 @@ q_table {
     width: 100%;
 }
 
-
 q_table img {
     margin: 0px;
 }
@@ -615,10 +631,15 @@ q_table img {
 .attachment {
     max-height: 300px;
     max-width: 300px;
+    border: 3px solid #838383;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-top: 0;
 }
 
 .marg {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    margin-top: 5px;
 }
 
 .searchresult a {
@@ -652,8 +673,6 @@ q_table img {
 
 .fixed_button {
     position: fixed;
-    right: 30px;
-    bottom: 30px;
     text-align: center;
     width: 50px;
     height: 50px;
@@ -666,6 +685,26 @@ q_table img {
     border:none;
     vertical-align: middle;
     box-shadow: 0 0 15px rgba(29, 29, 29, 0.3);
+    right: 30px;
+    bottom: 30px;
+}
+
+.fixed_button_2 {
+    position: fixed;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    text-decoration: none;
+    background-color: #2693FF;
+    color: white;
+    padding: 5px;
+    font-size: 1.2em;
+    border-radius: 50%;
+    border:none;
+    vertical-align: middle;
+    box-shadow: 0 0 15px rgba(29, 29, 29, 0.3);
+    right: 30px;
+    bottom: 100px;
 }
 
 .fixed_button:hover {
@@ -682,4 +721,28 @@ q_table img {
 
 .desc_cell {
     width: 95%;
+}
+
+.comm {
+   background-color: #6eb173;
+}
+
+.small_gray {
+    margin: 1px 5px 5px 0;
+    color: #5d5d5d;
+    font-weight: 100;
+    font-style: italic;
+    font-size: 1em;
+}
+
+.small_gray_2 {
+    margin: 5px 5px 0 0;
+    color: #5d5d5d;
+    font-weight: 100;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.comm:hover {
+    background-color: #588d5c;
 }
