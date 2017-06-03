@@ -5,6 +5,7 @@ from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
 import questions_logic
+import search_logic
 from data_manager import *
 from logic import *
 import helper
@@ -84,18 +85,16 @@ def show_contact():
 @app.route("/search/")
 def show_search_results():
     """View function of the results page."""
-    if request.args.get("q"):
-        phrase = request.args["q"]
+    if not request.args.get("q"):
+        flash("Empty search field. No results retrieved.", "error")
+        return redirect(url_for('show_index'))
 
-        questions = get_questions_with_answers(phrase)
-        if not questions:
-            flash("No search results for phrase '{}'.".format(phrase), "error")
+    phrase = request.args["q"]
+    questions = search_logic.get_questions_with_answers(phrase)
+    if not questions:
+        flash("No search results for phrase '{}'.".format(phrase), "error")
 
-        return render_template("search.html", questions=questions, phrase=phrase, title="Search Results")
-
-    flash("Empty search field. No results retrieved.", "error")
-
-    return redirect(url_for('show_index'))
+    return render_template("search.html", questions=questions, phrase=phrase, title="Search Results")
 
 
 @app.route("/list/")
