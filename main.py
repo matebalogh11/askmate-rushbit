@@ -132,7 +132,7 @@ def show_edit_question_form(question_id):
 
 @app.route("/question/<question_id>")
 def show_question_page(question_id):
-    """View function of question page, with details and answers."""
+    """View function of question page, with details, answers, comments, tags."""
     if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
@@ -152,19 +152,14 @@ def show_question_page(question_id):
 
 @app.route("/question/<question_id>/delete")
 def delete_question(question_id):
-    """Delete question (and its image) based on its question_id
-    furthermore delete corresponding answers and their images.
-    """
-    try:
-        selected_question = get_question_details(question_id)
-        if not selected_question:
-            raise IndexError
-    except (psycopg2.DatabaseError, IndexError):
+    """Delete question, its answers and all comments, and all image files."""
+    if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
-    remove_answer_images_by_q_id(question_id)
-    image = selected_question[2]
-    filter_questions(question_id, image)
+    questions_logic.remove_answer_images_by_q_id(question_id)
+
+    question_image = questions_logic.get_question_details(question_id)[2]
+    questions_logic.delete_question_with_image(question_id, question_image)
 
     return redirect(url_for("show_question_list"))
 

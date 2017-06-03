@@ -104,7 +104,9 @@
             <h5><a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</h5>
 
             {% if answer[5] %}
-                <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
+                <a href="{{ url_for('static',filename='uploads/' + answer[5]) }}" target="_blank">
+                    <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image" class="attachment">
+                </a>
             {% endif %}
 
             <form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>

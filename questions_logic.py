@@ -155,15 +155,16 @@ def retrieve_comments(question_id, answers):
     data1 = (question_id,)
     fetch = "all"
 
-    if answers[0]:
+    if answers:
         SQL2 = """SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time;"""
         answer_ids = tuple(answer[0] for answer in answers)
         data2 = (answer_ids,)
-        results = db.run_statements(((SQL1, data1, fetch), (SQL2, data2, fetch)))
+        q_comments, a_comments = db.run_statements(((SQL1, data1, fetch), (SQL2, data2, fetch)))
     else:
-        results = db.run_statements(((SQL1, data1, fetch),)), None
+        q_comments = db.run_statements(((SQL1, data1, fetch),))[0]
+        a_comments = None
 
-    return results
+    return q_comments, a_comments
 
 
 def get_added_tags(question_id):
@@ -176,3 +177,33 @@ def get_added_tags(question_id):
     fetch = "all"
     added_tags = db.run_statements(((SQL, data, fetch),))[0]
     return added_tags
+
+
+def remove_answer_images_by_q_id(question_id):
+    """Return filtered answers (2d list), removing answers with question_id."""
+    SQL = """SELECT image from answer WHERE question_id = %s;"""
+    data = (question_id,)
+    fetch = "col"
+    images = db.run_statements(((SQL, data, fetch),))[0]
+
+    if images:
+        for image in images:
+            if image:
+                try:
+                    os.remove('static/uploads/' + image)
+                except FileNotFoundError:
+                    pass
+
+
+def delete_question_with_image(question_id, question_image):
+    """Delete question record and image from filesystem."""
+    SQL = """DELETE FROM question WHERE id = %s;"""
+    data = (question_id, )
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+    if question_image:
+        try:
+            os.remove('static/uploads/' + question_image)
+        except FileNotFoundError:
+            pass
