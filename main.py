@@ -132,7 +132,7 @@ def show_new_answer_form(question_id):
 def show_edit_question_form(question_id):
     """View function of edit question form"""
     try:
-        selected_question = get_question_details(question_id)
+        selected_question = questions_logic.get_question_details(question_id)
         if not selected_question:
             raise IndexError
     except (psycopg2.DatabaseError, IndexError):
