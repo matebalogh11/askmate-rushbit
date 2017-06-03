@@ -11,9 +11,10 @@ def get_questions_with_answers(phrase):
     i_phrase = re.compile(re.escape(phrase), re.IGNORECASE)
 
     questions, answers = get_search_results(phrase)
-    questions_hightlight_and_append_answers(questions, answers, i_phrase, phrase)
 
     missing_question_ids = tuple(get_missing_q_ids_and_do_ans_highlight(questions, answers, i_phrase, phrase))
+
+    questions_hightlight_and_append_answers(questions, answers, i_phrase, phrase)
 
     additional_questions = get_additional_questions(missing_question_ids)
 
