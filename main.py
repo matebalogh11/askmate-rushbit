@@ -4,7 +4,7 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
-import questions
+import questions_logic
 from data_manager import *
 from logic import *
 import helper
@@ -21,10 +21,10 @@ def ask_question():
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    new_question = questions.create_new_question_no_image(request.form)
-    question_id, previous_image = questions.insert_question(new_question)
+    new_question = questions_logic.create_new_question_no_image(request.form)
+    question_id, previous_image = questions_logic.insert_question(new_question)
 
-    image_status = questions.update_question_image(question_id, previous_image, request.files)
+    image_status = questions_logic.update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "not_allowed_ext":
@@ -43,17 +43,17 @@ def edit_question(question_id):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
     try:
-        selected_question = questions.get_question_details(question_id)
+        selected_question = questions_logic.get_question_details(question_id)
         if not selected_question:
             raise IndexError
     except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
-    questions.update_question(request.form, question_id)
+    questions_logic.update_question(request.form, question_id)
 
-    previous_image = questions.get_image_for_update_question(question_id)
+    previous_image = questions_logic.get_image_for_update_question(question_id)
 
-    image_status = questions.update_question_image(question_id, previous_image, request.files)
+    image_status = questions_logic.update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "updated":
@@ -69,7 +69,7 @@ def edit_question(question_id):
 @app.route("/")
 def show_index():
     """View function of index page."""
-    questions = questions.get_5_questions()
+    questions = questions_logic.get_5_questions()
 
     return render_template("index.html", questions=questions, title="Index")
 
