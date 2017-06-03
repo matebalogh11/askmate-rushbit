@@ -18,15 +18,17 @@
 
     <h1>{{ question[4] }}</h1>
     <h5>Question: {{ question_id }} | Views: {{ question[2] }} | Submission: {{ question[1] }}</h5>
-        <form action="">
-            <p class="actionbuttons">
-                <input type="submit" value="Edit question" name="submit1" class= "cta" id="submit1" formaction="{{ url_for('show_edit_question_form', question_id=question_id) }}">
-                <input type="submit" value="Delete question" name="submit2" class= "delete_button" id="submit2" formaction="{{ url_for('delete_question', question_id=question_id) }}">
-                <input type="submit" value="Add answer" name="submit3" class= "cta" id="submit3" formaction="{{ url_for('show_new_answer_form', question_id=question_id) }}">
-                <input type="submit" value="Add tag" name="submit4" class= "cta" id="submit4" formaction="{{ url_for('show_add_tag', question_id=question_id) }}">
-                <input type="submit" value="Back to Questions" name="submit5" class= "cta" id="submit5" formaction="{{ url_for('show_question_list') }}">
-            </p>
-        </form>
+
+    <form action="">
+        <p class="actionbuttons">
+            <a href="{{ url_for('show_edit_question_form', question_id=question_id) }}" class="cta">Edit question</a>
+            <a href="{{ url_for('delete_question', question_id=question_id) }}" class="delete_button">Delete question</a>
+            <a href="{{ url_for('show_new_answer_form', question_id=question_id) }}" class="cta">Add answer</a>
+            <a href="{{ url_for('show_add_tag', question_id=question_id) }}" class="cta">Add tag</a>
+            <a href="{{ url_for('show_question_list') }}" class="cta">Back to Questions</a>
+        </p>
+    </form>
+
     <table class="q_table">
         <tr>
             <td class="vote_cell">
@@ -49,7 +51,6 @@
         </tr>
     </table>
     
-
     {% if question[6] %}
         <h3>Attachment</h3>
         <a href="{{ url_for('static',filename='uploads/' + question[6]) }}" target="_blank">
@@ -58,7 +59,6 @@
     {% endif %}
 
     <h3>Comments</h3>
-
     {% if q_comments %}        
         {% for comment in q_comments %}
             <div>     
@@ -89,21 +89,20 @@
         </form>
     </div>
 
-
     {% if answers %}
-    <hr>
-    <h3>Answers</h3>
+        <hr>
+        <h3>Answers</h3>
         {% for answer in answers %}
-        <p class="answers">{{ answer[4] }}</p>
-        <div class="voter-mini">
-            <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}" class="voteup-mini">▲</a>
-            <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}" class="votedown-mini">▼</a>
-        </div>
-        <h5><a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</h5>
-        
-        {% if answer[5] %}
-            <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
-        {% endif %}
+            <p class="answers">{{ answer[4] }}</p>
+            <div class="voter-mini">
+                <a href="{{ url_for('vote', direction='up', answer_id=answer[0]) }}" class="voteup-mini">▲</a>
+                <a href="{{ url_for('vote', direction='down', answer_id=answer[0]) }}" class="votedown-mini">▼</a>
+            </div>
+            <h5><a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>Submission: {{ answer[1] }} | Votes: {{ answer[2] }}</h5>
+
+            {% if answer[5] %}
+                <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image">
+            {% endif %}
             <form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>
                 <label>Add comment</label>
                 <input class="conditional_form_part_activator" type="checkbox" value="edit">
@@ -112,6 +111,7 @@
                     <input type="submit" value="Submit comment" class="cta">
                 </div>
             </form>
+
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
                 <div class="commentident">
