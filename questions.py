@@ -8,52 +8,34 @@ import helper
 
 
 def create_new_question_no_image(q_form):
-    """Create new question from successfully filled question form
-    with unique ID in questions, actual unix timestamp and additional initial values.
-    @questions list: 2d list.
-    @q_form dict: q_title and q_desc are the expected keys.
-    @return list: id(str), unix timestamp(int), views(int), votes(int),
-                        title(str), desc(str), image path(str), answer count(int).
-    """
+    """Create new question from successfully filled question form."""
     intial_views = 0
     initial_votes = 0
     empty_image = None
     initial_answer_count = 0
-    new_question = [helper.create_timestamp(), intial_views, initial_votes, q_form['q_title'], q_form['q_desc'],
+    new_question = [helper.create_timestamp(), intial_views, initial_votes,
+                    q_form['q_title'], q_form['q_desc'],
                     empty_image, initial_answer_count]
     return new_question
 
 
 def insert_question(new_question):
-    """Insert question."""
-    SQL = """INSERT INTO question (submission_time, view_number, vote_number,
-                                   title, message, image, answer_count)
+    """Insert new question into question table."""
+    SQL = """INSERT INTO question
+             (submission_time, view_number, vote_number, title, message, image, answer_count)
              VALUES (%s, %s, %s, %s, %s, %s, %s)
              RETURNING id, image;"""
     data = (new_question[0], new_question[1], new_question[2], new_question[3],
             new_question[4], new_question[5], new_question[6])
     fetch = "one"
-
     results = db.run_statements(((SQL, data, fetch),))
     result = results[0]
-
     return result
 
 
 def update_question_image(question_id, previous_image, files):
-    """Update path to question image and manage filesystem.
-    If image belonged to question already and new image is uploaded,
-    then delete previous image and upload new image.
-    If no image belonged to question, then simply upload new image upon request.
-
-    Files being uploaded to /static/uploads.
-    Validated server-side if file has been really sent with HTTP request
-    and if extension is valid.
-
-    @question list: id(str), unix timestamp(int), views(int), votes(int),
-                        title(str), desc(str), image path(str), answer count(int).
-    @files dict: q_image key is the only expected key.
-    @return str: status to know what message should be flashed to user.
+    """Handles filesystem by uploading new images, deleting unused ones,
+    also manages filenames stored in database.
     """
     image = files.get('q_image', None)
     image_status = None
@@ -75,9 +57,34 @@ def update_question_image(question_id, previous_image, files):
 
 
 def rename_question_image(filename, question_id):
-    """"""
+    """Rename a question image by updating database cell where id found."""
     SQL = """UPDATE question SET image = %s WHERE id = %s;"""
     data = (filename, question_id)
     fetch = None
-
     db.run_statements(((SQL, data, fetch),))
+
+
+def get_question_details(question_id):
+    """Return a question title, message and image name, where id is found."""
+    SQL = """SELECT title, message, image FROM question WHERE id = %s;"""
+    data = (question_id,)
+    fetch = "one"
+    question = db.run_statements(((SQL, data, fetch),))[0]
+    return question
+
+
+def update_question(q_form, question_id):
+    """Update a question title and message where id found."""
+    SQL = """UPDATE question SET title = %s, message = %s WHERE id = %s;"""
+    data = (q_form['q_title'], q_form['q_desc'], question_id)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+
+def get_image_for_update_question(question_id):
+    """Get image name for question with question_id."""
+    SQL = """SELECT image FROM question WHERE id = %s;"""
+    data = (question_id,)
+    fetch = "one"
+    image = db.run_statements(((SQL, data, fetch),))[0][0]
+    return image

@@ -7,6 +7,7 @@ from flask import (Flask, abort, flash, redirect, render_template, request,
 import questions
 from data_manager import *
 from logic import *
+import helper
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ def ask_question():
     """Post a new question with title, description and optional image.
     Redirect: to new question posted upon success, else to question list page.
     """
-    if not valid_request(request.form):
+    if not helper.valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
@@ -38,21 +39,21 @@ def edit_question(question_id):
     """Edit question with question_id, based on filled HTTP request form.
     Updates info in CSV file and manages filesystem.
     """
-    if not valid_request(request.form):
+    if not helper.valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
     try:
-        selected_question = get_question_details(question_id)
+        selected_question = questions.get_question_details(question_id)
         if not selected_question:
             raise IndexError
     except (psycopg2.DatabaseError, IndexError):
         return abort(404)
 
-    update_question(request.form, question_id)
+    questions.update_question(request.form, question_id)
 
-    previous_image = get_image_for_update_question(question_id)
+    previous_image = questions.get_image_for_update_question(question_id)
 
-    image_status = update_question_image(question_id, previous_image, request.files)
+    image_status = questions.update_question_image(question_id, previous_image, request.files)
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
     elif image_status == "updated":
