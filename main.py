@@ -69,7 +69,7 @@ def edit_question(question_id):
 @app.route("/")
 def show_index():
     """View function of index page."""
-    questions = get_5_questions()
+    questions = questions.get_5_questions()
 
     return render_template("index.html", questions=questions, title="Index")
 

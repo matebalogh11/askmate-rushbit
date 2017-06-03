@@ -88,3 +88,13 @@ def get_image_for_update_question(question_id):
     fetch = "one"
     image = db.run_statements(((SQL, data, fetch),))[0][0]
     return image
+
+
+def get_5_questions():
+    """Return 5 most recent questions."""
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+             FROM question ORDER BY submission_time DESC LIMIT 5;"""
+    data = None
+    fetch = "all"
+    questions = db.run_statements(((SQL, data, fetch),))[0]
+    return questions
