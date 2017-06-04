@@ -4,6 +4,9 @@
 
 {% block content %}
 <div class="wrapper">
+
+    {% if not answer %}
+
     <h1>New answer</h1>
 
     <form action="{{ url_for('add_answer', question_id=question_id) }}" method="POST" enctype='multipart/form-data'>
@@ -19,5 +22,32 @@
             <input type="submit" value="Submit" name="submit" class="cta_home" id="submit">
         </p>
     </form>
+
+    {% elif answer %}
+
+    <h1>Edit answer</h1>
+
+    <form action="{{ url_for('edit_answer', answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>
+        <p>
+            <h3><label for="message">Your answer:</label><br></h3>
+            <input type="text" name="message" class="inputfield" id="message" minlength="10" required value="{{ answer[4] }}">
+        </p>
+        <p>
+            <h3><label for="a_image">Image upload:</label><br></h3>
+            <input type="file" name="a_image" id="a_image">
+        </p>
+        <p>
+            <input type="submit" value="Submit" name="submit" class="cta_home" id="submit">
+        </p>
+    </form>
+
+    {% if answer[5] %}
+    <img src="{{ url_for('static', filename='uploads/' + answer[5]) }}" alt="Uploaded image">
+    <p>Currently uploaded image: {{ answer[5] }}</p>
+    <a href="{{ url_for('delete_image', answer_id=answer[0]) }}" class="delete_button">Delete image</a>
+    {% endif %}
+
+    {% endif %}
+
 </div>
 {% endblock %}

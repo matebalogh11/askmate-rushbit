@@ -48,7 +48,6 @@ def edit_question(question_id):
     if not questions_logic.valid_question_id(question_id):
         return abort(404)
 
-    selected_question = questions_logic.get_question_details(question_id)
     questions_logic.update_question(request.form, question_id)
     previous_image = questions_logic.get_image_for_update_question(question_id)
 
@@ -179,7 +178,7 @@ def add_answer(question_id):
 
     new_answer = answers_logic.create_new_answer_no_image(request.form["message"], question_id)
     answer_id, image = answers_logic.insert_answer(new_answer)
-    image_status = answers_logic.update_answer_image(answer_id, request.files)
+    image_status = answers_logic.update_answer_image(answer_id, None, request.files)
 
     if image_status == "uploaded":
         flash("✓ File was uploaded successfully.", "success")
@@ -190,11 +189,41 @@ def add_answer(question_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/answer/<answer_id>/edit", methods=["GET", "POST"])
+def edit_answer(answer_id):
+    """Delete answer with answer_id and redirect to its question page."""
+    if not answers_logic.valid_answer_id(answer_id):
+        return abort(404)
+
+    previous_image, question_id = answers_logic.get_answer_image_and_q_id(answer_id)
+
+    if request.method == "POST":
+        if not answers_logic.valid_answer_message(request.form):
+            flash("✘ Message must be filled and at least 10 characters long.", "error")
+            return redirect(url_for('edit_answer', answer_id=answer_id))
+
+        answers_logic.update_answer_message(answer_id, request.form['message'])
+
+        image_status = answers_logic.update_answer_image(answer_id, previous_image, request.files)
+        if image_status == "uploaded":
+            flash("✓ Answer image was uploaded successfully.", "success")
+        elif image_status == "updated":
+            flash("✓ Previous answer image was updated with new one successfully.", "success")
+        elif image_status == "not_allowed_ext":
+            flash("✘ Image was not updated. Allowed extensions: JPEG, JPG, PNG, GIF.", "error")
+
+        return redirect(url_for('show_question_page', question_id=question_id))
+
+    answer = answers_logic.get_answer_details(answer_id)
+    title = "Add new answer to question: {}".format(question_id)
+    return render_template("a_form.html", title=title, question_id=question_id, answer=answer)
+
+
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
     try:
-        selected_answer_id = get_answer_details(answer_id)
+        selected_answer_id = get_answer_details(answer_id) # get_answer_details rewritten
         if not selected_answer_id:
             raise IndexError
     except (psycopg2.DatabaseError, IndexError):
@@ -220,12 +249,21 @@ def vote(direction, question_id=None, answer_id=None):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/answer/<answer_id>/del-img")
 @app.route("/question/<question_id>/del-img")
-def delete_image(question_id):
+def delete_image(question_id=None, answer_id=None):
     """Delete image of selected question."""
-    do_delete_image(question_id)
+    do_delete_image(question_id, answer_id) # Now must be implemented for answers too
 
-    return redirect(url_for('show_edit_question_form', question_id=question_id))
+    if question_id:
+        if not questions_logic.valid_question_id(question_id):
+            return abort(404)
+        return redirect(url_for('show_edit_question_form', question_id=question_id))
+
+    elif answer_id:
+        if not answers_logic.valid_answer_id(answer_id):
+            return abort(404)
+        return redirect(url_for('edit_answer', answer_id=answer_id))
 
 
 @app.route("/comment/<question_id>", methods=["POST"])
