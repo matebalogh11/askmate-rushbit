@@ -1,6 +1,20 @@
 
+from psycopg2 import DatabaseError
+
 import db
 import helper
+
+
+def valid_comment_id(comment_id):
+    """Return True if comment_id found in comment table."""
+    SQL = """SELECT id FROM comment WHERE id = %s;"""
+    data = (comment_id,)
+    fetch = "one"
+    try:
+        found_id = db.run_statements(((SQL, data, fetch),))[0][0]
+    except (DatabaseError, TypeError):
+        return False
+    return True
 
 
 def retrieve_comments(question_id, answers):
@@ -43,5 +57,13 @@ def insert_comment(question_id, answer_id, message):
                                     message, submission_time, edited_count)
             VALUES (%s, %s, %s, %s, %s);"""
     data = (question_id, answer_id, message, init_time, init_edit)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+
+def delete_comment(comment_id):
+    """Delete comment with comment_id."""
+    SQL = """DELETE FROM comment WHERE id = %s;"""
+    data = (comment_id,)
     fetch = None
     db.run_statements(((SQL, data, fetch),))

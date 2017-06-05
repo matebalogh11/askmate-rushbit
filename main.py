@@ -4,15 +4,13 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
-import comments_logic
-import tag_logic
 import answers_logic
+import comments_logic
 import helper
 import questions_logic
 import search_logic
+import tag_logic
 import vote_logic
-from data_manager import *
-from logic import *
 
 app = Flask(__name__)
 
@@ -274,9 +272,22 @@ def vote(direction, question_id=None, answer_id=None):
 @app.route("/answer/<answer_id>/new-comment", methods=["POST"])
 def add_comment(question_id=None, answer_id=None):
     """Add comment. Works for question and answer as well."""
+    if not question_id:
+        question_id = request.args.get('q_id')
+
+    if not questions_logic.valid_question_id(question_id):
+        return abort(404)
+
+    if answer_id:
+        if not answers_logic.valid_answer_id(answer_id):
+            return abort(404)
+
     if request.method == 'POST':
-        if len(request.form.get('message', '')) >= 10:
+        if len(request.form.get('message', '')) >= 5:
             comments_logic.insert_comment(question_id, answer_id, request.form['message'])
+            flash("Comment successfully added.", "success")
+        else:
+            flash("Comment was not added. It has to be at least 5 characters long.", "error")
 
     return redirect(url_for("show_question_page", question_id=question_id))
 
@@ -284,19 +295,28 @@ def add_comment(question_id=None, answer_id=None):
 @app.route("/comment/<comment_id>/<question_id>/edit", methods=["POST"])
 def edit_comment(comment_id, question_id):
     """Edit comment."""
+    if (not comments_logic.valid_comment_id(comment_id) or
+            not questions_logic.valid_question_id(question_id)):
+        return abort(404)
+
     if request.method == 'POST':
-        if len(request.form.get('message', '')) >= 10:
+        if len(request.form.get('message', '')) >= 5:
             comments_logic.edit_comment(request.form['message'], comment_id)
+            flash("Comment successfully edited.", "success")
         else:
-            flash("Comment message must be at least 10 characters long.", "error")
+            flash("Comment was not edited. It has to be at least 5 characters long.", "error")
 
     return redirect(url_for("show_question_page", question_id=question_id))
 
 
 @app.route("/comment/<comment_id>/<question_id>/edit")
-def remove_comment(comment_id, question_id):
-    """Remove comment from question."""
-    delete_comment(comment_id) # still need to be done
+def delete_comment(comment_id, question_id):
+    """Delete comment from question."""
+    if (not comments_logic.valid_comment_id(comment_id) or
+            not questions_logic.valid_question_id(question_id)):
+        return abort(404)
+
+    comments_logic.delete_comment(comment_id)
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
