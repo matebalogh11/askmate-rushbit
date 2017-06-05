@@ -72,7 +72,7 @@
 
     <div class = "q_comments">
         <button onclick="hideMe_q_submit()" class="cta marg comm">Comment question</button>
-        <form action="{{ url_for('add_comment', question_id=question_id, answer_id=none) }}" method="POST" enctype='multipart/form-data'>
+        <form action="{{ url_for('add_comment', question_id=question_id) }}" method="POST" enctype='multipart/form-data'>
             <div id="q_comment_submit">
                 <textarea class="textarea" name="message"></textarea><br>
                 <input type="submit" value="Submit comment" class="cta marg comm">
@@ -98,15 +98,6 @@
                         </form>
                     </span>
                 </div>
-                
-                <!--<form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
-                    <label>Edit comment</label>
-                    <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                    <div class="conditional_form_part" id="cd">
-                        <textarea class="textarea" name="message"></textarea><br>
-                        <input type="submit" value="Submit comment" class="cta comm">
-                    </div>
-                </form>-->
 
             </div>
         {% endfor %}
@@ -136,7 +127,7 @@
                 <!-- This is new, and works. -->
                 <span class="small_gray">
                     <button onclick="hideMe_a_submit('{{ 'a_c_edit' + loop.index|string }}')" class="delete_mini">Comment answer</button>
-                    <form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST">
+                    <form action="{{ url_for('add_comment', answer_id=answer[0]) }}" method="POST">
                         <div class="a_comment_submit" id="{{ 'a_c_edit' + loop.index|string }}">
                             <textarea class="textarea" name="message"></textarea><br>
                             <input type="submit" value="Submit comment" class="cta marg comm">
@@ -150,15 +141,6 @@
                     <img src="{{ url_for('static',filename='uploads/' + answer[5]) }}" alt="Answer Image" class="attachment">
                 </a>
             {% endif %}
-
-            <!--<form action="{{ url_for('add_comment', question_id=question_id, answer_id=answer[0]) }}" method="POST" enctype='multipart/form-data'>
-                <label>Comment answer</label>
-                <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                <div class="conditional_form_part" id="cd">
-                    <textarea class="textarea" name="message"></textarea><br>
-                    <input type="submit" value="Submit comment" class="cta comm">
-                </div>
-            </form>-->
 
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
@@ -179,15 +161,6 @@
                             </form>
                         </span>
                     </div>
-
-                    <!--<form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0]) }}" method="POST" enctype='multipart/form-data'>
-                        <label>Edit comment</label>
-                        <input class="conditional_form_part_activator" type="checkbox" value="edit">
-                        <div class="conditional_form_part" id="cd">
-                            <textarea class="textarea" name="message"></textarea><br>
-                            <input type="submit" value="Submit comment" class="cta comm">
-                        </div>
-                    </form>-->
 
                 </div>
                 {% endif %}

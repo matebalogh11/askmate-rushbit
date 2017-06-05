@@ -31,3 +31,17 @@ def edit_comment(new_comment, comment_id):
     data = (new_comment, submission_time, comment_id)
     fetch = None
     db.run_statements(((SQL, data, fetch),))
+
+
+def insert_comment(question_id, answer_id, message):
+    """Initialize comment and insert into comment table."""
+    init_time = helper.create_timestamp()
+    init_edit = 0
+    comment = (question_id, answer_id, message, init_time, init_edit)
+
+    SQL = """INSERT INTO comment (question_id, answer_id,
+                                    message, submission_time, edited_count)
+            VALUES (%s, %s, %s, %s, %s);"""
+    data = (question_id, answer_id, message, init_time, init_edit)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))

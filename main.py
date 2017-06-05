@@ -270,18 +270,15 @@ def vote(direction, question_id=None, answer_id=None):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
-@app.route("/comment/<question_id>", methods=["POST"])
-def add_comment(question_id):
+@app.route("/question/<question_id>/new-comment", methods=["POST"])
+@app.route("/answer/<answer_id>/new-comment", methods=["POST"])
+def add_comment(question_id=None, answer_id=None):
     """Add comment. Works for question and answer as well."""
-    answer_id = request.args.get("answer_id")
-    new_com = new_comment(question_id, answer_id, request.form.get("message"))
-    insert_comment(new_com)
+    if request.method == 'POST':
+        if len(request.form.get('message', '')) >= 10:
+            comments_logic.insert_comment(question_id, answer_id, request.form['message'])
 
     return redirect(url_for("show_question_page", question_id=question_id))
-
-
-# @app.route("/question/<question_id>/new-comment", methods=["POST"])
-# @app.route("/answer/<answer_id>/new-comment", methods=["POST"])
 
 
 @app.route("/comment/<comment_id>/<question_id>/edit", methods=["POST"])
