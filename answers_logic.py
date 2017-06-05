@@ -98,7 +98,7 @@ def rename_answer_image(filename, answer_id):
 
 
 def get_answer_image_and_q_id(answer_id):
-    """Return answer image based on answer_id."""
+    """Return answer image and question_id based on answer_id."""
     SQL = """SELECT image, question_id FROM answer WHERE id = %s;"""
     data = (answer_id,)
     fetch = "one"
@@ -176,3 +176,13 @@ def remove_answer_image(answer_id):
     data = (answer_id,)
     fetch = None
     db.run_statements(((SQL, data, fetch),))
+
+
+def get_question_id(answer_id):
+    """Return question_id based on answer_id."""
+    SQL = """SELECT question_id FROM answer WHERE id = %s;"""
+    data = (answer_id,)
+    fetch = "one"
+
+    question_id = db.run_statements(((SQL, data, fetch),))[0][0]
+    return question_id

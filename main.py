@@ -8,6 +8,7 @@ import answers_logic
 import helper
 import questions_logic
 import search_logic
+import vote_logic
 from data_manager import *
 from logic import *
 
@@ -255,9 +256,10 @@ def vote(direction, question_id=None, answer_id=None):
     then redirect to corresponding question_page.
     """
     if question_id:
-        do_vote(direction, question_id=question_id)
+        vote_logic.vote_question(direction, question_id=question_id)
     elif answer_id:
-        question_id = do_vote(direction, answer_id=answer_id)
+        vote_logic.vote_answer(direction, answer_id=answer_id)
+        question_id = answers_logic.get_question_id(answer_id)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
