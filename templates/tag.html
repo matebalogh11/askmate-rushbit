@@ -5,35 +5,34 @@
 {% block content %}
 <div class="wrapper">
 
-    <h1>Add tag to question - ID: {{ question_id }}</h1>
+    <h1>Manage tags for question - ID: {{ question_id }}</h1>
 
     {% if added_tags %}
     <h3>Added tags:</h3>
         <div class="tags">
-        {% for tag in added_tags %}
-            <span>{{ tag }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
+        {% for tag_id, tag_name in added_tags %}
+            <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id, direct='tag_manager') }}">×</a></span>
         {% endfor %}
         </div>
     {% endif %}
 
-    
-    <form action="{{ url_for('show_add_tag', question_id=question_id) }}" method="POST">
+    <form action="{{ url_for('manage_tags', question_id=question_id) }}" method="POST">
         <div class="select_tags">
             <select name="select_tag1" id="select_tag1">
                 <option disabled selected value> -- select an option -- </option>
-                {% for tag in existing_tags %}
+                {% for tag in not_yet_added_tags %}
                 <option>{{ tag }}</option>
                 {% endfor %}
             </select>
             <select name="select_tag2" id="select_tag2">
                 <option disabled selected value> -- select an option -- </option>
-                {% for tag in existing_tags %}
+                {% for tag in not_yet_added_tags %}
                 <option>{{ tag }}</option>
                 {% endfor %}
             </select>
             <select name="select_tag3" id="select_tag3">
                 <option disabled selected value> -- select an option -- </option>
-                {% for tag in existing_tags %}
+                {% for tag in not_yet_added_tags %}
                 <option>{{ tag }}</option>
                 {% endfor %}
             </select>

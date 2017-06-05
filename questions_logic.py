@@ -177,7 +177,7 @@ def retrieve_comments(question_id, answers):
     return q_comments, a_comments
 
 
-def get_added_tags(question_id):
+def get_added_tag_ids_and_names(question_id):
     """Return added tags for question with question_id."""
     SQL = """SELECT tag.id, tag.name FROM question_tag AS qt
              JOIN tag ON

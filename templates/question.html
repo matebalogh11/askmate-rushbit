@@ -24,7 +24,7 @@
     <p class="actionbuttons">
         <a href="{{ url_for('show_edit_question_form', question_id=question_id) }}" class="cta">Edit question</a>
         <a href="{{ url_for('delete_question', question_id=question_id) }}" class="delete_button">Delete question</a>
-        <a href="{{ url_for('show_add_tag', question_id=question_id) }}" class="cta">Add tag</a>
+        <a href="{{ url_for('manage_tags', question_id=question_id) }}" class="cta">Manage tags</a>
         <a href="{{ url_for('show_question_list') }}" class="cta">Back to Questions</a>
     </p>
 

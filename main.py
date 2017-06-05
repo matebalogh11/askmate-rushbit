@@ -4,6 +4,7 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+import tag_logic
 import answers_logic
 import helper
 import questions_logic
@@ -144,7 +145,7 @@ def show_question_page(question_id):
 
     q_comments, a_comments = questions_logic.retrieve_comments(question_id, answers)
 
-    added_tags = questions_logic.get_added_tags(question_id)
+    added_tags = tag_logic.get_added_tag_ids_and_names(question_id)
     title = "Question {}".format(question_id)
 
     return render_template("question.html", question=question, answers=answers, title=title,
@@ -256,8 +257,12 @@ def vote(direction, question_id=None, answer_id=None):
     then redirect to corresponding question_page.
     """
     if question_id:
+        if not questions_logic.valid_question_id(question_id):
+            return abort(404)
         vote_logic.vote_question(direction, question_id=question_id)
     elif answer_id:
+        if not answers_logic.valid_answer_id(answer_id):
+            return abort(404)
         vote_logic.vote_answer(direction, answer_id=answer_id)
         question_id = answers_logic.get_question_id(answer_id)
 
@@ -290,32 +295,44 @@ def remove_comment(question_id, comment_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
-@app.route("/question/<question_id>/new-tag", methods=["GET", "POST"])
-def show_add_tag(question_id):
-    """View function of question tag addition page."""
+@app.route("/question/<question_id>/manage-tags", methods=["GET", "POST"])
+def manage_tags(question_id):
+    """GET: view function of question tag addition page.
+    POST: allows choosing from existing tags and adding new ones.
+    """
+    if not questions_logic.valid_question_id(question_id):
+        return abort(404)
+
     if request.method == "POST":
+        error_message = tag_logic.manage_new_tag_relations(request.form, question_id)
 
-        status_message = do_inserts(request.form, question_id)
-
-        if status_message == "contains_space":
-            flash("The tag cannot contain spaces!", "error")
+        if error_message == "invalid_input":
+            flash("Tag length must be between 2-20 characters and contain only \
+            lowercase letters, digits and dashes.", "error")
             return redirect(url_for('show_question_page', question_id=question_id))
 
         return redirect(url_for('show_question_page', question_id=question_id))
 
-    else:
-        ids_tags = get_added_tags(question_id)
-        added_tags = [item[1] for item in ids_tags]
-        existing_tags = get_existing_tags(tuple(added_tags))
+    added_tag_ids_and_names = tag_logic.get_added_tag_ids_and_names(question_id)
+    added_tag_names = tuple(id_and_name[1] for id_and_name in added_tag_ids_and_names)
+    not_yet_added_tags = tag_logic.get_not_yet_added_tags(tuple(added_tag_names))
 
-        return render_template("tag.html", added_tags=added_tags, existing_tags=existing_tags,
-                               question_id=question_id, title="Add Tag")
+    return render_template("tag.html", added_tags=added_tag_ids_and_names, not_yet_added_tags=not_yet_added_tags,
+                           question_id=question_id, title="Manage Tags")
 
 
 @app.route("/question/<question_id>/tag/<tag_id>/delete")
 def delete_tag(question_id, tag_id):
-    """Delete tag."""
-    do_delete_tag(question_id, tag_id)
+    """Delete tag relation and reload page the link is requested from."""
+    if not questions_logic.valid_question_id(question_id):
+        return abort(404)
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    tag_logic.delete_tag(question_id, tag_id)
+
+    if request.args.get('direct') == 'tag_manager':
+        return redirect(url_for('manage_tags', question_id=question_id))
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -323,6 +340,11 @@ def delete_tag(question_id, tag_id):
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
+
+@app.errorhandler(405)
+def not_allowed_method(error):
+    return render_template('404.html'), 405
 
 
 if __name__ == "__main__":
