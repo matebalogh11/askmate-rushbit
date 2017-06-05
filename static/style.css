@@ -156,7 +156,7 @@ a:hover {
 .cta_home {
     display: inline-block;
     text-align: center;
-    width: 20%;
+    width: 18%;
     font-family: 'Open Sans', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
@@ -749,4 +749,8 @@ q_table img {
 
 .red_button {
     background-color: #DC4B47;
+}
+
+.red_button:hover {
+    background-color: #b03c38;
 }

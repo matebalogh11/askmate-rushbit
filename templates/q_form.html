@@ -26,7 +26,7 @@
         </p>
 
         {% if selected_question[2] %}
-        <img src="{{ url_for('static', filename='uploads/' + selected_question[2]) }}" alt="Uploaded image">
+        <img class="attachment" src="{{ url_for('static', filename='uploads/' + selected_question[2]) }}" alt="Uploaded image">
         <p>Currently uploaded image: {{ selected_question[2] }}</p>
         <a href="{{ url_for('delete_image', question_id=question_id) }}" class="delete_button">Delete image</a>
         {% endif %}
