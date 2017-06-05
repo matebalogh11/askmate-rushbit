@@ -150,8 +150,12 @@ def valid_question_id(question_id):
 
 def get_all_for_question(question_id):
     """Return tuple: 1. question record with question_id, 2. answers 2d list for question."""
-    SQL1 = """SELECT * FROM question WHERE id = %s;"""
-    SQL2 = """SELECT * FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC;"""
+    SQL1 = """SELECT
+                  id, submission_time, view_number, vote_number, title, message, image, answer_count
+              FROM question WHERE id = %s;"""
+    SQL2 = """SELECT
+                  id, submission_time, vote_number, question_id, message, image
+              FROM answer WHERE question_id = %s ORDER BY vote_number DESC, submission_time DESC;"""
     data = (question_id,)
     fetch1 = "one"
     fetch2 = "all"
