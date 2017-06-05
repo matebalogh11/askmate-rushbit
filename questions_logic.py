@@ -159,24 +159,6 @@ def get_all_for_question(question_id):
     return results
 
 
-def retrieve_comments(question_id, answers):
-    """Return comments for question and each answer."""
-    SQL1 = """SELECT * FROM comment WHERE question_id = %s ORDER BY submission_time;"""
-    data1 = (question_id,)
-    fetch = "all"
-
-    if answers:
-        SQL2 = """SELECT * FROM comment WHERE answer_id IN %s ORDER BY submission_time;"""
-        answer_ids = tuple(answer[0] for answer in answers)
-        data2 = (answer_ids,)
-        q_comments, a_comments = db.run_statements(((SQL1, data1, fetch), (SQL2, data2, fetch)))
-    else:
-        q_comments = db.run_statements(((SQL1, data1, fetch),))[0]
-        a_comments = None
-
-    return q_comments, a_comments
-
-
 def get_added_tag_ids_and_names(question_id):
     """Return added tags for question with question_id."""
     SQL = """SELECT tag.id, tag.name FROM question_tag AS qt

@@ -4,6 +4,7 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+import comments_logic
 import tag_logic
 import answers_logic
 import helper
@@ -143,7 +144,7 @@ def show_question_page(question_id):
 
     question, answers = questions_logic.get_all_for_question(question_id)
 
-    q_comments, a_comments = questions_logic.retrieve_comments(question_id, answers)
+    q_comments, a_comments = comments_logic.retrieve_comments(question_id, answers)
 
     added_tags = tag_logic.get_added_tag_ids_and_names(question_id)
     title = "Question {}".format(question_id)
@@ -273,25 +274,32 @@ def vote(direction, question_id=None, answer_id=None):
 def add_comment(question_id):
     """Add comment. Works for question and answer as well."""
     answer_id = request.args.get("answer_id")
-    new_com = new_comment(question_id, answer_id, request.form.get("get_comment"))
+    new_com = new_comment(question_id, answer_id, request.form.get("message"))
     insert_comment(new_com)
 
     return redirect(url_for("show_question_page", question_id=question_id))
 
 
-@app.route("/comment/edit/<question_id>/<comment_id>", methods=["POST"])
-def fetch_comment_for_edit(question_id, comment_id):
-    """Fetch comment for edit."""
-    new_comment = request.form.get("get_comment")
-    submission_time = create_timestamp()
-    edit_comment(new_comment, comment_id, submission_time)
+# @app.route("/question/<question_id>/new-comment", methods=["POST"])
+# @app.route("/answer/<answer_id>/new-comment", methods=["POST"])
+
+
+@app.route("/comment/<comment_id>/<question_id>/edit", methods=["POST"])
+def edit_comment(comment_id, question_id):
+    """Edit comment."""
+    if request.method == 'POST':
+        if len(request.form.get('message', '')) >= 10:
+            comments_logic.edit_comment(request.form['message'], comment_id)
+        else:
+            flash("Comment message must be at least 10 characters long.", "error")
+
     return redirect(url_for("show_question_page", question_id=question_id))
 
 
-@app.route("/comment/<question_id>/<comment_id>/delete")
-def remove_comment(question_id, comment_id):
+@app.route("/comment/<comment_id>/<question_id>/edit")
+def remove_comment(comment_id, question_id):
     """Remove comment from question."""
-    delete_comment(comment_id)
+    delete_comment(comment_id) # still need to be done
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
