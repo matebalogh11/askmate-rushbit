@@ -19,7 +19,7 @@ def ask_question():
     """Post a new question with title, description and optional image.
     Redirect: to new question posted upon success, else to question list page.
     """
-    if not helper.valid_request(request.form):
+    if not questions_logic.valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
@@ -41,7 +41,7 @@ def edit_question(question_id):
     """Edit question with question_id, based on filled HTTP request form.
     Updates info in CSV file and manages filesystem.
     """
-    if not helper.valid_request(request.form):
+    if not questions_logic.valid_request(request.form):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 

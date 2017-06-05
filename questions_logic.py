@@ -8,6 +8,16 @@ import db
 import helper
 
 
+def valid_request(q_form):
+    """Return True if HTTP request was sent with at least 10
+    characters long title and description, else False"""
+    title_length = len(q_form.get('q_title', ''))
+    desc_length = len(q_form.get('q_desc', ''))
+    if title_length >= 10 and desc_length >= 10:
+        return True
+    return False
+
+
 def create_new_question_no_image(q_form):
     """Create new question from successfully filled question form."""
     intial_views = 0
