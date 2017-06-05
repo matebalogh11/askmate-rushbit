@@ -125,3 +125,54 @@ def update_answer_message(answer_id, message):
     fetch = None
 
     db.run_statements(((SQL, data, fetch),))
+
+
+def remove_answer_and_get_q_id(answer_id):
+    """Remove answer record and its image,
+    then return its question_id.
+    """
+    image_to_delete, question_id = get_answer_image_and_q_id(answer_id)
+
+    try:
+        os.remove("static/uploads/" + image_to_delete)
+    except (FileNotFoundError, TypeError):
+        pass
+
+    delete_answer_by_id(answer_id)
+    return question_id
+
+
+def delete_answer_by_id(answer_id):
+    """Deletes answer by answer ID."""
+    SQL = """DELETE FROM answer WHERE id = %s;"""
+    data = (answer_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+
+def delete_a_image(answer_id):
+    """Delete image belonging to an answer with answer_id."""
+    current_image = get_answer_image(answer_id)
+    if current_image:
+        remove_answer_image(answer_id)
+    try:
+        os.remove("static/uploads/" + current_image)
+    except FileNotFoundError:
+        pass
+
+
+def get_answer_image(answer_id):
+    """Return answer image name."""
+    SQL = """SELECT image FROM answer WHERE id = %s;"""
+    data = (answer_id,)
+    fetch = "one"
+    q_img = db.run_statements(((SQL, data, fetch),))[0][0]
+    return q_img
+
+
+def remove_answer_image(answer_id):
+    """Remove answer image by updating database, setting image to NULL."""
+    SQL = """UPDATE answer SET image = NULL WHERE id = %s;"""
+    data = (answer_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))

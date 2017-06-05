@@ -222,17 +222,30 @@ def edit_answer(answer_id):
 @app.route("/answer/<answer_id>/delete")
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
-    try:
-        selected_answer_id = get_answer_details(answer_id) # get_answer_details rewritten
-        if not selected_answer_id:
-            raise IndexError
-    except (psycopg2.DatabaseError, IndexError):
+    if not answers_logic.valid_answer_id(answer_id):
         return abort(404)
 
-    question_id = remove_answer(answer_id)
-    update_answer_counter(question_id, operation="SUB")
+    question_id = answers_logic.remove_answer_and_get_q_id(answer_id)
+    answers_logic.update_answer_counter(question_id, operation="SUB")
 
     return redirect(url_for('show_question_page', question_id=question_id))
+
+
+@app.route("/answer/<answer_id>/del-img")
+@app.route("/question/<question_id>/del-img")
+def delete_image(question_id=None, answer_id=None):
+    """Delete image of selected question."""
+    if question_id:
+        if not questions_logic.valid_question_id(question_id):
+            return abort(404)
+        questions_logic.delete_q_image(question_id)
+        return redirect(url_for('show_edit_question_form', question_id=question_id))
+
+    elif answer_id:
+        if not answers_logic.valid_answer_id(answer_id):
+            return abort(404)
+        answers_logic.delete_a_image(answer_id)
+        return redirect(url_for('edit_answer', answer_id=answer_id))
 
 
 @app.route("/answer/<answer_id>/vote-<direction>")
@@ -247,23 +260,6 @@ def vote(direction, question_id=None, answer_id=None):
         question_id = do_vote(direction, answer_id=answer_id)
 
     return redirect(url_for('show_question_page', question_id=question_id))
-
-
-@app.route("/answer/<answer_id>/del-img")
-@app.route("/question/<question_id>/del-img")
-def delete_image(question_id=None, answer_id=None):
-    """Delete image of selected question."""
-    do_delete_image(question_id, answer_id) # Now must be implemented for answers too
-
-    if question_id:
-        if not questions_logic.valid_question_id(question_id):
-            return abort(404)
-        return redirect(url_for('show_edit_question_form', question_id=question_id))
-
-    elif answer_id:
-        if not answers_logic.valid_answer_id(answer_id):
-            return abort(404)
-        return redirect(url_for('edit_answer', answer_id=answer_id))
 
 
 @app.route("/comment/<question_id>", methods=["POST"])

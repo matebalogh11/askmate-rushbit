@@ -207,3 +207,31 @@ def delete_question_with_image(question_id, question_image):
             os.remove('static/uploads/' + question_image)
         except FileNotFoundError:
             pass
+
+
+def delete_q_image(question_id):
+    """Delete image belonging to a question with question_id."""
+    current_image = get_question_image(question_id)
+    if current_image:
+        remove_question_image(question_id)
+    try:
+        os.remove("static/uploads/" + current_image)
+    except FileNotFoundError:
+        pass
+
+
+def get_question_image(question_id):
+    """Return question image name."""
+    SQL = """SELECT image FROM question WHERE id = %s;"""
+    data = (question_id,)
+    fetch = "one"
+    q_img = db.run_statements(((SQL, data, fetch),))[0][0]
+    return q_img
+
+
+def remove_question_image(question_id):
+    """Remove question image by updating database, setting image to NULL."""
+    SQL = """UPDATE question SET image = NULL WHERE id = %s;"""
+    data = (question_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
