@@ -168,6 +168,7 @@ a:hover {
     font-size: 1.2em;
     border-radius: 0.3em;
     border:none;
+    margin: 20px 0;
 }
 
 .cta_home:hover {
@@ -744,4 +745,8 @@ q_table img {
 
 .comm:hover {
     background-color: #588d5c;
+}
+
+.red_button {
+    background-color: #DC4B47;
 }

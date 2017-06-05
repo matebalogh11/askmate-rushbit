@@ -16,11 +16,16 @@
 
     
     <div class="cta_container">
-        <a href="{{ url_for('show_new_question_form') }}" class="cta_home asknew" class="asknew"><img src="{{ url_for('static', filename='plus.svg') }}"><span>Ask a question</span></a> 
-        <a href="{{ url_for('show_question_list') }}" class="cta_home allquestions"><img src="{{ url_for('static', filename='table.svg') }}"><span>All questions</span></a>    
-        
+        <a href="{{ url_for('show_new_question_form') }}" class="cta_home asknew" class="asknew">
+            <img src="{{ url_for('static', filename='plus.svg') }}"><span>Ask a question</span>
+        </a> 
+        <a href="{{ url_for('show_question_list') }}" class="cta_home allquestions">
+            <img src="{{ url_for('static', filename='table.svg') }}"><span>All questions</span>
+        </a>
     </div>
+
     <h1>Most recent questions</h1>
+
     <table class="maintable">
         <tr class="header_row">
             <th class="number_cell">
@@ -69,9 +74,10 @@
             </tr>
         {% endfor %}
     </table>
+
     <div class="fixedadd">
         <a href="{{ url_for('show_new_question_form') }}" class="fixed_button" class="asknew"><img src="{{ url_for('static', filename='plus.svg') }}" class="midimg"></a> 
     </div>
-</div>
 
+</div>
 {% endblock %}

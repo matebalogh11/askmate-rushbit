@@ -5,18 +5,24 @@
 {% block content %}
 <div class="wrapper">
 
-    <h1>Manage tags for question - ID: {{ question_id }}</h1>
+    <h1>Manage tags for question #{{ question_id }}</h1>
 
     {% if added_tags %}
-    <h3>Added tags:</h3>
+    <h3>Added tags</h3>
         <div class="tags">
         {% for tag_id, tag_name in added_tags %}
             <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id, direct='tag_manager') }}">×</a></span>
         {% endfor %}
         </div>
+    {% else %}
+        <h3>Added tags</h3>
+        <p class="small_gray">No tags added yet.</p>
     {% endif %}
 
     <form action="{{ url_for('manage_tags', question_id=question_id) }}" method="POST">
+
+        <h3>Select from existing tags</h3>
+
         <div class="select_tags">
             <select name="select_tag1" id="select_tag1">
                 <option disabled selected value> -- select an option -- </option>
@@ -37,13 +43,19 @@
                 {% endfor %}
             </select>
         </div>
+
+        <h3>Add new tags</h3>
+
         <div class="add_tags">
             <input name="new_tag1" id="new_tag1" placeholder="Enter new tag" maxlength="20" minlength="2">
             <input name="new_tag2" id="new_tag2" placeholder="Enter new tag" maxlength="20" minlength="2">
             <input name="new_tag3" id="new_tag3" placeholder="Enter new tag" maxlength="20" minlength="2">
         </div>
-            <input type="submit" value="Submit" class="cta">
-    </form>
 
+        <input type="submit" value="Submit" class="cta_home">
+        <a href="{{ url_for('show_question_page', question_id=question_id) }}" class="cta_home red_button">Cancel</a>
+
+    </form>
+    
 </div>
 {% endblock %}
