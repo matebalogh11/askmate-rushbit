@@ -11,7 +11,11 @@ import questions_logic
 import search_logic
 import tag_logic
 import vote_logic
+<<<<<<< HEAD
 import users_logic
+=======
+import user_logic
+>>>>>>> user_page
 
 app = Flask(__name__)
 
@@ -430,6 +434,18 @@ def show_questions_with_tag(tag_id):
     title = "Questions with tag '{}'".format(tag_name)
 
     return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
+
+
+@app.route("/user/<user_id>")
+def show_user_page(user_id):
+    """Show user page in detail."""
+    user_name = user_logic.valid_user(user_id)
+    if not user_name:
+        return abort(404)
+    title = "AskMate User Page - {}".format(user_name)
+    question, answer, comment = user_logic.fetch_user_detail(user_name)
+    return render_template('user_page.html', user_name=user_name, title=title,
+                           question=question, answer=answer, comment=comment)
 
 
 @app.errorhandler(404)
