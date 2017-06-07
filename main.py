@@ -395,6 +395,13 @@ def show_registration_form():
     return render_template('register.html', title=title)
 
 
+@app.route("/create_account/", methods=('POST'))
+def create_account():
+    account_logic.create_account(request.form)
+
+    return redirect(url_for('show_login_page'))
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
