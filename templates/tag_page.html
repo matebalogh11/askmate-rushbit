@@ -1,0 +1,55 @@
+
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+
+    <h1>Tags page</h1>
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <table class="maintable">
+        <tr class="header_row">
+            <th>
+                Tag name
+                <a href="{{ url_for('show_tag_page', tag_name='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_tag_page', tag_name='desc') }}"><span class="arrow">▼</span></a>
+            </th>
+            <th class="number_cell">
+                Question count
+                <a href="{{ url_for('show_tag_page', question_count='asc') }}"><span class="arrow">▲</span></a>
+                <a href="{{ url_for('show_tag_page', question_count='desc') }}"><span class="arrow">▼</span></a>
+            </th>
+            <th class="number_cell">
+                Delete
+            </th>
+        </tr>
+    {% for tag in tags %}
+        <tr>
+            <td class="number_cell">
+                <a href="{{ url_for('show_questions_with_tag', tag_id=tag[0], tag_name=tag[1]) }}">
+                    <span class="linked_cell">
+                        {{ tag[1] }}
+                    </span>
+                </a>
+            </td>
+            <td class="number_cell">
+            {{ tag[2] }}
+            </td>
+            <td class="number_cell">
+                <a href="{{ url_for('delete_tag_4ever', tag_id=tag[0], tag_name=tag[1]) }}"><img class="trash" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+
+</div>
+{% endblock %}
