@@ -362,6 +362,30 @@ def delete_tag(question_id, tag_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/answer/<answer_id>/<question_id>/accept")
+def accept_answer(answer_id, question_id):
+    """Mark answer accepted and de-select any other answers."""
+    if (not answers_logic.valid_answer_id(answer_id) or
+            not questions_logic.valid_question_id(question_id)):
+        return abort(404)
+
+    answers_logic.mark_accepted_exclusively(answer_id, question_id)
+
+    return redirect(url_for('show_question_page', question_id=question_id))
+
+
+@app.route("/answer/<answer_id>/<question_id>/remove-accept")
+def remove_accept_mark(answer_id, question_id):
+    """Remove accept mark from answer."""
+    if (not answers_logic.valid_answer_id(answer_id) or
+            not questions_logic.valid_question_id(question_id)):
+        return abort(404)
+
+    answers_logic.remove_accept_mark(answer_id)
+
+    return redirect(url_for('show_question_page', question_id=question_id))
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404

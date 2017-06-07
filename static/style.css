@@ -358,6 +358,14 @@ a:hover {
     color: #3d3d3d;
     border-left: 5px solid rgb(76, 164, 252);
     border-radius: 5px;
+    min-height: 20px;
+    line-height: 20px;
+}
+
+.answers img {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
 }
 
 .commentident {
@@ -753,4 +761,12 @@ q_table img {
 
 .red_button:hover {
     background-color: #b03c38;
+}
+
+.check_mark {
+    border-radius: 30px;
+    width: 2%;
+    padding: 8px;
+    background-color: #838383;
+    margin: 0 20px 0 0;
 }

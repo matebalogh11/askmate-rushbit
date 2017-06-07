@@ -20,14 +20,14 @@ def valid_comment_id(comment_id):
 def retrieve_comments(question_id, answers):
     """Return comments for question and each answer."""
     SQL1 = """SELECT
-                  id, question_id, answer_id, message, submission_time, edited_count
+                  id, question_id, answer_id, message, submission_time, edited_count, user_name
               FROM comment WHERE question_id = %s ORDER BY submission_time DESC;"""
     data1 = (question_id,)
     fetch = "all"
 
     if answers:
         SQL2 = """SELECT
-                      id, question_id, answer_id, message, submission_time, edited_count
+                      id, question_id, answer_id, message, submission_time, edited_count, user_name
                   FROM comment WHERE answer_id IN %s ORDER BY submission_time DESC;"""
         answer_ids = tuple(answer[0] for answer in answers)
         data2 = (answer_ids,)
