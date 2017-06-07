@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="wrapper">
-    <form action="{{url_for('show_registration_form')}}">
+    <form action="{{url_for('create_account')}}" method="POST">
         <p>
             <label for="username">Username:</label></br>
             <input type="text" name="username" id="username" placeholder="e.g. DarkDestroyer93">
