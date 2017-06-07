@@ -2,7 +2,7 @@
 from os import urandom
 
 from flask import (Flask, abort, flash, redirect, render_template, request,
-                   url_for)
+                   url_for, session)
 
 import account_logic as account
 import answers_logic
@@ -456,8 +456,19 @@ def registration():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    """Placeholder. No functionaly implemented yet."""
-    return "Login Page"
+    """Show login page upon GET, do login upon POST request."""
+    if request.method == 'POST':
+        page = account.login_user()
+        return redirect(url_for(page))
+
+    return render_template('login.html', title='Login Page')
+
+
+@app.route('/logout/')
+def logout():
+    session.pop('user_name', None)
+    session.pop('role', None)
+    return redirect(url_for('show_index'))
 
 
 @app.errorhandler(404)
