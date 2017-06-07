@@ -11,11 +11,8 @@ import questions_logic
 import search_logic
 import tag_logic
 import vote_logic
-<<<<<<< HEAD
 import users_logic
-=======
-import user_logic
->>>>>>> user_page
+
 
 app = Flask(__name__)
 
