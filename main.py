@@ -11,6 +11,7 @@ import questions_logic
 import search_logic
 import tag_logic
 import vote_logic
+import users_logic
 
 app = Flask(__name__)
 
@@ -259,11 +260,16 @@ def vote(direction, question_id=None, answer_id=None):
         if not questions_logic.valid_question_id(question_id):
             return abort(404)
         vote_logic.vote_question(direction, question_id=question_id)
+
+        users_logic.change_reputation_q(question_id, direction)
+
     elif answer_id:
         if not answers_logic.valid_answer_id(answer_id):
             return abort(404)
         vote_logic.vote_answer(direction, answer_id=answer_id)
         question_id = answers_logic.get_question_id(answer_id)
+
+        users_logic.change_reputation_a(answer_id, direction, acc=None)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
