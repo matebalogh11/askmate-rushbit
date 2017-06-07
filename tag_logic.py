@@ -174,3 +174,46 @@ def valid_tag_id(tag_id):
     except (DatabaseError, TypeError):
         return False
     return True
+
+
+def get_tag_ids_names_question_count(criterium, order):
+    """Return all existing tag ids, names and number of questions."""
+    check_criterium = ("tag_name", "question_count")
+    check_order = ("asc", "desc")
+
+    if criterium not in check_criterium or order not in check_order:
+        criterium = "tag_name"
+        order = "asc"
+
+    SQL = """SELECT t.id, t.name AS tag_name, COUNT(q.id) AS question_count
+             FROM tag t
+             LEFT JOIN question_tag qt ON qt.tag_id = t.id
+             LEFT JOIN question q ON q.id = qt.question_id
+             GROUP BY t.id
+             ORDER BY {} {};""".format(criterium, order)
+    data = None
+    fetch = "all"
+    tag_ids_names_q_count = db.run_statements(((SQL, data, fetch),))[0]
+
+    return tag_ids_names_q_count
+
+
+def delete_tag_4ever(tag_id):
+    """Delete tag from tag table, irreversibly."""
+    SQL = """DELETE FROM tag WHERE id = %s;"""
+    data = (tag_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
+
+
+def get_questions_with_tag(tag_id):
+    """Get all questions that have the tag with tag_id."""
+    SQL = """SELECT q.id, q.title, q.submission_time, q.view_number, q.vote_number, q.answer_count
+             FROM question q
+             JOIN question_tag qt ON qt.question_id = q.id
+             WHERE qt.tag_id = %s
+             ORDER BY q.submission_time DESC;"""
+    data = (tag_id,)
+    fetch = "all"
+    questions_with_tag = db.run_statements(((SQL, data, fetch),))[0]
+    return questions_with_tag

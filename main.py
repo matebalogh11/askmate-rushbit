@@ -386,6 +386,42 @@ def remove_accept_mark(answer_id, question_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/tags/")
+def show_tag_page(criterium='tag_name', order='asc'):
+    """View function of tag page."""
+    for key in request.args:
+        criterium = key
+        order = request.args[key]
+    tags = tag_logic.get_tag_ids_names_question_count(criterium, order)
+    return render_template("tag_page.html", tags=tags, title="Existing Tags")
+
+
+@app.route("/tag/<tag_id>/del")
+def delete_tag_4ever(tag_id):
+    """Delete tag from tag table, irreversibly."""
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    tag_logic.delete_tag_4ever(tag_id)
+    tag_name = request.args.get('tag_name') if request.args.get('tag_name') else "Unknown"
+
+    flash("Tag '{}' deleted from existing tags.".format(tag_name), "success")
+    return redirect(url_for('show_tag_page'))
+
+
+@app.route("/tag/<tag_id>/questions")
+def show_questions_with_tag(tag_id):
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+    # get all question_id(s) based on tag_id and then get all questions where id in question_id(s)
+    # render page for this list (clickable questions, just as list.html)
+    questions = tag_logic.get_questions_with_tag(tag_id)
+    tag_name = request.args.get('tag_name')
+    title = "Questions with tag '{}'".format(tag_name)
+
+    return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404

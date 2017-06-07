@@ -13,9 +13,17 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+    {% if not tag_name %}
+    <h1>Questions</h1>
+    {% else %}
+    <h1>Questions with tag '{{ tag_name }}'</h1>
+    {% endif %}
+
     <div class="cta_container">
         <a href="{{ url_for('show_new_question_form') }}" class="cta_home asknew" class="asknew"><img src="{{ url_for('static', filename='plus.svg') }}"><span>Ask a question</span></a> 
     </div>
+
     <table class="maintable">
         <tr class="header_row">
             <th class="number_cell">
@@ -52,7 +60,7 @@
                 <td><span class="linked_cell number_cell"> {{ line[0] }}</span></td>
                 <td>
                     <a href="{{ url_for('show_question_page', question_id=line[0], view='counted') }}">
-                        <span class="linked_cell">                     
+                        <span class="linked_cell">
                             {{ line[1] }}
                         </span>
                     </a>
