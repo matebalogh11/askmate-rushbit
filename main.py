@@ -386,6 +386,15 @@ def remove_accept_mark(answer_id, question_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/register/")
+@app.route("/signup/")
+def show_registration_form():
+    """Show page where the registration form appears."""
+    title = "Register"
+
+    return render_template('register.html', title=title)
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
