@@ -396,6 +396,17 @@ def remove_accept_mark(answer_id, question_id):
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/user_list")
+def show_user_list(criterium='role', order='asc'):
+    for key in request.args:
+        criterium = key
+        order = request.args[key]
+
+    users = users_logic.get_user_list(criterium, order)
+
+    return render_template('user_list.html', users=users, title="Users")
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
