@@ -1,4 +1,5 @@
 import db
+from psycopg2 import DatabaseError
 
 
 def valid_user(user_id):
@@ -6,7 +7,10 @@ def valid_user(user_id):
     SQL = """SELECT user_name FROM users WHERE id = %s;"""
     data = (user_id,)
     fetch = "cell"
-    user_name = db.run_statements(((SQL, data, fetch),))[0]
+    try:
+        user_name = db.run_statements(((SQL, data, fetch),))[0]
+    except(DatabaseError, TypeError):
+        return False
     return user_name
 
 
