@@ -186,3 +186,34 @@ def get_question_id(answer_id):
 
     question_id = db.run_statements(((SQL, data, fetch),))[0][0]
     return question_id
+
+
+def mark_accepted_exclusively(answer_id, question_id):
+    """Mark an answer accepted. De-select any previously
+    marked answer, since only one accepted question might remain.
+    """
+    other_answer_ids = get_other_answer_ids(answer_id, question_id)
+
+    SQL1 = """UPDATE answer SET accepted = true WHERE id = %s;"""
+    data1 = (answer_id,)
+    SQL2 = """UPDATE answer SET accepted = false WHERE accepted = true and id IN %s;"""
+    data2 = (tuple(other_answer_ids),)
+    fetch = None
+    db.run_statements(((SQL1, data1, fetch), (SQL2, data2, fetch)))
+
+
+def get_other_answer_ids(answer_id, question_id):
+    """Return all answer ids for question with question_id, other than answer_id."""
+    SQL = """SELECT id FROM answer WHERE question_id = %s AND id != %s;"""
+    data = (question_id, answer_id)
+    fetch = "col"
+    other_answer_ids = db.run_statements(((SQL, data, fetch),))[0]
+    return other_answer_ids
+
+
+def remove_accept_mark(answer_id):
+    """Remove accept mark from answer."""
+    SQL = """UPDATE answer SET accepted = false WHERE accepted = true and id = %s;"""
+    data = (answer_id,)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
