@@ -378,6 +378,7 @@ def accept_answer(answer_id, question_id):
         return abort(404)
 
     answers_logic.mark_accepted_exclusively(answer_id, question_id)
+    users_logic.change_reputation_a(answer_id, direction="up", acc=True)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -390,6 +391,7 @@ def remove_accept_mark(answer_id, question_id):
         return abort(404)
 
     answers_logic.remove_accept_mark(answer_id)
+    users_logic.change_reputation_a(answer_id, direction="down", acc=True)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
