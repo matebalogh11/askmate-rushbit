@@ -4,14 +4,15 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+import account_logic as account
 import answers_logic
 import comments_logic
 import helper
 import questions_logic
 import search_logic
 import tag_logic
-import vote_logic
 import users_logic
+import vote_logic
 
 
 app = Flask(__name__)
@@ -424,8 +425,7 @@ def delete_tag_4ever(tag_id):
 def show_questions_with_tag(tag_id):
     if not tag_logic.valid_tag_id(tag_id):
         return abort(404)
-    # get all question_id(s) based on tag_id and then get all questions where id in question_id(s)
-    # render page for this list (clickable questions, just as list.html)
+
     questions = tag_logic.get_questions_with_tag(tag_id)
     tag_name = request.args.get('tag_name')
     title = "Questions with tag '{}'".format(tag_name)
@@ -443,6 +443,21 @@ def show_user_page(user_id):
     question, answer, comment = user_logic.fetch_user_detail(user_name)
     return render_template('user_page.html', user_name=user_name, title=title,
                            question=question, answer=answer, comment=comment)
+
+
+@app.route('/register/', methods=['GET', 'POST'])
+def registration():
+    if request.method == 'POST':
+        page = account.register_account()
+        return redirect(url_for(page))
+
+    return render_template('registration.html', title='Registration Page')
+
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    """Placeholder. No functionaly implemented yet."""
+    return "Login Page"
 
 
 @app.errorhandler(404)

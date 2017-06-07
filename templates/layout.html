@@ -12,14 +12,15 @@
             <div class="navbar_wrapper">
                 <a href="{{ url_for('show_index') }}">
                     <img src="{{ url_for('static', filename='logos/askmate_logo2.png') }}">
-                </a> 
+                </a>
                 <ul>
                     <li><a href="{{ url_for('show_index') }}">Home</a></li>
                     <li><a href="{{ url_for('show_question_list') }}">Questions</a></li>
-                    <li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
+                    <!--<li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
                     <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
-                    <li><a href="https://prezi.com/p/efegz5dw-wft/">About us</a></li>
+                    <li><a href="https://prezi.com/p/efegz5dw-wft/">About us</a></li>-->
                     <li><a href="{{ url_for('show_tag_page') }}">Tags</a></li>
+                    <li><a href="{{ url_for('registration') }}">Registration</a></li>
                 </ul>
                 <div class="searchbar">
                     <form action="{{ url_for('show_search_results') }}">
