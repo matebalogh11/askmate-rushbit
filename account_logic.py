@@ -21,20 +21,22 @@ def register_account():
     if user_name in user_names:
         flash("User name already exists. Please choose another one.", "error")
         page = "registration"
+        return page
 
     if valid_user_name(user_name):
         if valid_password(pw_1, pw_2):
             create_account(user_name, pw_1)
             flash("Successful registration. Please log in.", "success")
             page = "login"
+            return page
         else:
             flash("Invalid password. Should be 8-16 characters long, contain only letters and numbers.", "error")
             page = "registration"
+            return page
     else:
         flash("Invalid user name. Should be 8-16 characters long, contain only letters and numbers.", "error")
         page = "registration"
-
-    return page
+        return page
 
 
 def login_user():
@@ -44,11 +46,11 @@ def login_user():
         session['user_name'] = user_name
         session['role'] = get_user_role(user_name)
         page = "show_index"
+        return page
     else:
         flash("Invalid credentials.", "error")
         page = "login"
-
-    return page
+        return page
 
 
 def get_user_names():
