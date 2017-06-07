@@ -393,7 +393,7 @@ def show_user_page(user_id):
     user_name = user_logic.valid_user(user_id)
     if not user_name:
         return abort(404)
-    title = "User Page"
+    title = "AskMate User Page - {}".format(user_name)
     question, answer, comment = user_logic.fetch_user_detail(user_name)
     return render_template('user_page.html', user_name=user_name, title=title,
                            question=question, answer=answer, comment=comment)

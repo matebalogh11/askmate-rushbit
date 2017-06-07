@@ -6,6 +6,7 @@
 <div class="wrapper searchresult">
     <h1>User page - {{user_name}}</h1>
     {% if question %}
+    <h2>Question</h2>
     <table  class="maintable">
         {% for table in question %} 
             <tr> 
@@ -21,21 +22,22 @@
     </table>
     {% endif %}
     {% if answer %}
-    <table>
+    <h2>Answer</h2>
+    <table class="userp">
         {% for table in answer %}
         <tr>
-            <td>{{ table[4] }}</td>
+            <td><p id="userp">{{ table[4] }}</p></td>
         </tr>
         {% endfor %}
     </table>
     {% endif %}
     <br>
-    <br>
     {% if comment %}
-    <table>
+    <h2>Comment</h2>
+    <table class="userp">
         {% for table in comment %}
         <tr>
-            <td>{{ table[2] }}</td>
+            <td><p id="userp">{{ table[2] }}</p></td>
         </tr>
         {% endfor %}
     </table>
