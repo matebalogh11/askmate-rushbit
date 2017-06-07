@@ -11,6 +11,7 @@ import questions_logic
 import search_logic
 import tag_logic
 import vote_logic
+import user_logic
 
 app = Flask(__name__)
 
@@ -384,6 +385,18 @@ def remove_accept_mark(answer_id, question_id):
     answers_logic.remove_accept_mark(answer_id)
 
     return redirect(url_for('show_question_page', question_id=question_id))
+
+
+@app.route("/user/<user_id>")
+def show_user_page(user_id):
+    """Show user page in detail."""
+    user_name = user_logic.valid_user(user_id)
+    if not user_name:
+        return abort(404)
+    title = "User Page"
+    question, answer, comment = user_logic.fetch_user_detail(user_name)
+    return render_template('user_page.html', user_name=user_name, title=title,
+                           question=question, answer=answer, comment=comment)
 
 
 @app.errorhandler(404)
