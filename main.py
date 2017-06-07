@@ -4,14 +4,15 @@ from os import urandom
 from flask import (Flask, abort, flash, redirect, render_template, request,
                    url_for)
 
+import account_logic as account
 import answers_logic
 import comments_logic
 import helper
 import questions_logic
 import search_logic
 import tag_logic
-import vote_logic
 import users_logic
+import vote_logic
 
 app = Flask(__name__)
 
@@ -431,19 +432,19 @@ def show_questions_with_tag(tag_id):
     return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
 
 
-@app.route("/register/")
-def show_registration_form():
-    """Show page where the registration form appears."""
-    title = "Register"
+@app.route('/register/', methods=['GET', 'POST'])
+def registration():
+    if request.method == 'POST':
+        page = account.register_account()
+        return redirect(url_for(page))
 
-    return render_template('register.html', title=title)
+    return render_template('registration.html', title='Registration Page')
 
 
-@app.route("/create_account/", methods=('POST'))
-def create_account():
-    account_logic.create_account(request.form)
-
-    return redirect(url_for('show_login_page'))
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    """Placeholder. No functionaly implemented yet."""
+    return "Login Page"
 
 
 @app.errorhandler(404)

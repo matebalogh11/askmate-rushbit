@@ -1,0 +1,35 @@
+
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <h1>Registration Page</h1>
+    <p>Please fill all fields to register an account.</p>
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %} 
+    {% endwith %}
+
+    <form action="{{ url_for('registration') }}" method="POST">
+
+        <label for="user_name">User name</label>
+        <input type="user_name" name="user_name" id="user_name" required minlength="8" maxlength="16">
+
+        <label for="password_1">Password #1</label>
+        <input type="password" name="password_1" id="password_1" required minlength="8" maxlength="16">
+
+        <label for="password_2">Password #2</label>
+        <input type="password" name="password_2" id="password_2" required minlength="8" maxlength="16">
+
+        <input type="submit" value="Register">
+    
+    </form>
+
+</div>
+{% endblock %}
