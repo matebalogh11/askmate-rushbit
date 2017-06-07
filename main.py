@@ -11,6 +11,7 @@ import questions_logic
 import search_logic
 import tag_logic
 import vote_logic
+import users_logic
 
 app = Flask(__name__)
 
@@ -255,15 +256,22 @@ def vote(direction, question_id=None, answer_id=None):
     """Modify number of votes of a given question or answer,
     then redirect to corresponding question_page.
     """
-    if question_id:
-        if not questions_logic.valid_question_id(question_id):
-            return abort(404)
-        vote_logic.vote_question(direction, question_id=question_id)
-    elif answer_id:
-        if not answers_logic.valid_answer_id(answer_id):
-            return abort(404)
-        vote_logic.vote_answer(direction, answer_id=answer_id)
-        question_id = answers_logic.get_question_id(answer_id)
+    valid_directions = ("up", "down")
+    if direction in valid_directions:
+        if question_id:
+            if not questions_logic.valid_question_id(question_id):
+                return abort(404)
+            vote_logic.vote_question(direction, question_id=question_id)
+
+            users_logic.change_reputation_q(question_id, direction)
+
+        elif answer_id:
+            if not answers_logic.valid_answer_id(answer_id):
+                return abort(404)
+            vote_logic.vote_answer(direction, answer_id=answer_id)
+            question_id = answers_logic.get_question_id(answer_id)
+
+            users_logic.change_reputation_a(answer_id, direction)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -370,6 +378,7 @@ def accept_answer(answer_id, question_id):
         return abort(404)
 
     answers_logic.mark_accepted_exclusively(answer_id, question_id)
+    users_logic.change_reputation_a(answer_id, direction="up", acc=True)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -382,12 +391,47 @@ def remove_accept_mark(answer_id, question_id):
         return abort(404)
 
     answers_logic.remove_accept_mark(answer_id)
+    users_logic.change_reputation_a(answer_id, direction="down", acc=True)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
+@app.route("/tags/")
+def show_tag_page(criterium='tag_name', order='asc'):
+    """View function of tag page."""
+    for key in request.args:
+        criterium = key
+        order = request.args[key]
+    tags = tag_logic.get_tag_ids_names_question_count(criterium, order)
+    return render_template("tag_page.html", tags=tags, title="Existing Tags")
+
+
+@app.route("/tag/<tag_id>/del")
+def delete_tag_4ever(tag_id):
+    """Delete tag from tag table, irreversibly."""
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    tag_logic.delete_tag_4ever(tag_id)
+    tag_name = request.args.get('tag_name') if request.args.get('tag_name') else "Unknown"
+
+    flash("Tag '{}' deleted from existing tags.".format(tag_name), "success")
+    return redirect(url_for('show_tag_page'))
+
+
+@app.route("/tag/<tag_id>/questions")
+def show_questions_with_tag(tag_id):
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    questions = tag_logic.get_questions_with_tag(tag_id)
+    tag_name = request.args.get('tag_name')
+    title = "Questions with tag '{}'".format(tag_name)
+
+    return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
+
+
 @app.route("/register/")
-@app.route("/signup/")
 def show_registration_form():
     """Show page where the registration form appears."""
     title = "Register"

@@ -770,3 +770,11 @@ q_table img {
     background-color: #838383;
     margin: 0 20px 0 0;
 }
+
+.trash {
+    border-radius: 10px;
+    width: 7%;
+    padding: 10px;
+    background-color: #DC4B47;
+    margin: 2px auto 0px auto;
+}
