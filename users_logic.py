@@ -9,16 +9,13 @@ def change_reputation_q(question_id, direction):
         amount = 5
     elif direction == "down":
         amount = -2
-    SQL1 = """SELECT user_name FROM question WHERE id = %s;"""
-    data1 = (question_id, )
-    fetch1 = "one"
-    q_user_name = db.run_statements(((SQL1, data1, fetch1),))
-
-    SQL2 = """UPDATE users SET reputation = (reputation + %s)
-                WHERE users.user_name = %s;"""
-    data2 = (amount, q_user_name[0])
-    fetch2 = None
-    db.run_statements(((SQL2, data2, fetch2),))
+    SQL = """UPDATE users
+            SET reputation = reputation + %s
+            FROM question
+            WHERE users.user_name = question.user_name AND question.id = %s;"""
+    data = (amount, question_id)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))
 
 
 def change_reputation_a(answer_id, direction, acc=None):
@@ -32,13 +29,10 @@ def change_reputation_a(answer_id, direction, acc=None):
         amount = 10
     elif direction == "down":
         amount = -2
-    SQL1 = """SELECT user_name FROM answer WHERE id = %s;"""
-    data1 = (answer_id,)
-    fetch1 = "one"
-    a_user_name = db.run_statements(((SQL1, data1, fetch1),))
-
-    SQL2 = """UPDATE users SET reputation = (reputation + %s)
-                WHERE users.user_name = %s;"""
-    data2 = (amount, a_user_name[0])
-    fetch2 = None
-    db.run_statements(((SQL2, data2, fetch2),))
+    SQL = """UPDATE users
+            SET reputation = reputation + %s
+            FROM answer
+            WHERE users.user_name = answer.user_name AND answer.id = %s;"""
+    data = (amount, answer_id)
+    fetch = None
+    db.run_statements(((SQL, data, fetch),))

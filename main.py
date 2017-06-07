@@ -271,7 +271,7 @@ def vote(direction, question_id=None, answer_id=None):
             vote_logic.vote_answer(direction, answer_id=answer_id)
             question_id = answers_logic.get_question_id(answer_id)
 
-            users_logic.change_reputation_a(answer_id, direction, acc=None)
+            users_logic.change_reputation_a(answer_id, direction)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
