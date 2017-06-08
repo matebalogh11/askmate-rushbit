@@ -16,12 +16,24 @@
         {% endif %} 
     {% endwith %}
 
-    <p>Please enter your user name and password to log in to page.</p>
+    <p class="reg_fill">Please enter your user name and password to log in.</p>
 
     <form action="{{ url_for('login') }}" method="POST">
-        <input type="user_name" name="user_name" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <input type="submit" value="Login">
+        <div class="log_reg">
+            <label for="user_name">User name</label>
+            <div class="log_reg_form">
+                <input type="user_name" class="inputfield" name="user_name">
+            </div>
+
+            <label for="password_1">Password</label>
+            <div class="log_reg_form">
+                <input type="password" class="inputfield" name="password">
+            </div>
+
+            <div>
+                <input type="submit" value="Login" id="reg_button">
+            </div>
+        </div>
     </form>
 
     <h2>Registration</h2>
