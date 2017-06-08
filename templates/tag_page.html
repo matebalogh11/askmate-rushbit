@@ -5,7 +5,7 @@
 {% block content %}
 <div class="wrapper">
 
-    <h1>Tags page</h1>
+    <h1>Tag List</h1>
 
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -45,7 +45,7 @@
             {{ tag[2] }}
             </td>
             <td class="number_cell">
-                <a href="{{ url_for('delete_tag_4ever', tag_id=tag[0], tag_name=tag[1]) }}"><img class="trash" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"</a>
+                <a href="{{ url_for('delete_tag_4ever', tag_id=tag[0], tag_name=tag[1]) }}"><img class="trash" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"></a>
             </td>
         </tr>
     {% endfor %}

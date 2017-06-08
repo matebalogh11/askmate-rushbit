@@ -6,7 +6,7 @@
 
 <div class="wrapper">
 
-    <h1>Users</h1>
+    <h1>User List</h1>
 
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -74,7 +74,7 @@
                 <td><span class="linked_cell number_cell">{{ user[7] }}</span></td>
                <td>
                     <a href="{{ url_for('delete_user', user_id=user[0]) }}">
-                     <span class="linked_cell number_cell">del</span>
+                     <span class="linked_cell number_cell"><img class="trash_big" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"></span>
                     </a>
                 </td>
             </tr>

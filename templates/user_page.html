@@ -5,7 +5,7 @@
 
 <div class="wrapper searchresult">
 
-    <h1>User page - {{user_name}}</h1>
+    <h1>Profile - {{user_name}}</h1>
 
     <!-- Error messages in a loop with classes: error, success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -17,51 +17,45 @@
     {% endwith %}
 
     {% if question %}
-    <h2>Question</h2>
-    <table  class="maintable">
-        {% for table in question %} 
-            <tr> 
-                <td>               
-                    <a href="{{ url_for('show_question_page', question_id=table[0], view='counted') }}">
-                        <span class="linked_cell">                     
-                        {{ table[1] }}
-                        </span>
-                    </a> 
-                </td>
-            </tr>
+        <h2>Questions</h2>
+        {% for table in question %}
+        <h3>> <a href="{{ url_for('show_question_page', question_id=table[0], view='counted') }}">{{ table[1] }}</a></h3>
         {% endfor %}
-    </table>
     {% endif %}
 
     {% if answer %}
-    <h2>Answer</h2>
-    <table class="userp">
+        <h2>Answers</h2>
         {% for table in answer %}
-        <tr>
-            <td><p id="userp">{{ table[4] }}</p></td>
-        </tr>
+            <span>
+                <p class="small_gray">{{ table[4] }}</p>
+                <a href="{{ url_for('show_question_page', question_id=table[0], view='counted') }}">See in Question #{{ table[0] }}</a>
+            </span>
         {% endfor %}
-    </table>
     {% endif %}
 
-    <br>
-
     {% if comment %}
-    <h2>Comment</h2>
-    <table class="userp">
+        <h2>Comments</h2>
         {% for table in comment %}
-        <tr>
-            <td><p id="userp">{{ table[2] }}</p></td>
-        </tr>
+            <span>
+                <p class="small_gray">{{ table[2] }}</p>
+                {% if table[0] %}
+                <a href="{{ url_for('show_question_page', question_id=table[0], view='counted') }}">See in Question #{{ table[0] }}</a>
+                {% else %}
+                <a href="#">N/A</a>
+                {% endif %}
+            </span>
         {% endfor %}
-    </table>
     {% endif %}
 
     {% if not question and not answer and not comment %}
-    <p>There are no entries available for this user.</p>
+        <p>There are no entries available for this user.</p>
     {% endif %}
-    <p>
-        <a href="{{ url_for('show_user_list') }}" id="spec_butt" class="cta_home">User list</a>
-    </p>
+
+    <div class="reg_on_login">
+        <p>
+            <a href="{{ url_for('show_user_list') }}" id="spec_butt" class="cta_home">User list</a>
+        </p>
+    </div>
+
 </div>
 {% endblock %}

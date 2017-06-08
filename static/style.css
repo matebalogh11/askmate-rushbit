@@ -35,7 +35,7 @@ h2 {
 }
 
 h3 {
-    font-size: 1.4em;
+    font-size: 1.1em;
     margin-top: 20px;
     margin-bottom: 5px;
     color: #5d5d5d;
@@ -811,7 +811,7 @@ q_table img {
 
 .log_reg {
     text-align: center;
-    margin: auto;
+    margin: 0 auto 30px auto;
     background-color: #2693FF;
     width: 500px;
     border: 20px;
@@ -834,6 +834,8 @@ q_table img {
     text-align: center;
     font-family: 'Open Sans', serif;
     font-weight: 800;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
 #reg_button {
@@ -849,4 +851,17 @@ q_table img {
     color: #4CA6FF;
     padding: 6px 15px;
     border-radius: 0.3em;
+}
+
+.trash_big {
+    border-radius: 10px;
+    width: 15%;
+    padding: 8px;
+    background-color: #DC4B47;
+    margin: 2px auto 0px auto;
+}
+
+.reg_on_login {
+    text-align: center;
+    margin: 30px auto 30px auto;
 }
