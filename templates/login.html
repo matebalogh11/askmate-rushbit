@@ -36,12 +36,15 @@
         </div>
     </form>
 
-    <h2>Registration</h2>
-    <p>You can register to this online platform and stay up to date.</p>
+    <div class="log_reg">
+        <h2 id="reg">Registration</h2>
+        <p>You can register to this online platform and stay up to date.</p>
 
-    <form action="{{ url_for('registration') }}">
-        <input type="submit" value="Register">
-    </form>
+        <form action="{{ url_for('registration') }}">
+            <input type="submit" value="Register" id="reg_button">
+        </form>
+    </div>
+    
 
 </div>
 {% endblock %}
