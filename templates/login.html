@@ -36,12 +36,12 @@
         </div>
     </form>
 
-    <div class="reg_on_login">
-        <h2>Registration</h2>
-        <p>In case you have not registered an account yet, plase click on the link below.</p>
+    <div class="log_reg">
+        <h2 id="reg">Registration</h2>
+        <p>You can register to this online platform and stay up to date.</p>
 
         <form action="{{ url_for('registration') }}">
-            <input type="submit" value="Register">
+            <input type="submit" value="Register" id="reg_button">
         </form>
     </div>
 

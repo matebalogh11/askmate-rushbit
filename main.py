@@ -477,9 +477,13 @@ def show_questions_with_tag(tag_id):
 @app.route("/user/<user_id>/")
 def show_user_page(user_id):
     """Show user page in detail."""
-    user_name = users_logic.valid_user(user_id)
-    if not user_name:
-        return abort(404)
+    user_name = request.args.get('user_name')
+    if users_logic.valid_user_by_name(user_name):
+        pass
+    else:
+        user_name = users_logic.valid_user(user_id)
+        if not user_name:
+            return abort(404)
     title = "AskMate User Page - {}".format(user_name)
     question, answer, comment = users_logic.fetch_user_detail(user_name)
     return render_template('user_page.html', user_name=user_name, title=title,

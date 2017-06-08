@@ -74,6 +74,18 @@ def valid_user(user_id):
     return user_name
 
 
+def valid_user_by_name(user_name):
+    """Check whether the user is in the tabe and return the name."""
+    SQL = """SELECT id FROM users WHERE user_name = %s;"""
+    data = (user_name,)
+    fetch = "cell"
+    try:
+        user_id = db.run_statements(((SQL, data, fetch),))[0]
+    except(DatabaseError, TypeError):
+        return False
+    return True
+
+
 def fetch_user_detail(user_name):
     """Fetch all the data for a specific user."""
 

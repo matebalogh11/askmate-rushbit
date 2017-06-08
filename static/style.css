@@ -790,8 +790,11 @@ q_table img {
     margin-left: 20px
 }
 
-.profile_picture_navbar {
+#profile_picture_navbar {
     border-radius: 10px;
+    margin: auto;
+    position: relative;
+    top: -14px;
 }
 
 .navbar_span {
@@ -820,6 +823,8 @@ q_table img {
     color: white;
     font-family: 'Open Sans', serif;    
     font-weight: 400; 
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .log_reg_form {
@@ -864,4 +869,8 @@ q_table img {
 .reg_on_login {
     text-align: center;
     margin: 30px auto 30px auto;
+}
+
+#reg {
+    color: white;
 }
