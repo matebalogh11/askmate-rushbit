@@ -316,7 +316,7 @@ def add_comment(question_id=None, answer_id=None):
 
     if request.method == 'POST':
         if len(request.form.get('message', '')) >= 5:
-            comments_logic.insert_comment(question_id, answer_id, request.form['message'])
+            comments_logic.insert_comment(question_id, answer_id, request.form['message'], request.args.get('only'))
             flash("Comment successfully added.", "success")
         else:
             flash("Comment was not added. It has to be at least 5 characters long.", "error")
@@ -465,11 +465,11 @@ def show_questions_with_tag(tag_id):
 @app.route("/user/<user_id>/")
 def show_user_page(user_id):
     """Show user page in detail."""
-    user_name = user_logic.valid_user(user_id)
+    user_name = users_logic.valid_user(user_id)
     if not user_name:
         return abort(404)
     title = "AskMate User Page - {}".format(user_name)
-    question, answer, comment = user_logic.fetch_user_detail(user_name)
+    question, answer, comment = users_logic.fetch_user_detail(user_name)
     return render_template('user_page.html', user_name=user_name, title=title,
                            question=question, answer=answer, comment=comment)
 
