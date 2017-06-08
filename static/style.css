@@ -808,3 +808,45 @@ q_table img {
     color: white;
     margin: 30px auto;
 }
+
+.log_reg {
+    text-align: center;
+    margin: auto;
+    background-color: #2693FF;
+    width: 500px;
+    border: 20px;
+    border-radius: 10px;
+    padding-top: 20px;
+    color: white;
+    font-family: 'Open Sans', serif;    
+    font-weight: 400; 
+}
+
+.log_reg_form {
+    display: block;
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
+.reg_fill {
+    color: #5d5d5d;
+    text-transform: uppercase;
+    text-align: center;
+    font-family: 'Open Sans', serif;
+    font-weight: 800;
+}
+
+#reg_button {
+    border: none;
+    margin-bottom: 20px;
+    display: inline-block;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    vertical-align: middle;
+    text-transform: uppercase;
+    background-color: white;
+    color: #4CA6FF;
+    padding: 6px 15px;
+    border-radius: 0.3em;
+}
