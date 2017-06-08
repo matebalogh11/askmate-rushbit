@@ -4,6 +4,7 @@
 {% block content %}
 
 <div class="wrapper">
+    <h1>Users</h1>
     <table class="maintable">
         <tr class="header_row">
             <th>
@@ -16,7 +17,7 @@
                 <a href="{{ url_for('show_user_list', role='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_user_list', role='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th class="number_cell">
+            <th class="number_cell_big">
                 Reputation
                 <a href="{{ url_for('show_user_list', reputation='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_user_list', reputation='desc') }}"><span class="arrow">▼</span></a>
@@ -36,21 +37,23 @@
                 <a href="{{ url_for('show_user_list', a_count='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_user_list', a_count='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th class="number_cell">
+            <th class="number_cell_big">
                 Comments
                 <a href="{{ url_for('show_user_list', c_count='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_user_list', c_count='desc') }}"><span class="arrow">▼</span></a>
             </th>
         </tr>
-        {% for valami in users %}
-        {% for user in valami %}
+        {% for sublist in users %}
+        {% for user in sublist %}
             <tr>
                 <td>
-                    <span class="linked_cell number_cell">{{ user[1] }}</span>
+                    <a href="{{ url_for('show_user_page', user_id=user[0]) }}">
+                     <span class="linked_cell number_cell">{{ user[1] }}</span>
+                    </a>
                 </td>
                 <td><span class="linked_cell number_cell"> {{ user[2] }}</span></td>
-                <td><span class="linked_cell date_cell"> {{ user[3] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ user[4] }}</span></td>
+                <td><span class="linked_cell number_cell"> {{ user[3] }}</span></td>
+                <td><span class="linked_cell date_cell"> {{ user[4] }}</span></td>
                 <td><span class="linked_cell number_cell"> {{ user[5] }}</span></td>
                 <td><span class="linked_cell number_cell"> {{ user[6] }}</span></td>
                 <td><span class="linked_cell number_cell"> {{ user[7] }}</span></td>
