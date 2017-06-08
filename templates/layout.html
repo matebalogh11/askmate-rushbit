@@ -13,37 +13,46 @@
                 <a href="{{ url_for('show_index') }}">
                     <img src="{{ url_for('static', filename='logos/askmate_logo2.png') }}">
                 </a>
-                <ul>
-                    <li><a href="{{ url_for('show_index') }}">Home</a></li>
-                    <li><a href="{{ url_for('show_question_list') }}">Questions</a></li>
-                    <!--<li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
-                    <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
-                    <li><a href="https://prezi.com/p/efegz5dw-wft/">About us</a></li>-->
-                    <li><a href="{{ url_for('show_user_list') }}">Users</a></li>
-                    <li><a href="{{ url_for('show_tag_page') }}">Tags</a></li>
-
-                    {% if session.user_name %}
-                        <li>
-                            <img id="profile_picture_navbar" src="{{ url_for('static', filename='ph_pic.png') }}">
-                            <span class="navbar_span">
-                                <a href="{{ url_for('show_user_page', user_id='None', user_name=session.user_name) }}">{{ session.user_name }}</a>
-                            </span>
-                        </li>
-                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('registration') }}">Registration</a></li>
-                    {% endif %}
-
-                </ul>
-                <div class="searchbar">
+                <div class="navlinks">
+                    <a href="{{ url_for('show_index') }}">Home</a>
+                    <a href="{{ url_for('show_question_list') }}">Questions</a>
+                    <!--<a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a>
+                    <a href="{{ url_for('show_contact') }}">Contact</a>
+                    <a href="https://prezi.com/p/efegz5dw-wft/">About us</a>-->
+                    <a href="{{ url_for('show_user_list') }}">Users</a>
+                    <a href="{{ url_for('show_tag_page') }}">Tags</a>
+                </div>
+                <span class="searchbar">
                     <form action="{{ url_for('show_search_results') }}">
                         <div>
                             <input type="text" name="q" id="search" class="inputfield" placeholder="Search">
                             <input type="image" src="{{ url_for('static', filename='magnifier.svg')}}" name="submit" id="search-submit" class="searchbutton">
                         </div>
                     </form>
+                </span>
+                {% if session.user_name %}
+                <div class="dropdown">
+                    <div class="dropbtn">
+                        <img id="profile_picture_navbar" src="{{ url_for('static', filename='ph_pic.png') }}">
+                        <span class="navbar_span">
+                            <span>{{ session.user_name }}</span>
+                            <div class="dropdown_content">
+                                <a href="{{ url_for('show_user_page', user_id='None', user_name=session.user_name) }}">Profile</a>
+                                <a href="{{ url_for('logout') }}">Logout</a>
+                            </div>
+                        </span>
+                    </div>
                 </div>
+                
+                    {% else %}
+                        <div class="logdata">
+                            <span class="signup"><a href="{{ url_for('registration') }}">Sign Up</a></span>
+                            <span class="login"><a href="{{ url_for('login') }}">Login</a></span>
+                        </div>
+                    {% endif %}
+
+                
+                
             </div>
         </div>
         {% block content %}{% endblock %}

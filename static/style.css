@@ -513,32 +513,28 @@ textarea {
     border: none;
 }
 
-.navbar ul {
+.navlinks {
     padding-left: 10px;
     margin: 0px;
     list-style-type: none;
     display: inline-block;  
 }
 
-.navbar li {
+.navlinks a {
     display: inline-block;
-    padding: 19px 5px;
-    margin-right: 0px;
+    margin-right: -5px;
+    padding: 19px 15px 14px 15px;
 }
 
-.navbar li a {
-    padding: 10px 10px;
-    border-radius: 3px;
-}
 
-.navbar li a:hover {
-    background-color: #E87668;
-    color: white;   
+.navlinks a:hover, .navlinks a:active {
+    background-color: #F3F3F3;
+    border-bottom: 5px solid #4CA6FF;   
 }
 
 .searchbar {
-    float: right;
     display: inline-block;
+    margin: 0px 20px;
 }
 
 .searchbar div {
@@ -873,4 +869,62 @@ q_table img {
 
 #reg {
     color: white;
+}
+
+
+
+.login a {
+    background-color: #4CA6FF;
+    padding: 28px 15px 19px 15px;
+    color: white;
+}
+
+.login a:hover {
+    background-color: #4290DE;
+}
+
+.signup a {
+    padding: 28px 15px 14px 15px;
+}
+
+.signup a:hover {
+    background-color: #F3F3F3;
+    border-bottom: 5px solid #4CA6FF;  
+}
+
+.logdata {
+    display: inline-block;
+    padding-left: 35px;
+}
+
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown_content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 20px;
+    z-index: 1;
+    top: 60px;
+}
+
+.dropdown_content a {
+    display: block;
+    padding: 5px;
+    width: 206px;
+    background-color: #4CA6FF;
+    color: white;
+    border: 1px solid white;
+    margin-bottom: -1px;
+}
+
+.dropdown_content a:hover {
+    background-color: #0095E2;
+    
+}
+
+.dropdown:hover .dropdown_content {
+    display: block;
 }
