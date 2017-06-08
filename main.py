@@ -38,7 +38,7 @@ def ask_question():
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    new_question = questions_logic.create_new_question_no_image(request.form)
+    new_question = questions_logic.create_new_question_no_image(request.form, session['user_name'])
     question_id, previous_image = questions_logic.insert_question(new_question)
 
     image_status = questions_logic.update_question_image(question_id, previous_image, request.files)
@@ -197,7 +197,7 @@ def add_answer(question_id):
 
     answers_logic.update_answer_counter(question_id, operation="ADD")
 
-    new_answer = answers_logic.create_new_answer_no_image(request.form["message"], question_id)
+    new_answer = answers_logic.create_new_answer_no_image(request.form["message"], question_id, session['user_name'])
     answer_id, image = answers_logic.insert_answer(new_answer)
     image_status = answers_logic.update_answer_image(answer_id, None, request.files)
 
@@ -316,7 +316,8 @@ def add_comment(question_id=None, answer_id=None):
 
     if request.method == 'POST':
         if len(request.form.get('message', '')) >= 5:
-            comments_logic.insert_comment(question_id, answer_id, request.form['message'], request.args.get('only'))
+            comments_logic.insert_comment(question_id, answer_id, request.form['message'],
+                                          session['user_name'], request.args.get('only'))
             flash("Comment successfully added.", "success")
         else:
             flash("Comment was not added. It has to be at least 5 characters long.", "error")

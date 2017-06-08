@@ -18,7 +18,7 @@ def valid_request(q_form):
     return False
 
 
-def create_new_question_no_image(q_form):
+def create_new_question_no_image(q_form, user_name):
     """Create new question from successfully filled question form."""
     intial_views = 0
     initial_votes = 0
@@ -26,18 +26,18 @@ def create_new_question_no_image(q_form):
     initial_answer_count = 0
     new_question = [helper.create_timestamp(), intial_views, initial_votes,
                     q_form['q_title'], q_form['q_desc'],
-                    empty_image, initial_answer_count]
+                    empty_image, initial_answer_count, user_name]
     return new_question
 
 
 def insert_question(new_question):
     """Insert new question into question table."""
     SQL = """INSERT INTO question
-             (submission_time, view_number, vote_number, title, message, image, answer_count)
-             VALUES (%s, %s, %s, %s, %s, %s, %s)
+             (submission_time, view_number, vote_number, title, message, image, answer_count, user_name)
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
              RETURNING id, image;"""
     data = (new_question[0], new_question[1], new_question[2], new_question[3],
-            new_question[4], new_question[5], new_question[6])
+            new_question[4], new_question[5], new_question[6], new_question[7])
     fetch = "one"
     results = db.run_statements(((SQL, data, fetch),))
     result = results[0]

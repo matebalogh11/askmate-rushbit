@@ -43,23 +43,24 @@ def update_answer_counter(question_id, operation):
     db.run_statements(((SQL, data, fetch),))
 
 
-def create_new_answer_no_image(message, question_id):
+def create_new_answer_no_image(message, question_id, user_name):
     """Return new answer with message from form, initialized without image."""
     init_time = helper.create_timestamp()
     init_votes = 0
     init_image = None
-    new_answer = [init_time, init_votes, question_id, message, init_image]
+    accepted = False
+    new_answer = [init_time, init_votes, question_id, message, init_image, accepted, user_name]
     return new_answer
 
 
 def insert_answer(new_answer):
     """Insert new answer into answer table."""
     SQL = """INSERT INTO answer
-             (submission_time, vote_number,question_id, message, image)
-             VALUES (%s, %s, %s, %s, %s)
+             (submission_time, vote_number,question_id, message, image, accepted, user_name)
+             VALUES (%s, %s, %s, %s, %s, %s, %s)
              RETURNING id, image;"""
     data = (new_answer[0], new_answer[1], new_answer[2],
-            new_answer[3], new_answer[4])
+            new_answer[3], new_answer[4], new_answer[5], new_answer[6])
     fetch = "one"
 
     answer_id, image = db.run_statements(((SQL, data, fetch),))[0]
@@ -193,6 +194,8 @@ def mark_accepted_exclusively(answer_id, question_id):
     marked answer, since only one accepted question might remain.
     """
     other_answer_ids = get_other_answer_ids(answer_id, question_id)
+    if not other_answer_ids:
+        other_answer_ids = (None,)
 
     SQL1 = """UPDATE answer SET accepted = true WHERE id = %s;"""
     data1 = (answer_id,)

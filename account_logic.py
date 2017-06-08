@@ -31,7 +31,7 @@ def login_required(role):
                     url_parts = request.url.split('/')
                     entry_id = url_parts[4]
                     entry_type = url_parts[3]
-                    owner = get_author(entry_type, entry_id)
+                    owner = get_author(entry_type, entry_id, is_accept_answer(url_parts))
                     if session.get('user_name') == owner or session.get('role') == 'admin':
                         return func(*args, **kwargs)
 
@@ -243,7 +243,7 @@ def get_user_role(user_name):
     return role
 
 
-def get_author(entry_type, entry_id):
+def get_author(entry_type, entry_id, is_accept_answer):
     """Return author from entry_type table where entry_id."""
     if entry_type not in ('question', 'answer', 'comment'):
         return None
@@ -253,8 +253,33 @@ def get_author(entry_type, entry_id):
     except ValueError:
         return None
 
-    SQL = """SELECT user_name FROM {} WHERE id = %s;""".format(entry_type)
-    data = (entry_id,)
     fetch = "cell"
+
+    if is_accept_answer:
+        q_id = get_q_id_by_a_id(entry_id)
+        SQL = """SELECT user_name FROM question WHERE id = %s;"""
+        data = (q_id,)
+    else:
+        SQL = """SELECT user_name FROM {} WHERE id = %s;""".format(entry_type)
+        data = (entry_id,)
+
     author = db.run_statements(((SQL, data, fetch),))[0]
     return author
+
+
+def is_accept_answer(url_parts):
+    """Return True if certain part of the url has 'accept' substring in it."""
+    if len(url_parts) >= 7:
+        if "accept" in url_parts[6]:
+            return True
+    return False
+
+
+def get_q_id_by_a_id(answer_id):
+    """Return question_id based on given answer_id."""
+    SQL = """SELECT question_id FROM answer WHERE id = %s;"""
+    data = (answer_id,)
+    fetch = "cell"
+
+    question_id = db.run_statements(((SQL, data, fetch),))[0]
+    return question_id
