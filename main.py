@@ -2,16 +2,18 @@
 from os import urandom
 
 from flask import (Flask, abort, flash, redirect, render_template, request,
-                   url_for)
+                   url_for, session)
 
+import account_logic as account
 import answers_logic
 import comments_logic
 import helper
 import questions_logic
 import search_logic
 import tag_logic
-import vote_logic
 import users_logic
+import vote_logic
+
 
 app = Flask(__name__)
 
@@ -405,6 +407,76 @@ def show_user_list(criterium='role', order='asc'):
     users = users_logic.get_user_list(criterium, order)
 
     return render_template('user_list.html', users=users, title="Users")
+
+
+@app.route("/tags/")
+def show_tag_page(criterium='tag_name', order='asc'):
+    """View function of tag page."""
+    for key in request.args:
+        criterium = key
+        order = request.args[key]
+    tags = tag_logic.get_tag_ids_names_question_count(criterium, order)
+    return render_template("tag_page.html", tags=tags, title="Existing Tags")
+
+
+@app.route("/tag/<tag_id>/del")
+def delete_tag_4ever(tag_id):
+    """Delete tag from tag table, irreversibly."""
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    tag_logic.delete_tag_4ever(tag_id)
+    tag_name = request.args.get('tag_name') if request.args.get('tag_name') else "Unknown"
+
+    flash("Tag '{}' deleted from existing tags.".format(tag_name), "success")
+    return redirect(url_for('show_tag_page'))
+
+
+@app.route("/tag/<tag_id>/questions")
+def show_questions_with_tag(tag_id):
+    if not tag_logic.valid_tag_id(tag_id):
+        return abort(404)
+
+    questions = tag_logic.get_questions_with_tag(tag_id)
+    tag_name = request.args.get('tag_name')
+    title = "Questions with tag '{}'".format(tag_name)
+
+    return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
+
+
+@app.route("/user/<user_id>")
+def show_user_page(user_id):
+    """Show user page in detail."""
+    user_name = users_logic.valid_user(user_id)
+    if not user_name:
+        return abort(404)
+    title = "AskMate User Page - {}".format(user_name)
+    question, answer, comment = users_logic.fetch_user_detail(user_name)
+    return render_template('user_page.html', user_name=user_name, title=title,
+                           question=question, answer=answer, comment=comment)
+
+
+@app.route('/register/', methods=['GET', 'POST'])
+def registration():
+    if request.method == 'POST':
+        return account.register_account()
+
+    return render_template('registration.html', title='Registration Page')
+
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    """Show login page upon GET, do login upon POST request."""
+    if request.method == 'POST':
+        return account.login_user()
+
+    return render_template('login.html', title='Login Page')
+
+
+@app.route('/logout/')
+def logout():
+    """Logout user from page."""
+    return account.logout_user()
 
 
 @app.errorhandler(404)

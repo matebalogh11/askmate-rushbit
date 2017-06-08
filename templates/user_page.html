@@ -1,0 +1,46 @@
+{% extends "layout.html"  %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="wrapper searchresult">
+    <h1>User page - {{user_name}}</h1>
+    {% if question %}
+    <h2>Question</h2>
+    <table  class="maintable">
+        {% for table in question %} 
+            <tr> 
+                <td>               
+                    <a href="{{ url_for('show_question_page', question_id=table[0], view='counted') }}">
+                        <span class="linked_cell">                     
+                        {{ table[1] }}
+                        </span>
+                    </a> 
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% if answer %}
+    <h2>Answer</h2>
+    <table class="userp">
+        {% for table in answer %}
+        <tr>
+            <td><p id="userp">{{ table[4] }}</p></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    <br>
+    {% if comment %}
+    <h2>Comment</h2>
+    <table class="userp">
+        {% for table in comment %}
+        <tr>
+            <td><p id="userp">{{ table[2] }}</p></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

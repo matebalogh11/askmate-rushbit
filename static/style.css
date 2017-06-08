@@ -770,3 +770,31 @@ q_table img {
     background-color: #838383;
     margin: 0 20px 0 0;
 }
+
+.trash {
+    border-radius: 10px;
+    width: 7%;
+    padding: 10px;
+    background-color: #DC4B47;
+    margin: 2px auto 0px auto;
+}
+
+#userp {
+    display:list-item;
+    padding:0 0 0 14px;
+    margin-left: 20px
+}
+
+.profile_picture_navbar {
+    border-radius: 10px;
+}
+
+.navbar_span {
+    color: #5d5d5d;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: 'Open Sans', serif;
+    font-weight: 800;
+    padding: 10px 10px;
+    border-radius: 3px;
+}
