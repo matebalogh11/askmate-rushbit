@@ -19,6 +19,7 @@
                     <!--<li><a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a></li>
                     <li><a href="{{ url_for('show_contact') }}">Contact</a></li>
                     <li><a href="https://prezi.com/p/efegz5dw-wft/">About us</a></li>-->
+                    <li><a href="{{ url_for('show_user_list') }}">Users</a></li>
                     <li><a href="{{ url_for('show_tag_page') }}">Tags</a></li>
                     {% if session.user_name %}
                     <li><img class="profile_picture_navbar" src="{{ url_for('static', filename='ph_pic.png') }}"><span class="navbar_span">{{ session.user_name }}</span></li>
