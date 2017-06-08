@@ -49,8 +49,13 @@ def get_user_list(criterium, order):
         criterium = "role"
         order = "asc"
 
-    SQL = """SELECT user_name, role, reputation, reg_date, COUNT(question.id), COUNT(answer.id), COUNT(comment.id)
-            FROM users
+    SQL = """ SELECT """
+
+    SQL = """SELECT u.id, u.user_name, u.role, u.reputation, u.reg_date,
+            (SELECT COUNT(q.user_name) FROM question q WHERE q.user_name = u.user_name) AS q_count,
+            (SELECT COUNT(a.user_name) FROM answer a WHERE a.user_name = u.user_name) AS a_count,
+            (SELECT COUNT(c.user_name) FROM comment c WHERE c.user_name = u.user_name) AS c_count
+            FROM users u
             ORDER BY {} {};""".format(criterium, order)
     data = None
     fetch = "all"
