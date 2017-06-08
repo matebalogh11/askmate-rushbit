@@ -103,7 +103,7 @@ def get_image_for_update_question(question_id):
 
 def get_5_questions():
     """Return 5 most recent questions."""
-    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count, user_name
              FROM question ORDER BY submission_time DESC LIMIT 5;"""
     data = None
     fetch = "all"
@@ -120,7 +120,7 @@ def get_questions(criterium, order):
         criterium = "submission_time"
         order = "desc"
 
-    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count
+    SQL = """SELECT id, title, submission_time, view_number, vote_number, answer_count, user_name
              FROM question ORDER BY {} {};""".format(criterium, order)
     data = None
     fetch = "all"

@@ -54,6 +54,9 @@
                 <a href="{{ url_for('show_question_list', answer_count='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_question_list', answer_count='desc') }}"><span class="arrow">▼</span></a>
             </th>
+            <th class="number_cell">
+                Author
+            </th>
         </tr>
         {% for line in questions %}
             <tr>
@@ -65,10 +68,11 @@
                         </span>
                     </a>
                 </td>
-                <td><span class="linked_cell date_cell"> {{ line[2] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ line[3] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ line[4] }}</span></td>
-                <td><span class="linked_cell number_cell"> {{ line[5] }}</span>                                                                                                                                 </td>
+                <td><span class="linked_cell date_cell">{{ line[2] }}</span></td>
+                <td><span class="linked_cell number_cell">{{ line[3] }}</span></td>
+                <td><span class="linked_cell number_cell">{{ line[4] }}</span></td>
+                <td><span class="linked_cell number_cell">{{ line[5] }}</span></td>
+                <td><span class="linked_cell number_cell">{% if line[6] %}{{ line[6] }}{% else %}N/A{% endif %}</span></td>
             </tr>
         {% endfor %}
     </table>

@@ -208,7 +208,7 @@ def delete_tag_4ever(tag_id):
 
 def get_questions_with_tag(tag_id):
     """Get all questions that have the tag with tag_id."""
-    SQL = """SELECT q.id, q.title, q.submission_time, q.view_number, q.vote_number, q.answer_count
+    SQL = """SELECT q.id, q.title, q.submission_time, q.view_number, q.vote_number, q.answer_count, q.user_name
              FROM question q
              JOIN question_tag qt ON qt.question_id = q.id
              WHERE qt.tag_id = %s
