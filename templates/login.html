@@ -30,6 +30,8 @@
                 <input type="password" class="inputfield" name="password">
             </div>
 
+            <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
             <div>
                 <input type="submit" value="Login" id="reg_button">
             </div>

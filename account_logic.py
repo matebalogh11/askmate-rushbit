@@ -39,7 +39,7 @@ def login_required(role):
                 return redirect(url_for('show_index'))
             else:
                 flash("You are not logged in. Please log in first.", "error")
-                return redirect(url_for('login'))
+                return redirect(url_for('login', next=request.url))
         return wrapper
     return decorator
 
@@ -125,6 +125,9 @@ def login_user():
     user_name = request.form['user_name']
     session['user_name'] = user_name
     session['role'] = get_user_role(user_name)
+
+    if request.form.get('next'):
+        return redirect(request.form['next'])
 
     return redirect(url_for('show_index'))
 
