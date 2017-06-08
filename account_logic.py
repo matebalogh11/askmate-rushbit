@@ -1,6 +1,7 @@
 
 from binascii import hexlify
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import wraps
 from hashlib import sha512
 from os import urandom
 from string import ascii_lowercase, digits
@@ -10,6 +11,84 @@ from flask import (abort, flash, redirect, render_template, request, session,
 
 import db
 import helper
+from answers_logic import valid_answer_id
+from comments_logic import valid_comment_id
+from questions_logic import valid_question_id
+
+
+def login_required(role):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if 'user_name' in session:
+                if role == "user":
+                    if session.get('role') in ('user', 'admin'):
+                        return func(*args, **kwargs)
+                elif role == "admin":
+                    if session.get('role') == 'admin':
+                        return func(*args, **kwargs)
+                elif role == "author":
+                    url_parts = request.url.split('/')
+                    entry_id = url_parts[4]
+                    entry_type = url_parts[3]
+                    owner = get_author(entry_type, entry_id)
+                    if session.get('user_name') == owner or session.get('role') == 'admin':
+                        return func(*args, **kwargs)
+
+                flash("You requested a restricted operation. Permission denied.", "error")
+                return redirect(url_for('show_index'))
+            else:
+                flash("You are not logged in. Please log in first.", "error")
+                return redirect(url_for('login'))
+        return wrapper
+    return decorator
+
+
+def not_loggedin(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'user_name' not in session:
+            return func(*args, **kwargs)
+        else:
+            flash("Cannot access page. You are already logged in.", "error")
+            return redirect(url_for("show_index"))
+    return wrapper
+
+
+def make_session_permanent(app):
+    """Makes session permanent, set lifetime to 5 minutes, refresh upon each request."""
+    if 'user_name' in session:
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=5)
+
+
+def check_for_valid_request():
+    """Check if HTTP request is any of the allowed request methods,
+    and if function does not exist for requested URL, then abort.
+    """
+    allowed_req_methods = ('GET', 'POST')
+    if request.method not in allowed_req_methods:
+        abort(405)
+    if request.endpoint is None:
+        abort(404)
+
+
+def check_for_valid_id_variable():
+    """Check whether requested URL has valid id variable in it, found in corresponding table."""
+    url_parts = request.url.split('/')
+    if len(url_parts) >= 5:
+        entry_type = url_parts[3]
+        entry_id = url_parts[4]
+        if entry_type == "question":
+            if not valid_question_id(entry_id):
+                return abort(404)
+        if entry_type == "answer":
+            if not valid_answer_id(entry_id):
+                return abort(404)
+    if len(url_parts) >= 6 and entry_type == "comment":
+        q_id = url_parts[5]
+        if not valid_comment_id(entry_id) or not valid_question_id(q_id):
+            return abort(404)
 
 
 def register_account():
@@ -55,6 +134,7 @@ def logout_user():
     session.pop('user_name', None)
     session.pop('role', None)
 
+    flash("You are now logged out.", "success")
     return redirect(url_for('show_index'))
 
 
@@ -161,3 +241,20 @@ def get_user_role(user_name):
     fetch = "cell"
     role = db.run_statements(((SQL, data, fetch),))[0]
     return role
+
+
+def get_author(entry_type, entry_id):
+    """Return author from entry_type table where entry_id."""
+    if entry_type not in ('question', 'answer', 'comment'):
+        return None
+
+    try:
+        entry_id = int(entry_id)
+    except ValueError:
+        return None
+
+    SQL = """SELECT user_name FROM {} WHERE id = %s;""".format(entry_type)
+    data = (entry_id,)
+    fetch = "cell"
+    author = db.run_statements(((SQL, data, fetch),))[0]
+    return author

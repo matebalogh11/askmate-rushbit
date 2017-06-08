@@ -18,7 +18,18 @@ import vote_logic
 app = Flask(__name__)
 
 
+@app.before_request
+def check_before_request():
+    """Before each request, check/do the following:
+    1. Refresh session time, 2. Check for valid request method, 3. Check for valid id variable.
+    """
+    account.make_session_permanent(app)
+    account.check_for_valid_request()
+    account.check_for_valid_id_variable()
+
+
 @app.route('/new-question/post', methods=['POST'])
+@account.login_required('user')
 def ask_question():
     """Post a new question with title, description and optional image.
     Redirect: to new question posted upon success, else to question list page.
@@ -41,6 +52,7 @@ def ask_question():
 
 
 @app.route('/question/<question_id>/post-edit', methods=['POST'])
+@account.login_required('author')
 def edit_question(question_id):
     """Edit question with question_id, based on filled HTTP request form.
     Updates info in CSV file and manages filesystem.
@@ -109,6 +121,7 @@ def show_question_list(criterium='submission_time', order='desc'):
 
 
 @app.route("/new-question/")
+@account.login_required('user')
 def show_new_question_form():
     """View function of new question form."""
     title = "Ask New Question"
@@ -116,6 +129,7 @@ def show_new_question_form():
 
 
 @app.route("/question/<question_id>/new-answer")
+@account.login_required('user')
 def show_new_answer_form(question_id):
     """View function of new answer form."""
     title = "Add new answer to question: {}".format(question_id)
@@ -123,6 +137,7 @@ def show_new_answer_form(question_id):
 
 
 @app.route("/question/<question_id>/edit")
+@account.login_required('author')
 def show_edit_question_form(question_id):
     """View function of edit question form"""
     if not questions_logic.valid_question_id(question_id):
@@ -134,7 +149,7 @@ def show_edit_question_form(question_id):
                            selected_question=selected_question, question_id=question_id)
 
 
-@app.route("/question/<question_id>")
+@app.route("/question/<question_id>/")
 def show_question_page(question_id):
     """View function of question page, with details, answers, comments, tags."""
     if not questions_logic.valid_question_id(question_id):
@@ -155,6 +170,7 @@ def show_question_page(question_id):
 
 
 @app.route("/question/<question_id>/delete")
+@account.login_required('author')
 def delete_question(question_id):
     """Delete question, its answers and all comments, and all image files."""
     if not questions_logic.valid_question_id(question_id):
@@ -169,6 +185,7 @@ def delete_question(question_id):
 
 
 @app.route("/question/<question_id>/new-answer", methods=["POST"])
+@account.login_required('user')
 def add_answer(question_id):
     """Add answer and redirect to its question page."""
     if not questions_logic.valid_question_id(question_id):
@@ -194,6 +211,7 @@ def add_answer(question_id):
 
 
 @app.route("/answer/<answer_id>/edit", methods=["GET", "POST"])
+@account.login_required('author')
 def edit_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
     if not answers_logic.valid_answer_id(answer_id):
@@ -224,6 +242,7 @@ def edit_answer(answer_id):
 
 
 @app.route("/answer/<answer_id>/delete")
+@account.login_required('author')
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
     if not answers_logic.valid_answer_id(answer_id):
@@ -237,6 +256,7 @@ def delete_answer(answer_id):
 
 @app.route("/answer/<answer_id>/del-img")
 @app.route("/question/<question_id>/del-img")
+@account.login_required('author')
 def delete_image(question_id=None, answer_id=None):
     """Delete image of selected question."""
     if question_id:
@@ -254,6 +274,7 @@ def delete_image(question_id=None, answer_id=None):
 
 @app.route("/answer/<answer_id>/vote-<direction>")
 @app.route("/question/<question_id>/vote-<direction>")
+@account.login_required('user')
 def vote(direction, question_id=None, answer_id=None):
     """Modify number of votes of a given question or answer,
     then redirect to corresponding question_page.
@@ -280,6 +301,7 @@ def vote(direction, question_id=None, answer_id=None):
 
 @app.route("/question/<question_id>/new-comment", methods=["POST"])
 @app.route("/answer/<answer_id>/new-comment", methods=["POST"])
+@account.login_required('user')
 def add_comment(question_id=None, answer_id=None):
     """Add comment. Works for question and answer as well."""
     if not question_id:
@@ -303,6 +325,7 @@ def add_comment(question_id=None, answer_id=None):
 
 
 @app.route("/comment/<comment_id>/<question_id>/edit", methods=["POST"])
+@account.login_required('author')
 def edit_comment(comment_id, question_id):
     """Edit comment."""
     if (not comments_logic.valid_comment_id(comment_id) or
@@ -320,6 +343,7 @@ def edit_comment(comment_id, question_id):
 
 
 @app.route("/comment/<comment_id>/<question_id>/edit")
+@account.login_required('author')
 def delete_comment(comment_id, question_id):
     """Delete comment from question."""
     if (not comments_logic.valid_comment_id(comment_id) or
@@ -331,6 +355,7 @@ def delete_comment(comment_id, question_id):
 
 
 @app.route("/question/<question_id>/manage-tags", methods=["GET", "POST"])
+@account.login_required('author')
 def manage_tags(question_id):
     """GET: view function of question tag addition page.
     POST: allows choosing from existing tags and adding new ones.
@@ -357,6 +382,7 @@ def manage_tags(question_id):
 
 
 @app.route("/question/<question_id>/tag/<tag_id>/delete")
+@account.login_required('author')
 def delete_tag(question_id, tag_id):
     """Delete tag relation and reload page the link is requested from."""
     if not questions_logic.valid_question_id(question_id):
@@ -373,6 +399,7 @@ def delete_tag(question_id, tag_id):
 
 
 @app.route("/answer/<answer_id>/<question_id>/accept")
+@account.login_required('author')
 def accept_answer(answer_id, question_id):
     """Mark answer accepted and de-select any other answers."""
     if (not answers_logic.valid_answer_id(answer_id) or
@@ -386,6 +413,7 @@ def accept_answer(answer_id, question_id):
 
 
 @app.route("/answer/<answer_id>/<question_id>/remove-accept")
+@account.login_required('author')
 def remove_accept_mark(answer_id, question_id):
     """Remove accept mark from answer."""
     if (not answers_logic.valid_answer_id(answer_id) or
@@ -409,6 +437,7 @@ def show_tag_page(criterium='tag_name', order='asc'):
 
 
 @app.route("/tag/<tag_id>/del")
+@account.login_required('admin')
 def delete_tag_4ever(tag_id):
     """Delete tag from tag table, irreversibly."""
     if not tag_logic.valid_tag_id(tag_id):
@@ -433,7 +462,7 @@ def show_questions_with_tag(tag_id):
     return render_template('list.html', questions=questions, title=title, tag_name=tag_name)
 
 
-@app.route("/user/<user_id>")
+@app.route("/user/<user_id>/")
 def show_user_page(user_id):
     """Show user page in detail."""
     user_name = user_logic.valid_user(user_id)
@@ -445,7 +474,8 @@ def show_user_page(user_id):
                            question=question, answer=answer, comment=comment)
 
 
-@app.route('/register/', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
+@account.not_loggedin
 def registration():
     if request.method == 'POST':
         return account.register_account()
@@ -453,7 +483,8 @@ def registration():
     return render_template('registration.html', title='Registration Page')
 
 
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+@account.not_loggedin
 def login():
     """Show login page upon GET, do login upon POST request."""
     if request.method == 'POST':
@@ -462,7 +493,8 @@ def login():
     return render_template('login.html', title='Login Page')
 
 
-@app.route('/logout/')
+@app.route('/logout')
+@account.login_required('user')
 def logout():
     """Logout user from page."""
     return account.logout_user()
