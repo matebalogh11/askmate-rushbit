@@ -512,6 +512,20 @@ def logout():
     return account.logout_user()
 
 
+@app.route('/user/<user_id>/del')
+@account.login_required('admin')
+def delete_user(user_id):
+    """Delete user. Admin only function."""
+    if not users_logic.valid_user(user_id):
+        abort(404)
+
+    user_name = users_logic.delete_user_and_get_name(user_id)
+
+    flash("User '{}' deleted.".format(user_name), "success")
+
+    return redirect(url_for('show_user_list'))
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404

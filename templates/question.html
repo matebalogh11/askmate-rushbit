@@ -31,7 +31,7 @@
     <table class="q_table">
         <tr>
             <td colspan="2">
-                <span class="small_gray">Question: {{ question_id }} | Views: {{ question[2] }} | Submission: {{ question[1] }} | {% if question[8] %}Author: {{ question[8] }}{% else %}Anonymous{% endif %}</span>
+                <span class="small_gray">Question: {{ question_id }} | Views: {{ question[2] }} | Submission: {{ question[1] }} | {% if question[8] %}Author: {{ question[8] }}{% else %}N/A{% endif %}</span>
             </td>
         </tr>
         <tr>
@@ -83,7 +83,7 @@
     {% if q_comments %}        
         {% for comment in q_comments %}
             <div>
-                <span class="small_gray_2">Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}Anonymous{% endif %}</span>
+                <span class="small_gray_2">Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}N/A{% endif %}</span>
                 <p class="commentzone">{{ comment[3] }}</p>
                 <div class="small-gray">
                     <a href="{{ url_for('delete_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a>
@@ -112,7 +112,7 @@
 
         {% for answer in answers %}
 
-            <div class="small_gray_2">Submission: {{ answer[1] }} | Author: {% if answer[7] %}{{ answer[7] }}{% else %}Anonymous{% endif %}</div>
+            <div class="small_gray_2">Submission: {{ answer[1] }} | Author: {% if answer[7] %}{{ answer[7] }}{% else %}N/A{% endif %}</div>
 
             <div class="answers">{% if answer[6] %}<img class="check_mark" src="{{ url_for('static', filename='checked.svg') }}">{% endif %}<span>{{ answer[4] }}</span></div>
             <div class="voter-mini">
@@ -151,7 +151,7 @@
             {% for comment in a_comments %}
                 {% if comment[2] == answer[0] %}
                 <div class="commentident">
-                    <div class="small_gray_2">Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}Anonymous{% endif %}</div>
+                    <div class="small_gray_2">Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}N/A{% endif %}</div>
                     <p class="commentzone">{{ comment[3] }}</p>
 
                     <div class="small-gray">

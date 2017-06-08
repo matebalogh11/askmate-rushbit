@@ -803,3 +803,8 @@ q_table img {
     padding: 10px 10px;
     border-radius: 3px;
 }
+
+#spec_butt {
+    color: white;
+    margin: 30px auto;
+}

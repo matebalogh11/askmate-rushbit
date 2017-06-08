@@ -98,3 +98,15 @@ def fetch_user_detail(user_name):
     comment = user_details[2]
 
     return question, answer, comment
+
+
+def delete_user_and_get_name(user_id):
+    """Delete user from users table based on user_id."""
+    SQL1 = """SELECT user_name FROM users WHERE id = %s;"""
+    fetch1 = "cell"
+    SQL2 = """DELETE FROM users WHERE id = %s;"""
+    fetch2 = None
+    data = (user_id,)
+
+    user_name = db.run_statements(((SQL1, data, fetch1), (SQL2, data, fetch2)))[0]
+    return user_name

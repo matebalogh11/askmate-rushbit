@@ -4,7 +4,18 @@
 {% block content %}
 
 <div class="wrapper searchresult">
+
     <h1>User page - {{user_name}}</h1>
+
+    <!-- Error messages in a loop with classes: error, success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     {% if question %}
     <h2>Question</h2>
     <table  class="maintable">
@@ -21,6 +32,7 @@
         {% endfor %}
     </table>
     {% endif %}
+
     {% if answer %}
     <h2>Answer</h2>
     <table class="userp">
@@ -31,7 +43,9 @@
         {% endfor %}
     </table>
     {% endif %}
+
     <br>
+
     {% if comment %}
     <h2>Comment</h2>
     <table class="userp">
@@ -42,5 +56,12 @@
         {% endfor %}
     </table>
     {% endif %}
+
+    {% if not question and not answer and not comment %}
+    <p>There are no entries available for this user.</p>
+    {% endif %}
+    <p>
+        <a href="{{ url_for('show_user_list') }}" id="spec_butt" class="cta_home">User list</a>
+    </p>
 </div>
 {% endblock %}
