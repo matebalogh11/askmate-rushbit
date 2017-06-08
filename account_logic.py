@@ -15,42 +15,47 @@ import helper
 def register_account():
     """Register account after validation and hashing process."""
     user_name = request.form.get('user_name')
-    user_names = get_user_names()
     pw_1 = request.form.get('password_1')
     pw_2 = request.form.get('password_2')
+    user_names = get_user_names()
+
     if user_name in user_names:
         flash("User name already exists. Please choose another one.", "error")
-        page = "registration"
-        return page
+        return redirect(url_for('registration'))
 
-    if valid_user_name(user_name):
-        if valid_password(pw_1, pw_2):
-            create_account(user_name, pw_1)
-            flash("Successful registration. Please log in.", "success")
-            page = "login"
-            return page
-        else:
-            flash("Invalid password. Should be 8-16 characters long, contain only letters and numbers.", "error")
-            page = "registration"
-            return page
-    else:
+    if not valid_user_name(user_name):
         flash("Invalid user name. Should be 8-16 characters long, contain only letters and numbers.", "error")
-        page = "registration"
-        return page
+        return redirect(url_for('registration'))
+
+    if not valid_password(pw_1, pw_2):
+        flash("Invalid password or not matching. 8-16 characters long passwords \
+        containing only letters and numbers are accepted.", "error")
+        return redirect(url_for('registration'))
+
+    create_account(user_name, pw_1)
+    flash("Successful registration. Please log in.", "success")
+    return redirect(url_for('login'))
 
 
 def login_user():
     """Login user after validating credentials. Store user name and role in session cookies."""
-    if valid_credentials(request.form):
-        user_name = request.form['user_name']
-        session['user_name'] = user_name
-        session['role'] = get_user_role(user_name)
-        page = "show_index"
-        return page
-    else:
+    if not valid_credentials(request.form):
         flash("Invalid credentials.", "error")
-        page = "login"
-        return page
+        return redirect(url_for('login'))
+
+    user_name = request.form['user_name']
+    session['user_name'] = user_name
+    session['role'] = get_user_role(user_name)
+
+    return redirect(url_for('show_index'))
+
+
+def logout_user():
+    """Logout user, removing session cookies accordingly."""
+    session.pop('user_name', None)
+    session.pop('role', None)
+
+    return redirect(url_for('show_index'))
 
 
 def get_user_names():
@@ -153,5 +158,6 @@ def get_user_role(user_name):
     """Return role for user_name."""
     SQL = """SELECT role FROM users WHERE user_name = %s;"""
     data = (user_name,)
-    role = db.run_statements(((SQL, data, "one"),))[0][0]
+    fetch = "cell"
+    role = db.run_statements(((SQL, data, fetch),))[0]
     return role

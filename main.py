@@ -448,8 +448,7 @@ def show_user_page(user_id):
 @app.route('/register/', methods=['GET', 'POST'])
 def registration():
     if request.method == 'POST':
-        page = account.register_account()
-        return redirect(url_for(page))
+        return account.register_account()
 
     return render_template('registration.html', title='Registration Page')
 
@@ -458,17 +457,15 @@ def registration():
 def login():
     """Show login page upon GET, do login upon POST request."""
     if request.method == 'POST':
-        page = account.login_user()
-        return redirect(url_for(page))
+        return account.login_user()
 
     return render_template('login.html', title='Login Page')
 
 
 @app.route('/logout/')
 def logout():
-    session.pop('user_name', None)
-    session.pop('role', None)
-    return redirect(url_for('show_index'))
+    """Logout user from page."""
+    return account.logout_user()
 
 
 @app.errorhandler(404)
