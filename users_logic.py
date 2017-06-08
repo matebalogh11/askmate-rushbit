@@ -38,6 +38,30 @@ def change_reputation_a(answer_id, direction, acc=None):
     db.run_statements(((SQL, data, fetch),))
 
 
+def get_user_list(criterium, order):
+    """List all user infromation except id, password and salt
+    in a table on the user_list page.
+    """
+    valid_criterium = ("user_name", "role", "reputation", "reg_date", "q_count", "a_count", "c_count", )
+    valid_order = ("asc", "desc")
+
+    if criterium not in valid_criterium or order not in valid_order:
+        criterium = "role"
+        order = "asc"
+
+    SQL = """SELECT u.id, u.user_name, u.role, u.reputation, u.reg_date,
+            (SELECT COUNT(q.user_name) FROM question q WHERE q.user_name = u.user_name) AS q_count,
+            (SELECT COUNT(a.user_name) FROM answer a WHERE a.user_name = u.user_name) AS a_count,
+            (SELECT COUNT(c.user_name) FROM comment c WHERE c.user_name = u.user_name) AS c_count
+            FROM users u
+            ORDER BY {} {};""".format(criterium, order)
+    data = None
+    fetch = "all"
+
+    users = db.run_statements(((SQL, data, fetch),))
+    return users
+
+
 def valid_user(user_id):
     """Check whether the user is in the tabe and return the name."""
     SQL = """SELECT user_name FROM users WHERE id = %s;"""

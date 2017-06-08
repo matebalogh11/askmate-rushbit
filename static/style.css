@@ -77,6 +77,11 @@ h5 {
     text-align: center;
 }
 
+.maintable .number_cell_big {
+    max-width: 130px;
+    text-align: center;
+}
+
 .maintable .date_cell {
     min-width: 200px;
     text-align: center;
