@@ -49,8 +49,6 @@ def get_user_list(criterium, order):
         criterium = "role"
         order = "asc"
 
-    SQL = """ SELECT """
-
     SQL = """SELECT u.id, u.user_name, u.role, u.reputation, u.reg_date,
             (SELECT COUNT(q.user_name) FROM question q WHERE q.user_name = u.user_name) AS q_count,
             (SELECT COUNT(a.user_name) FROM answer a WHERE a.user_name = u.user_name) AS a_count,
