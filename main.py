@@ -294,7 +294,7 @@ def add_comment(question_id=None, answer_id=None):
 
     if request.method == 'POST':
         if len(request.form.get('message', '')) >= 5:
-            comments_logic.insert_comment(question_id, answer_id, request.form['message'])
+            comments_logic.insert_comment(question_id, answer_id, request.form['message'], request.args.get('only'))
             flash("Comment successfully added.", "success")
         else:
             flash("Comment was not added. It has to be at least 5 characters long.", "error")

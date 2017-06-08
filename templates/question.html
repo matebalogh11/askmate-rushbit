@@ -133,7 +133,7 @@
                 <!-- This is new, and works. -->
                 <span class="small_gray">
                     <button onclick="hideMe_a_submit('{{ 'a_c_edit' + loop.index|string }}')" class="delete_mini">Comment answer</button>
-                    <form action="{{ url_for('add_comment', answer_id=answer[0], q_id=question_id) }}" method="POST">
+                    <form action="{{ url_for('add_comment', answer_id=answer[0], q_id=question_id, only='answer' ) }}" method="POST">
                         <div class="a_comment_submit" id="{{ 'a_c_edit' + loop.index|string }}">
                             <textarea class="textarea" name="message"></textarea><br>
                             <input type="submit" value="Submit comment" class="cta marg comm">
@@ -159,7 +159,7 @@
                         <span class="small_gray">
                             <!-- This is new, and works. -->
                             <button onclick="hideMe_a_edit('{{ 'a_e_edit' + loop.index|string }}')" class="delete_mini">Edit comment</button>
-                            <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0]) }}" method="POST">
+                            <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0] ) }}" method="POST">
                                 <div class="a_comment_edit" id="{{ 'a_e_edit' + loop.index|string }}">
                                     <textarea class="textarea" name="message">{{ comment[3] }}</textarea><br>
                                     <input type="submit" value="Submit comment" class="cta marg comm">

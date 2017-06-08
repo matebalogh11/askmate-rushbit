@@ -51,10 +51,14 @@ def edit_comment(new_comment, comment_id):
     db.run_statements(((SQL, data, fetch),))
 
 
-def insert_comment(question_id, answer_id, message):
+def insert_comment(question_id, answer_id, message, only_answer):
     """Initialize comment and insert into comment table."""
     init_time = helper.create_timestamp()
     init_edit = 0
+
+    if only_answer == "answer":
+        question_id = None
+
     comment = (question_id, answer_id, message, init_time, init_edit)
 
     SQL = """INSERT INTO comment (question_id, answer_id,
