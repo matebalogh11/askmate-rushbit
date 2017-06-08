@@ -22,9 +22,11 @@
     <h1>{{ question[4] }}</h1>
 
     <p class="actionbuttons">
-        <a href="{{ url_for('show_edit_question_form', question_id=question_id) }}" class="cta">Edit question</a>
-        <a href="{{ url_for('delete_question', question_id=question_id) }}" class="delete_button">Delete question</a>
-        <a href="{{ url_for('manage_tags', question_id=question_id) }}" class="cta">Manage tags</a>
+        {% if session.user_name == question[8] or session.role == 'admin' %}
+            <a href="{{ url_for('show_edit_question_form', question_id=question_id) }}" class="cta">Edit question</a>
+            <a href="{{ url_for('delete_question', question_id=question_id) }}" class="delete_button">Delete question</a>
+            <a href="{{ url_for('manage_tags', question_id=question_id) }}" class="cta">Manage tags</a>
+        {% endif %}
         <a href="{{ url_for('show_question_list') }}" class="cta">Back to Questions</a>
     </p>
 
@@ -51,7 +53,12 @@
                 {% if added_tags %}
                 <div class="tags">
                     {% for tag_id, tag_name in added_tags %}
-                    <span>{{ tag_name }}<a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a></span>
+                    <span>
+                        {{ tag_name }}
+                        {% if session.user_name == question[8] or session.role == 'admin' %}
+                            <a href="{{ url_for('delete_tag', question_id=question_id, tag_id=tag_id) }}">×</a>
+                        {% endif %}
+                    </span>
                     {% endfor %}
                 </div>
                 {% else %}
@@ -85,19 +92,21 @@
             <div>
                 <span class="small_gray_2">Submission time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}N/A{% endif %}</span>
                 <p class="commentzone">{{ comment[3] }}</p>
-                <div class="small-gray">
-                    <a href="{{ url_for('delete_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a>
-                    <span class="small_gray">
-                        <!-- This is new, and works. -->
-                        <button onclick="hideMe_q_edit('{{ 'q_c_edit' + loop.index|string }}')" class="delete_mini">Edit comment</button>
-                        <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0]) }}" method="POST">
-                            <div class="q_comment_edit" id="{{ 'q_c_edit' + loop.index|string }}">
-                                <textarea class="textarea" name="message">{{ comment[3] }}</textarea><br>
-                                <input type="submit" value="Submit comment" class="cta marg comm">
-                            </div>
-                        </form>
-                    </span>
-                </div>
+                {% if session.user_name == comment[6] or session.role == 'admin' %}
+                    <div class="small-gray">
+                        <a href="{{ url_for('delete_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a>
+                        <span class="small_gray">
+                            <!-- This is new, and works. -->
+                            <button onclick="hideMe_q_edit('{{ 'q_c_edit' + loop.index|string }}')" class="delete_mini">Edit comment</button>
+                            <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0]) }}" method="POST">
+                                <div class="q_comment_edit" id="{{ 'q_c_edit' + loop.index|string }}">
+                                    <textarea class="textarea" name="message">{{ comment[3] }}</textarea><br>
+                                    <input type="submit" value="Submit comment" class="cta marg comm">
+                                </div>
+                            </form>
+                        </span>
+                    </div>
+                {% endif %}
 
             </div>
         {% endfor %}
@@ -122,14 +131,17 @@
             </div>
 
             <div class="small_gray">
-                {% if answer[6] %}
-                <a href="{{ url_for('remove_accept_mark', answer_id=answer[0], question_id=question_id) }}" class="delete_mini">Not accepted</a>
-                {% else %}
-                <a href="{{ url_for('accept_answer', answer_id=answer[0], question_id=question_id) }}" class="delete_mini">Mark Accepted</a>
+                {% if session.user_name == question[8] or session.role == 'admin' %}
+                    {% if answer[6] %}
+                        <a href="{{ url_for('remove_accept_mark', answer_id=answer[0], question_id=question_id) }}" class="delete_mini">Not accepted</a>
+                    {% else %}
+                        <a href="{{ url_for('accept_answer', answer_id=answer[0], question_id=question_id) }}" class="delete_mini">Mark Accepted</a>
+                    {% endif %}
                 {% endif %}
-
-                <a href="{{ url_for('edit_answer', answer_id=answer[0]) }}" class="delete_mini">Edit answer</a>
-                <a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>
+                {% if session.user_name == answer[7] or session.role == 'admin' %}
+                    <a href="{{ url_for('edit_answer', answer_id=answer[0]) }}" class="delete_mini">Edit answer</a>
+                    <a href="{{ url_for('delete_answer', answer_id=answer[0]) }}" class="delete_mini">✖ Delete</a>
+                {% endif %}
                 <!-- This is new, and works. -->
                 <span class="small_gray">
                     <button onclick="hideMe_a_submit('{{ 'a_c_edit' + loop.index|string }}')" class="delete_mini">Comment answer</button>
@@ -154,19 +166,21 @@
                     <div class="small_gray_2">Submission Time: {{ comment[4] }} | Number of times edited: {{ comment[5] }} | Author: {% if comment[6] %}{{ comment[6] }}{% else %}N/A{% endif %}</div>
                     <p class="commentzone">{{ comment[3] }}</p>
 
-                    <div class="small-gray">
-                        <a href="{{ url_for('delete_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a>
-                        <span class="small_gray">
-                            <!-- This is new, and works. -->
-                            <button onclick="hideMe_a_edit('{{ 'a_e_edit' + loop.index|string }}')" class="delete_mini">Edit comment</button>
-                            <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0] ) }}" method="POST">
-                                <div class="a_comment_edit" id="{{ 'a_e_edit' + loop.index|string }}">
-                                    <textarea class="textarea" name="message">{{ comment[3] }}</textarea><br>
-                                    <input type="submit" value="Submit comment" class="cta marg comm">
-                                </div>
-                            </form>
-                        </span>
-                    </div>
+                    {% if session.user_name == comment[6] or session.role == 'admin' %}
+                        <div class="small-gray">
+                            <a href="{{ url_for('delete_comment', question_id=question_id, comment_id=comment[0]) }}" class="delete_mini">✖ Delete</a>
+                            <span class="small_gray">
+                                <!-- This is new, and works. -->
+                                <button onclick="hideMe_a_edit('{{ 'a_e_edit' + loop.index|string }}')" class="delete_mini">Edit comment</button>
+                                <form action="{{ url_for('edit_comment', question_id=question_id, comment_id=comment[0] ) }}" method="POST">
+                                    <div class="a_comment_edit" id="{{ 'a_e_edit' + loop.index|string }}">
+                                        <textarea class="textarea" name="message">{{ comment[3] }}</textarea><br>
+                                        <input type="submit" value="Submit comment" class="cta marg comm">
+                                    </div>
+                                </form>
+                            </span>
+                        </div>
+                    {% endif %}
 
                 </div>
                 {% endif %}

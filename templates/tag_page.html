@@ -28,9 +28,13 @@
                 <a href="{{ url_for('show_tag_page', question_count='asc') }}"><span class="arrow">▲</span></a>
                 <a href="{{ url_for('show_tag_page', question_count='desc') }}"><span class="arrow">▼</span></a>
             </th>
-            <th class="number_cell">
-                Delete
-            </th>
+    
+            {% if session.role == 'admin' %}
+                <th class="number_cell">
+                    Delete
+                </th>
+            {% endif %}
+
         </tr>
     {% for tag in tags %}
         <tr>
@@ -44,9 +48,13 @@
             <td class="number_cell">
             {{ tag[2] }}
             </td>
-            <td class="number_cell">
-                <a href="{{ url_for('delete_tag_4ever', tag_id=tag[0], tag_name=tag[1]) }}"><img class="trash" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"></a>
-            </td>
+
+            {% if session.role == 'admin' %}
+                <td class="number_cell">
+                    <a href="{{ url_for('delete_tag_4ever', tag_id=tag[0], tag_name=tag[1]) }}"><img class="trash" src="{{ url_for('static', filename='trash.svg') }}" alt="Delete"></a>
+                </td>
+            {% endif %}
+
         </tr>
     {% endfor %}
     </table>
