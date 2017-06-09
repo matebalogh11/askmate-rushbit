@@ -133,11 +133,11 @@ def remove_answer_and_get_q_id(answer_id):
     then return its question_id.
     """
     image_to_delete, question_id = get_answer_image_and_q_id(answer_id)
-
-    try:
-        os.remove("static/uploads/" + image_to_delete)
-    except (FileNotFoundError, TypeError):
-        pass
+    if image_to_delete:
+        try:
+            os.remove("static/uploads/" + image_to_delete)
+        except (FileNotFoundError, TypeError):
+            pass
 
     delete_answer_by_id(answer_id)
     return question_id
@@ -156,10 +156,10 @@ def delete_a_image(answer_id):
     current_image = get_answer_image(answer_id)
     if current_image:
         remove_answer_image(answer_id)
-    try:
-        os.remove("static/uploads/" + current_image)
-    except FileNotFoundError:
-        pass
+        try:
+            os.remove("static/uploads/" + current_image)
+        except FileNotFoundError:
+            pass
 
 
 def get_answer_image(answer_id):

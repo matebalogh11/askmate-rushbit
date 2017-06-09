@@ -1,12 +1,14 @@
 
 <!doctype html>
 <html>
+
     <head> 
         <title>AskMate - {% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="shortcut icon" type="image/png" sizes="16x16" href="{{url_for('static', filename='favicon.png')}}">
     </head>
+
     <body>
         <div class="navbar">
             <div class="navbar_wrapper">
@@ -16,12 +18,10 @@
                 <div class="navlinks">
                     <a href="{{ url_for('show_index') }}">Home</a>
                     <a href="{{ url_for('show_question_list') }}">Questions</a>
-                    <!--<a href="{{ url_for('show_question_list', vote_number='desc') }}">Trending</a>
-                    <a href="{{ url_for('show_contact') }}">Contact</a>
-                    <a href="https://prezi.com/p/efegz5dw-wft/">About us</a>-->
                     <a href="{{ url_for('show_user_list') }}">Users</a>
                     <a href="{{ url_for('show_tag_page') }}">Tags</a>
                 </div>
+
                 <span class="searchbar">
                     <form action="{{ url_for('show_search_results') }}">
                         <div>
@@ -30,6 +30,7 @@
                         </div>
                     </form>
                 </span>
+
                 {% if session.user_name %}
                 <div class="dropdown">
                     <div class="dropbtn">
@@ -37,30 +38,33 @@
                         <span class="navbar_span">
                             <span>{{ session.user_name }}</span>
                             <div class="dropdown_content">
-                                <a href="{{ url_for('show_user_page', user_id='None', user_name=session.user_name) }}">Profile</a>
+                                <a href="{{ url_for('show_user_page', user_id='profile', user_name=session.user_name) }}">Profile</a>
                                 <a href="{{ url_for('logout') }}">Logout</a>
                             </div>
                         </span>
                     </div>
                 </div>
                 
-                    {% else %}
-                        <div class="logdata">
-                            <span class="signup"><a href="{{ url_for('registration') }}">Sign Up</a></span>
-                            <span class="login"><a href="{{ url_for('login') }}">Login</a></span>
-                        </div>
-                    {% endif %}
+                {% else %}
+                    <div class="logdata">
+                        <span class="signup"><a href="{{ url_for('registration') }}">Sign Up</a></span>
+                        <span class="login"><a href="{{ url_for('login') }}">Login</a></span>
+                    </div>
 
-                
-                
+                {% endif %}
+
             </div>
         </div>
+
         {% block content %}{% endblock %}
-    <div class="rushbit_logo_container">
-        <p class="credits"> All rights reserved.</p>
-        <a href="{{ url_for('show_index') }}" >
-            <img src="/static/logos/rushbit.png" class="rushbit_logo">
-        </a>
-    </div>
+
+        <div class="rushbit_logo_container">
+            <p class="credits"> All rights reserved.</p>
+            <a href="{{ url_for('show_index') }}" >
+                <img src="/static/logos/rushbit.png" class="rushbit_logo">
+            </a>
+        </div>
+
     </body>
+
 </html>

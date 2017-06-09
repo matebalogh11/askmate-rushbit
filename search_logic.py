@@ -16,7 +16,7 @@ def get_questions_with_answers(phrase):
 
     for i in range(len(additional_questions)):
         for answer in answers:
-            if questions[i][0] == answer[3]:
+            if additional_questions[i][0] == answer[3]:
                 additional_questions[i][6].append(answer)
 
     questions.extend(additional_questions)

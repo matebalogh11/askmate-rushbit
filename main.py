@@ -61,9 +61,6 @@ def edit_question(question_id):
         flash("✘ Title and description must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_question_list'))
 
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     questions_logic.update_question(request.form, question_id)
     previous_image = questions_logic.get_image_for_update_question(question_id)
 
@@ -140,9 +137,6 @@ def show_new_answer_form(question_id):
 @account.login_required('author')
 def show_edit_question_form(question_id):
     """View function of edit question form"""
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     selected_question = questions_logic.get_question_details(question_id)
 
     return render_template("q_form.html", title="Edit Question",
@@ -152,14 +146,10 @@ def show_edit_question_form(question_id):
 @app.route("/question/<question_id>/")
 def show_question_page(question_id):
     """View function of question page, with details, answers, comments, tags."""
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     if request.args.get('view') == "counted":
         questions_logic.update_view_count(question_id)
 
     question, answers = questions_logic.get_all_for_question(question_id)
-
     q_comments, a_comments = comments_logic.retrieve_comments(question_id, answers)
 
     added_tags = tag_logic.get_added_tag_ids_and_names(question_id)
@@ -173,11 +163,7 @@ def show_question_page(question_id):
 @account.login_required('author')
 def delete_question(question_id):
     """Delete question, its answers and all comments, and all image files."""
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     questions_logic.remove_answer_images_by_q_id(question_id)
-
     question_image = questions_logic.get_question_details(question_id)[2]
     questions_logic.delete_question_with_image(question_id, question_image)
 
@@ -188,9 +174,6 @@ def delete_question(question_id):
 @account.login_required('user')
 def add_answer(question_id):
     """Add answer and redirect to its question page."""
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     if not answers_logic.valid_answer_message(request.form):
         flash("✘ Message must be filled and at least 10 characters long.", "error")
         return redirect(url_for('show_new_answer_form', question_id=question_id))
@@ -214,9 +197,6 @@ def add_answer(question_id):
 @account.login_required('author')
 def edit_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
-    if not answers_logic.valid_answer_id(answer_id):
-        return abort(404)
-
     previous_image, question_id = answers_logic.get_answer_image_and_q_id(answer_id)
 
     if request.method == "POST":
@@ -245,9 +225,6 @@ def edit_answer(answer_id):
 @account.login_required('author')
 def delete_answer(answer_id):
     """Delete answer with answer_id and redirect to its question page."""
-    if not answers_logic.valid_answer_id(answer_id):
-        return abort(404)
-
     question_id = answers_logic.remove_answer_and_get_q_id(answer_id)
     answers_logic.update_answer_counter(question_id, operation="SUB")
 
@@ -260,14 +237,10 @@ def delete_answer(answer_id):
 def delete_image(question_id=None, answer_id=None):
     """Delete image of selected question."""
     if question_id:
-        if not questions_logic.valid_question_id(question_id):
-            return abort(404)
         questions_logic.delete_q_image(question_id)
         return redirect(url_for('show_edit_question_form', question_id=question_id))
 
     elif answer_id:
-        if not answers_logic.valid_answer_id(answer_id):
-            return abort(404)
         answers_logic.delete_a_image(answer_id)
         return redirect(url_for('edit_answer', answer_id=answer_id))
 
@@ -279,22 +252,19 @@ def vote(direction, question_id=None, answer_id=None):
     """Modify number of votes of a given question or answer,
     then redirect to corresponding question_page.
     """
-    valid_directions = ("up", "down")
-    if direction in valid_directions:
-        if question_id:
-            if not questions_logic.valid_question_id(question_id):
-                return abort(404)
-            vote_logic.vote_question(direction, question_id=question_id)
+    if direction not in ("up", "down"):
+        return abort(404)
 
-            users_logic.change_reputation_q(question_id, direction)
+    if question_id:
+        vote_logic.vote_question(direction, question_id=question_id)
 
-        elif answer_id:
-            if not answers_logic.valid_answer_id(answer_id):
-                return abort(404)
-            vote_logic.vote_answer(direction, answer_id=answer_id)
-            question_id = answers_logic.get_question_id(answer_id)
+        users_logic.change_reputation_q(question_id, direction)
 
-            users_logic.change_reputation_a(answer_id, direction)
+    elif answer_id:
+        vote_logic.vote_answer(direction, answer_id=answer_id)
+        question_id = answers_logic.get_question_id(answer_id)
+
+        users_logic.change_reputation_a(answer_id, direction)
 
     return redirect(url_for('show_question_page', question_id=question_id))
 
@@ -306,13 +276,6 @@ def add_comment(question_id=None, answer_id=None):
     """Add comment. Works for question and answer as well."""
     if not question_id:
         question_id = request.args.get('q_id')
-
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
-    if answer_id:
-        if not answers_logic.valid_answer_id(answer_id):
-            return abort(404)
 
     if request.method == 'POST':
         if len(request.form.get('message', '')) >= 5:
@@ -329,10 +292,6 @@ def add_comment(question_id=None, answer_id=None):
 @account.login_required('author')
 def edit_comment(comment_id, question_id):
     """Edit comment."""
-    if (not comments_logic.valid_comment_id(comment_id) or
-            not questions_logic.valid_question_id(question_id)):
-        return abort(404)
-
     if request.method == 'POST':
         if len(request.form.get('message', '')) >= 5:
             comments_logic.edit_comment(request.form['message'], comment_id)
@@ -347,11 +306,8 @@ def edit_comment(comment_id, question_id):
 @account.login_required('author')
 def delete_comment(comment_id, question_id):
     """Delete comment from question."""
-    if (not comments_logic.valid_comment_id(comment_id) or
-            not questions_logic.valid_question_id(question_id)):
-        return abort(404)
-
     comments_logic.delete_comment(comment_id)
+
     return redirect(url_for('show_question_page', question_id=question_id))
 
 
@@ -361,9 +317,6 @@ def manage_tags(question_id):
     """GET: view function of question tag addition page.
     POST: allows choosing from existing tags and adding new ones.
     """
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
-
     if request.method == "POST":
         error_message = tag_logic.manage_new_tag_relations(request.form, question_id)
 
@@ -378,7 +331,8 @@ def manage_tags(question_id):
     added_tag_names = tuple(id_and_name[1] for id_and_name in added_tag_ids_and_names)
     not_yet_added_tags = tag_logic.get_not_yet_added_tags(tuple(added_tag_names))
 
-    return render_template("tag.html", added_tags=added_tag_ids_and_names, not_yet_added_tags=not_yet_added_tags,
+    return render_template("tag.html", added_tags=added_tag_ids_and_names,
+                           not_yet_added_tags=not_yet_added_tags,
                            question_id=question_id, title="Manage Tags")
 
 
@@ -386,8 +340,6 @@ def manage_tags(question_id):
 @account.login_required('author')
 def delete_tag(question_id, tag_id):
     """Delete tag relation and reload page the link is requested from."""
-    if not questions_logic.valid_question_id(question_id):
-        return abort(404)
     if not tag_logic.valid_tag_id(tag_id):
         return abort(404)
 
@@ -403,8 +355,7 @@ def delete_tag(question_id, tag_id):
 @account.login_required('author')
 def accept_answer(answer_id, question_id):
     """Mark answer accepted and de-select any other answers."""
-    if (not answers_logic.valid_answer_id(answer_id) or
-            not questions_logic.valid_question_id(question_id)):
+    if questions_logic.valid_question_id(question_id):
         return abort(404)
 
     answers_logic.mark_accepted_exclusively(answer_id, question_id)
@@ -417,8 +368,7 @@ def accept_answer(answer_id, question_id):
 @account.login_required('author')
 def remove_accept_mark(answer_id, question_id):
     """Remove accept mark from answer."""
-    if (not answers_logic.valid_answer_id(answer_id) or
-            not questions_logic.valid_question_id(question_id)):
+    if questions_logic.valid_question_id(question_id):
         return abort(404)
 
     answers_logic.remove_accept_mark(answer_id)
@@ -434,7 +384,6 @@ def show_user_list(criterium='role', order='asc'):
         order = request.args[key]
 
     users = users_logic.get_user_list(criterium, order)
-
     return render_template('user_list.html', users=users, title="Users")
 
 
@@ -444,6 +393,7 @@ def show_tag_page(criterium='tag_name', order='asc'):
     for key in request.args:
         criterium = key
         order = request.args[key]
+
     tags = tag_logic.get_tag_ids_names_question_count(criterium, order)
     return render_template("tag_page.html", tags=tags, title="Existing Tags")
 

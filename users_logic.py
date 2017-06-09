@@ -63,7 +63,7 @@ def get_user_list(criterium, order):
 
 
 def valid_user(user_id):
-    """Check whether the user is in the tabe and return the name."""
+    """Check whether the user is in the tabel and return the name."""
     SQL = """SELECT user_name FROM users WHERE id = %s;"""
     data = (user_id,)
     fetch = "cell"

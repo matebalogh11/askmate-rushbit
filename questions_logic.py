@@ -212,10 +212,10 @@ def delete_q_image(question_id):
     current_image = get_question_image(question_id)
     if current_image:
         remove_question_image(question_id)
-    try:
-        os.remove("static/uploads/" + current_image)
-    except FileNotFoundError:
-        pass
+        try:
+            os.remove("static/uploads/" + current_image)
+        except FileNotFoundError:
+            pass
 
 
 def get_question_image(question_id):
