@@ -355,7 +355,8 @@ def delete_tag(question_id, tag_id):
 @account.login_required('author')
 def accept_answer(answer_id, question_id):
     """Mark answer accepted and de-select any other answers."""
-    if questions_logic.valid_question_id(question_id):
+    if (not answers_logic.valid_answer_id(answer_id) or
+            not questions_logic.valid_question_id(question_id)):
         return abort(404)
 
     answers_logic.mark_accepted_exclusively(answer_id, question_id)
@@ -368,7 +369,8 @@ def accept_answer(answer_id, question_id):
 @account.login_required('author')
 def remove_accept_mark(answer_id, question_id):
     """Remove accept mark from answer."""
-    if questions_logic.valid_question_id(question_id):
+    if (not answers_logic.valid_answer_id(answer_id) or
+            not questions_logic.valid_question_id(question_id)):
         return abort(404)
 
     answers_logic.remove_accept_mark(answer_id)
