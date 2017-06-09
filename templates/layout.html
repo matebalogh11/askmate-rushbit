@@ -12,24 +12,28 @@
     <body>
         <div class="navbar">
             <div class="navbar_wrapper">
-                <a href="{{ url_for('show_index') }}">
-                    <img src="{{ url_for('static', filename='logos/askmate_logo2.png') }}">
-                </a>
-                <div class="navlinks">
-                    <a href="{{ url_for('show_index') }}">Home</a>
-                    <a href="{{ url_for('show_question_list') }}">Questions</a>
-                    <a href="{{ url_for('show_user_list') }}">Users</a>
-                    <a href="{{ url_for('show_tag_page') }}">Tags</a>
+                <div class="nav_left">
+                    <div class="logo_wrapper">
+                    <a href="{{ url_for('show_index') }}">
+                        <img src="{{ url_for('static', filename='logos/askmate_logo2.png') }}">
+                    </a>
+                    </div>
+                    <div class="navlinks">
+                        <a href="{{ url_for('show_index') }}">Home</a>
+                        <a href="{{ url_for('show_question_list') }}">Questions</a>
+                        <a href="{{ url_for('show_user_list') }}">Users</a>
+                        <a href="{{ url_for('show_tag_page') }}">Tags</a>
+                    </div>
                 </div>
-
-                <span class="searchbar">
+                <div class="nav_right">
+                <div class="searchbar">
                     <form action="{{ url_for('show_search_results') }}">
                         <div>
                             <input type="text" name="q" id="search" class="inputfield" placeholder="Search">
                             <input type="image" src="{{ url_for('static', filename='magnifier.svg')}}" name="submit" id="search-submit" class="searchbutton">
                         </div>
                     </form>
-                </span>
+                </div>
 
                 {% if session.user_name %}
                 <div class="dropdown">
@@ -52,7 +56,7 @@
                     </div>
 
                 {% endif %}
-
+                </div>
             </div>
         </div>
 
